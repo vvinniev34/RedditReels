@@ -39,7 +39,7 @@ def scrape(url):
         time.sleep(10)
         wait = WebDriverWait(driver, 10)
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, "_1poyrkZ7g36PawDueRza")))
-        
+
         print("found")
         # Get the page source (HTML content) using Selenium
         page_source = driver.page_source
@@ -50,8 +50,11 @@ def scrape(url):
         # Find all <div> elements with the specified class
         div_elements = soup.find_all("div", class_="_1poyrkZ7g36PawDueRza-J")
 
+        count = 0
         # Iterate through the div elements and filter based on your criteria
         for div_element in div_elements:
+            if count == 10:
+                break
             print("outer for loop")
             # FILTER OUT PROMOTED ADS
 
@@ -71,6 +74,7 @@ def scrape(url):
                 inner_div = nested_div.find("div", class_="y8HYJ-y_lTUHkQIc1mdCq")
                 link = inner_div.find("a", class_="SQnoC3ObvgnGjWt90zD9Z").get("href")
                 print(link)
+            count += 1
     finally:
         # Close the browser
         driver.quit()
