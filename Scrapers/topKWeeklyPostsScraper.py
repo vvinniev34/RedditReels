@@ -45,19 +45,21 @@ driver = Edge(executable_path=edge_driver_path, options=edge_options)
 def scroll_page(by_pixels):
     driver.execute_script(f"window.scrollBy(0, {by_pixels});")
 
-def scrape(url, download_path):
+def scrape(url, download_path, subreddit):
     # Create the download directory if it doesn't exist
     if not os.path.exists(download_path):
         os.makedirs(download_path)
 
     output_file = os.path.join(download_path, "links.txt")
+    with open(output_file, 'a') as file:
+        file.write(f"{subreddit}\n\n")
 
     try:
         # Send an HTTP GET request to the URL using Selenium
         driver.get(url)
         # Wait for the page to load (adjust the wait time as needed)
         scroll_page("document.body.scrollHeight")
-        time.sleep(10)
+        time.sleep(5)
         wait = WebDriverWait(driver, 10)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'a[slot="full-post-link"]')))
 
@@ -68,27 +70,28 @@ def scrape(url, download_path):
         soup = BeautifulSoup(page_source, "html.parser")
 
         # Find all <div> elements with the specified class
-        div_elements = soup.find_all("a", {"slot": "full-post-link"})
+        link_elements = soup.find_all("a", {"slot": "full-post-link"})
 
-        count = 0
         # Iterate through the div elements and filter based on your criteria
-        for div_element in div_elements:
-            if count == 15:
-                break
-            print("reddit.com" + div_element.get("href"))
+        for i in range(min(len(link_elements), 15)):
+            link_element = link_elements[i]
+            print(f"reddit.com{link_element.get('href')}")
 
             with open(output_file, 'a') as file:
-                file.write(f"reddit.com{div_element.get('href')}\n")
-
-            count += 1
+                file.write(f"reddit.com{link_element.get('href')}\n")
+        with open(output_file, 'a') as file:
+            file.write("\n")
     finally:
-        # Close the browser
-        driver.quit()
+        print("finished")
 
 if __name__ == "__main__":
-    # Define the URL of the Reddit page you want to scrape
-    url = "https://www.reddit.com/r/tifu/top/?t=week"
-    # Get today's date
-    today = date.today().strftime("%Y-%m-%d")
-    download_path = f"redditPosts/{today}"
-    scrape(url, download_path)
+    subreddits = ["tifu", "AmItheAsshole"]
+    for subreddit in subreddits:
+        # Define the URLs of the Reddit page you want to scrape
+        url = f"https://www.reddit.com/r/{subreddit}/top/?t=week"
+        # Get today's date
+        today = date.today().strftime("%Y-%m-%d")
+        download_path = f"redditPosts/{today}"
+        scrape(url, download_path, subreddit)
+    # Close the browser
+    driver.quit()
