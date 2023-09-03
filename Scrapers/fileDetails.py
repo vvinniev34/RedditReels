@@ -74,9 +74,15 @@ if __name__ == "__main__":
     most_per_5_second = 0
     least_per_5_second = float('inf')
 
+    longest = 0
+    shortest = float('inf')
+
     num_files = 0
     for files in all_files:
         for post in files:
+            shortest = min(shortest, post[1])
+            longest = max(longest, post[1])
+
             average_per_second += post[2]
             least_per_second = min(least_per_second, post[2])
             most_per_second = max(most_per_second, post[2])
@@ -91,11 +97,12 @@ if __name__ == "__main__":
 
             num_files += 1
 
+    print(f"video -- shortest : {shortest}; longest: {longest}")
     print(f"1 -- average: {average_per_second / num_files}; least: {least_per_second}; most: {most_per_second}")
     print(f"3 -- average: {average_per_3_second / num_files}; least: {least_per_3_second}; most: {most_per_3_second}")
     print(f"5 -- average: {average_per_5_second / num_files}; least: {least_per_5_second}; most: {most_per_5_second}")
 
-
+# video -- shortest : 60.29; longest: 345.0
 # 1 -- average: 14.123736865087512; least: 12.83466740270494; most: 15.492711115002407
 # 3 -- average: 42.371210595262525; least: 38.50400220811482; most: 46.47813334500722
 # 5 -- average: 70.61868432543753; least: 64.1733370135247; most: 77.46355557501204
