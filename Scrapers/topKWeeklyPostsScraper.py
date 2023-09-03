@@ -82,7 +82,7 @@ def scrape(url, download_path, subreddit):
         with open(output_file, 'a') as file:
             file.write("\n")
     finally:
-        print("finished")
+        print(f"Finished running {subreddit}")
 
 if __name__ == "__main__":
     subreddits = ["tifu", "AmItheAsshole"]
