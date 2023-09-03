@@ -35,7 +35,7 @@ def getContent(url, download_path, subreddit, number):
         post_title = driver.find_element(By.ID, titleId)
         title = post_title.text
         # filter out non alphabet characters for the text file
-        filename = subreddit + str(number)
+        filename = subreddit + str(number) + ".txt"
 
         # create a file and write the title to it
         output_file = os.path.join(download_path, filename)
