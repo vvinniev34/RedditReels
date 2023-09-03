@@ -1,5 +1,6 @@
 import os
 from gtts import gTTS
+from datetime import date
 
 speed = 1.5  # Adjust this value to change the speed (1.0 is the default)
 
@@ -19,12 +20,12 @@ def convert(filename, folder_path):
     tts.save(output_file)
 
 if __name__ == "__main__":
-    outer_folder = "RedditPosts"
-    for days_folder in os.listdir(outer_folder):
-        print(f"At {days_folder}")
-        folder_path = f"RedditPosts/{days_folder}/Texts"
-        # Iterate through all files in the folder
+    today = date.today().strftime("%Y-%m-%d")
+    folder_path = f"RedditPosts/{today}/Texts"
+    # Iterate through all files in the folder
+    for subreddit in os.listdir(folder_path):
+        subreddit_path = f"{folder_path}/{subreddit}"
         for filename in os.listdir(folder_path):
             if filename.split('.')[-1] == "txt":
-                convert(filename, folder_path)
+                convert(filename, subreddit_path)
                 print(f"Processed {filename}")

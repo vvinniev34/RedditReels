@@ -58,5 +58,5 @@ if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
     url = "https://www.reddit.com/r/tifu/comments/167v1hi/tifu_by_making_a_porn_video_without_even_knowing/"
     today = date.today().strftime("%Y-%m-%d")
-    download_path = f"redditPosts/{today}/Texts"
+    download_path = f"RedditPosts/{today}/Texts"
     getContent(url, download_path)
