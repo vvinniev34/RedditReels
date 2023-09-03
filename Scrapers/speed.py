@@ -2,7 +2,7 @@ from pydub import AudioSegment
 from datetime import date
 # or
 today = date.today().strftime("%Y-%m-%d")
-path = f"redditPosts/{today}/Texts" + "/AITAfortellingmywifethelockonm.mp3"
+path = f"RedditPosts/{today}/Texts" + "/AITAfortellingmywifethelockonm.mp3"
     
 # export to mp3
 sound = AudioSegment.from_file(path)

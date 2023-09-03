@@ -7,8 +7,8 @@ if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
     today = date.today().strftime("%Y-%m-%d")
 
-    filePath = f"redditPosts/{today}/links.txt"
-    download_path = f"redditPosts/{today}/Texts"
+    filePath = f"RedditPosts/{today}/links.txt"
+    download_path = f"RedditPosts/{today}/Texts"
     file = open(filePath, 'r')
     links = file.readlines()
     subreddit = "TIFU"

@@ -7,7 +7,8 @@ speed = 1.5  # Adjust this value to change the speed (1.0 is the default)
 def convert(filename, folder_path):
     text_file_path = os.path.join(folder_path, filename)
     # Read text from the file
-    with open(text_file_path, 'r') as file:
+    print(text_file_path)
+    with open(text_file_path, 'r', encoding='utf-8') as file:
         text = file.read()
 
     # Initialize the gTTS object and convert text to speech
@@ -25,7 +26,8 @@ if __name__ == "__main__":
     # Iterate through all files in the folder
     for subreddit in os.listdir(folder_path):
         subreddit_path = f"{folder_path}/{subreddit}"
-        for filename in os.listdir(folder_path):
+        print(f"Currently processing {subreddit}")
+        for filename in os.listdir(subreddit_path):
             if filename.split('.')[-1] == "txt":
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
