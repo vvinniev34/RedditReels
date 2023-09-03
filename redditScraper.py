@@ -1,10 +1,12 @@
+import os
 import time
-from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+from msedge.selenium_tools import Edge, EdgeOptions
+from datetime import date
 
 # Set the desired user agent string
 user_agents = [
@@ -23,24 +25,42 @@ headers = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 
+# # Set up Chrome WebDriver with the desired user agent
+# chrome_options = Options()
+# chrome_options.add_argument(f"user-agent={user_agents[1]}")
+# driver = webdriver.Chrome()
 
-# Set up Chrome WebDriver with the desired user agent
-chrome_options = Options()
-chrome_options.add_argument(f"user-agent={user_agents[1]}")
-driver = webdriver.Chrome()
+# Configure Edge WebDriver options
+edge_options = EdgeOptions()
+edge_options.use_chromium = True  # Use Chromium-based Edge
+edge_options.add_argument(f"user-agent={user_agents[1]}")  # Change the index as needed
 
+# Specify the path to the Microsoft Edge WebDriver executable
+edge_driver_path = "msedgedriver.exe"  # Replace with the actual path
 
-def scrape(url):
-    # Check if the request was successful by ensuring the page title contains "reddit"
+# Create an Edge WebDriver instance
+driver = Edge(executable_path=edge_driver_path, options=edge_options)
+
+# Function to scroll the page by a specified amount (in pixels)
+def scroll_page(by_pixels):
+    driver.execute_script(f"window.scrollBy(0, {by_pixels});")
+
+def scrape(url, download_path):
+    # Create the download directory if it doesn't exist
+    if not os.path.exists(download_path):
+        os.makedirs(download_path)
+
+    output_file = os.path.join(download_path, "links.txt")
+
     try:
         # Send an HTTP GET request to the URL using Selenium
         driver.get(url)
         # Wait for the page to load (adjust the wait time as needed)
+        scroll_page("document.body.scrollHeight")
         time.sleep(10)
         wait = WebDriverWait(driver, 10)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "_1poyrkZ7g36PawDueRza")))
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'a[slot="full-post-link"]')))
 
-        print("found")
         # Get the page source (HTML content) using Selenium
         page_source = driver.page_source
 
@@ -48,32 +68,18 @@ def scrape(url):
         soup = BeautifulSoup(page_source, "html.parser")
 
         # Find all <div> elements with the specified class
-        div_elements = soup.find_all("div", class_="_1poyrkZ7g36PawDueRza-J")
+        div_elements = soup.find_all("a", {"slot": "full-post-link"})
 
         count = 0
         # Iterate through the div elements and filter based on your criteria
         for div_element in div_elements:
-            if count == 10:
+            if count == 15:
                 break
-            print("outer for loop")
-            # FILTER OUT PROMOTED ADS
+            print("reddit.com" + div_element.get("href"))
 
-            # Find nested div elements with class "_14-YvdFiW5iVvfe5wdgmET"
-            nested_div = div_element.find("div", class_="_14-YvdFiW5iVvfe5wdgmET")
-            # Find the div with class "cZPZhMe-UCZ8htPodMyJ5"
-            inner_div = nested_div.find("div", class_="cZPZhMe-UCZ8htPodMyJ5")
-            # Find the span with class "_3AStxql1mQsrZuUIFP9xSg"
-            inner_span = inner_div.find("span", class_="_3AStxql1mQsrZuUIFP9xSg")
-            # Check if the inner span contains a span with the text "Promoted"
-            if inner_span and "Promoted" in inner_span.text:
-                continue  # Skip this div as it contains the "Promoted" span
+            with open(output_file, 'a') as file:
+                file.write(f"reddit.com{div_element.get('href')}\n")
 
-            # NORMAL POST
-            else:
-                nested_div = div_element.find("div", class_="_2FCtq-QzlfuN-SwVMUZMM3")
-                inner_div = nested_div.find("div", class_="y8HYJ-y_lTUHkQIc1mdCq")
-                link = inner_div.find("a", class_="SQnoC3ObvgnGjWt90zD9Z").get("href")
-                print(link)
             count += 1
     finally:
         # Close the browser
@@ -82,4 +88,7 @@ def scrape(url):
 if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
     url = "https://www.reddit.com/r/tifu/top/?t=week"
-    scrape(url)
+    # Get today's date
+    today = date.today().strftime("%Y-%m-%d")
+    download_path = f"redditPosts/{today}"
+    scrape(url, download_path)
