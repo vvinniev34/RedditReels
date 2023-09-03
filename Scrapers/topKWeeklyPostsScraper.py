@@ -91,7 +91,7 @@ if __name__ == "__main__":
         url = f"https://www.reddit.com/r/{subreddit}/top/?t=week"
         # Get today's date
         today = date.today().strftime("%Y-%m-%d")
-        download_path = f"redditPosts/{today}"
+        download_path = f"RedditPosts/{today}"
         scrape(url, download_path, subreddit)
     # Close the browser
     driver.quit()
