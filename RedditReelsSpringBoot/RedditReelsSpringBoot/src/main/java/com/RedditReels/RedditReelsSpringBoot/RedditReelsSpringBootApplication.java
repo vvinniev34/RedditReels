@@ -1,13 +1,13 @@
-package com.redditReels.redditReels;
+package com.RedditReels.RedditReelsSpringBoot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RedditReelsApplication {
+public class RedditReelsSpringBootApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RedditReelsApplication.class, args);
+		SpringApplication.run(RedditReelsSpringBootApplication.class, args);
 	}
 
 }

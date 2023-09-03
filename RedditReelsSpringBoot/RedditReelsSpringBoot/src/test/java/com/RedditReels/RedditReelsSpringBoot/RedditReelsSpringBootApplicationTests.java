@@ -1,10 +1,10 @@
-package com.redditReels.redditReels;
+package com.RedditReels.RedditReelsSpringBoot;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RedditReelsApplicationTests {
+class RedditReelsSpringBootApplicationTests {
 
 	@Test
 	void contextLoads() {

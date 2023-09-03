@@ -1,8 +1,20 @@
 import os
 from gtts import gTTS
 from datetime import date
+from pydub import AudioSegment
 
 speed = 1.5  # Adjust this value to change the speed (1.0 is the default)
+
+
+def speedup():
+    today = date.today().strftime("%Y-%m-%d")
+    path = f"RedditPosts/{today}/Texts" + "/AITAfortellingmywifethelockonm.mp3"
+    # export to mp3
+    sound = AudioSegment.from_file(path)
+    velocidad_X = 1.25 
+    so = sound.speedup(velocidad_X, 150, 25)
+    so.export(path[:-4] + '_Out.mp3', format = 'mp3')
+
 
 def convert(filename, folder_path):
     text_file_path = os.path.join(folder_path, filename)
