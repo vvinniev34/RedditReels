@@ -15,6 +15,11 @@ def filter_non_printable(str):
 options = webdriver.safari.options.Options()
 driver = webdriver.Safari(options=options)
 
+def getOneLine(line, output_file):
+    with open(output_file, 'a') as file:
+        file.write(line)
+        file.write("\n")
+
 def getContent(url, download_path, subreddit, number):
     if not os.path.exists(download_path):
         os.makedirs(download_path)
@@ -47,9 +52,31 @@ def getContent(url, download_path, subreddit, number):
         # write the post to the file
         p_elements = div_post.find_elements(By.TAG_NAME, "p")
         for p_element in p_elements:
-            with open(output_file, 'a') as file:
-                file.write(p_element.text)
-                file.write("\n")
+            line = p_element.text
+            chunk_size = 25
+            start = 0
+            end = chunk_size
+            while start < len(line):
+                # Find the nearest space character after the current chunk_size
+                if start + chunk_size >= len(line):
+                    end = len(line) - 1
+                else:
+                    end = start + chunk_size
+
+                while end < len(line) and not line[end].isspace() and not line[end] == '.':
+                    end -= 1
+                
+                # If no space was found, use the next space after the current chunk_size
+                if end == start:
+                    end = start + chunk_size
+                    while end < len(line) and not line[end].isspace() and not line[end] == '.':
+                        end += 1
+                
+                # Print the chunk
+                getOneLine(line[start:end].strip(), output_file)
+                
+                # Update start for the next chunk
+                start = end
         
 
     except Exception as e:
