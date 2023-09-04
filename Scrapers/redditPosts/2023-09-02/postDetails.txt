@@ -1,240 +1,240 @@
 AmItheAsshole1.txt
 
-Non-empty characters: 1710
+Non-empty characters: 1378
 Length of MP3 file: 123.26 seconds
-Average characters per second: 13.87
-Average characters per 3 seconds: 41.62
-Average characters per 5 seconds: 69.37
+Average characters per second: 11.18
+Average characters per 3 seconds: 33.54
+Average characters per 5 seconds: 55.90
 
 AmItheAsshole10.txt
 
-Non-empty characters: 1683
+Non-empty characters: 1365
 Length of MP3 file: 115.30 seconds
-Average characters per second: 14.60
-Average characters per 3 seconds: 43.79
-Average characters per 5 seconds: 72.98
+Average characters per second: 11.84
+Average characters per 3 seconds: 35.52
+Average characters per 5 seconds: 59.19
 
 AmItheAsshole11.txt
 
-Non-empty characters: 1339
+Non-empty characters: 1073
 Length of MP3 file: 93.82 seconds
-Average characters per second: 14.27
-Average characters per 3 seconds: 42.82
-Average characters per 5 seconds: 71.36
+Average characters per second: 11.44
+Average characters per 3 seconds: 34.31
+Average characters per 5 seconds: 57.18
 
 AmItheAsshole12.txt
 
-Non-empty characters: 2784
+Non-empty characters: 2252
 Length of MP3 file: 202.92 seconds
-Average characters per second: 13.72
-Average characters per 3 seconds: 41.16
-Average characters per 5 seconds: 68.60
+Average characters per second: 11.10
+Average characters per 3 seconds: 33.29
+Average characters per 5 seconds: 55.49
 
 AmItheAsshole13.txt
 
-Non-empty characters: 1999
+Non-empty characters: 1622
 Length of MP3 file: 142.56 seconds
-Average characters per second: 14.02
-Average characters per 3 seconds: 42.07
-Average characters per 5 seconds: 70.11
+Average characters per second: 11.38
+Average characters per 3 seconds: 34.13
+Average characters per 5 seconds: 56.89
 
 AmItheAsshole14.txt
 
-Non-empty characters: 1526
+Non-empty characters: 1218
 Length of MP3 file: 110.83 seconds
-Average characters per second: 13.77
-Average characters per 3 seconds: 41.31
-Average characters per 5 seconds: 68.84
+Average characters per second: 10.99
+Average characters per 3 seconds: 32.97
+Average characters per 5 seconds: 54.95
 
 AmItheAsshole15.txt
 
-Non-empty characters: 1424
+Non-empty characters: 1169
 Length of MP3 file: 97.87 seconds
-Average characters per second: 14.55
-Average characters per 3 seconds: 43.65
-Average characters per 5 seconds: 72.75
+Average characters per second: 11.94
+Average characters per 3 seconds: 35.83
+Average characters per 5 seconds: 59.72
 
 AmItheAsshole2.txt
 
-Non-empty characters: 3539
+Non-empty characters: 2870
 Length of MP3 file: 228.43 seconds
-Average characters per second: 15.49
-Average characters per 3 seconds: 46.48
-Average characters per 5 seconds: 77.46
+Average characters per second: 12.56
+Average characters per 3 seconds: 37.69
+Average characters per 5 seconds: 62.82
 
 AmItheAsshole3.txt
 
-Non-empty characters: 1865
+Non-empty characters: 1488
 Length of MP3 file: 124.20 seconds
-Average characters per second: 15.02
-Average characters per 3 seconds: 45.05
-Average characters per 5 seconds: 75.08
+Average characters per second: 11.98
+Average characters per 3 seconds: 35.94
+Average characters per 5 seconds: 59.90
 
 AmItheAsshole4.txt
 
-Non-empty characters: 968
+Non-empty characters: 780
 Length of MP3 file: 69.43 seconds
-Average characters per second: 13.94
-Average characters per 3 seconds: 41.83
-Average characters per 5 seconds: 69.71
+Average characters per second: 11.23
+Average characters per 3 seconds: 33.70
+Average characters per 5 seconds: 56.17
 
 AmItheAsshole5.txt
 
-Non-empty characters: 2968
+Non-empty characters: 2379
 Length of MP3 file: 199.94 seconds
-Average characters per second: 14.84
-Average characters per 3 seconds: 44.53
-Average characters per 5 seconds: 74.22
+Average characters per second: 11.90
+Average characters per 3 seconds: 35.70
+Average characters per 5 seconds: 59.49
 
 AmItheAsshole6.txt
 
-Non-empty characters: 1955
+Non-empty characters: 1585
 Length of MP3 file: 132.14 seconds
-Average characters per second: 14.79
-Average characters per 3 seconds: 44.38
-Average characters per 5 seconds: 73.97
+Average characters per second: 11.99
+Average characters per 3 seconds: 35.98
+Average characters per 5 seconds: 59.97
 
 AmItheAsshole7.txt
 
-Non-empty characters: 1314
+Non-empty characters: 1077
 Length of MP3 file: 94.78 seconds
-Average characters per second: 13.86
-Average characters per 3 seconds: 41.59
-Average characters per 5 seconds: 69.32
+Average characters per second: 11.36
+Average characters per 3 seconds: 34.09
+Average characters per 5 seconds: 56.82
 
 AmItheAsshole8.txt
 
-Non-empty characters: 2365
+Non-empty characters: 1932
 Length of MP3 file: 168.34 seconds
-Average characters per second: 14.05
-Average characters per 3 seconds: 42.15
-Average characters per 5 seconds: 70.24
+Average characters per second: 11.48
+Average characters per 3 seconds: 34.43
+Average characters per 5 seconds: 57.38
 
 AmItheAsshole9.txt
 
-Non-empty characters: 1525
+Non-empty characters: 1238
 Length of MP3 file: 103.80 seconds
-Average characters per second: 14.69
-Average characters per 3 seconds: 44.08
-Average characters per 5 seconds: 73.46
+Average characters per second: 11.93
+Average characters per 3 seconds: 35.78
+Average characters per 5 seconds: 59.63
 
 tifu1.txt
 
-Non-empty characters: 930
+Non-empty characters: 744
 Length of MP3 file: 72.46 seconds
-Average characters per second: 12.83
-Average characters per 3 seconds: 38.50
-Average characters per 5 seconds: 64.17
+Average characters per second: 10.27
+Average characters per 3 seconds: 30.80
+Average characters per 5 seconds: 51.34
 
 tifu10.txt
 
-Non-empty characters: 1510
+Non-empty characters: 1239
 Length of MP3 file: 112.49 seconds
-Average characters per second: 13.42
-Average characters per 3 seconds: 40.27
-Average characters per 5 seconds: 67.12
+Average characters per second: 11.01
+Average characters per 3 seconds: 33.04
+Average characters per 5 seconds: 55.07
 
 tifu11.txt
 
-Non-empty characters: 2500
+Non-empty characters: 2014
 Length of MP3 file: 178.30 seconds
-Average characters per second: 14.02
-Average characters per 3 seconds: 42.06
-Average characters per 5 seconds: 70.11
+Average characters per second: 11.30
+Average characters per 3 seconds: 33.89
+Average characters per 5 seconds: 56.48
 
 tifu12.txt
 
-Non-empty characters: 1784
+Non-empty characters: 1434
 Length of MP3 file: 133.13 seconds
-Average characters per second: 13.40
-Average characters per 3 seconds: 40.20
-Average characters per 5 seconds: 67.00
+Average characters per second: 10.77
+Average characters per 3 seconds: 32.31
+Average characters per 5 seconds: 53.86
 
 tifu13.txt
 
-Non-empty characters: 1716
+Non-empty characters: 1356
 Length of MP3 file: 118.25 seconds
-Average characters per second: 14.51
-Average characters per 3 seconds: 43.53
-Average characters per 5 seconds: 72.56
+Average characters per second: 11.47
+Average characters per 3 seconds: 34.40
+Average characters per 5 seconds: 57.34
 
 tifu14.txt
 
-Non-empty characters: 2711
+Non-empty characters: 2165
 Length of MP3 file: 189.17 seconds
-Average characters per second: 14.33
-Average characters per 3 seconds: 42.99
-Average characters per 5 seconds: 71.66
+Average characters per second: 11.44
+Average characters per 3 seconds: 34.33
+Average characters per 5 seconds: 57.22
 
 tifu15.txt
 
-Non-empty characters: 827
+Non-empty characters: 662
 Length of MP3 file: 60.29 seconds
-Average characters per second: 13.72
-Average characters per 3 seconds: 41.15
-Average characters per 5 seconds: 68.59
+Average characters per second: 10.98
+Average characters per 3 seconds: 32.94
+Average characters per 5 seconds: 54.90
 
 tifu2.txt
 
-Non-empty characters: 3698
+Non-empty characters: 2986
 Length of MP3 file: 270.14 seconds
-Average characters per second: 13.69
-Average characters per 3 seconds: 41.07
-Average characters per 5 seconds: 68.45
+Average characters per second: 11.05
+Average characters per 3 seconds: 33.16
+Average characters per 5 seconds: 55.27
 
 tifu3.txt
 
-Non-empty characters: 1193
+Non-empty characters: 990
 Length of MP3 file: 84.12 seconds
-Average characters per second: 14.18
-Average characters per 3 seconds: 42.55
-Average characters per 5 seconds: 70.91
+Average characters per second: 11.77
+Average characters per 3 seconds: 35.31
+Average characters per 5 seconds: 58.84
 
 tifu4.txt
 
-Non-empty characters: 3903
+Non-empty characters: 3156
 Length of MP3 file: 274.85 seconds
-Average characters per second: 14.20
-Average characters per 3 seconds: 42.60
-Average characters per 5 seconds: 71.00
+Average characters per second: 11.48
+Average characters per 3 seconds: 34.45
+Average characters per 5 seconds: 57.41
 
 tifu5.txt
 
-Non-empty characters: 1152
+Non-empty characters: 934
 Length of MP3 file: 85.82 seconds
-Average characters per second: 13.42
-Average characters per 3 seconds: 40.27
-Average characters per 5 seconds: 67.12
+Average characters per second: 10.88
+Average characters per 3 seconds: 32.65
+Average characters per 5 seconds: 54.42
 
 tifu6.txt
 
-Non-empty characters: 4792
+Non-empty characters: 3836
 Length of MP3 file: 345.00 seconds
-Average characters per second: 13.89
-Average characters per 3 seconds: 41.67
-Average characters per 5 seconds: 69.45
+Average characters per second: 11.12
+Average characters per 3 seconds: 33.36
+Average characters per 5 seconds: 55.59
 
 tifu7.txt
 
-Non-empty characters: 1547
+Non-empty characters: 1273
 Length of MP3 file: 110.74 seconds
-Average characters per second: 13.97
-Average characters per 3 seconds: 41.91
-Average characters per 5 seconds: 69.85
+Average characters per second: 11.50
+Average characters per 3 seconds: 34.49
+Average characters per 5 seconds: 57.48
 
 tifu8.txt
 
-Non-empty characters: 1980
+Non-empty characters: 1596
 Length of MP3 file: 136.75 seconds
-Average characters per second: 14.48
-Average characters per 3 seconds: 43.44
-Average characters per 5 seconds: 72.39
+Average characters per second: 11.67
+Average characters per 3 seconds: 35.01
+Average characters per 5 seconds: 58.35
 
 tifu9.txt
 
-Non-empty characters: 1867
+Non-empty characters: 1521
 Length of MP3 file: 132.02 seconds
-Average characters per second: 14.14
-Average characters per 3 seconds: 42.43
-Average characters per 5 seconds: 70.71
+Average characters per second: 11.52
+Average characters per 3 seconds: 34.56
+Average characters per 5 seconds: 57.60
 

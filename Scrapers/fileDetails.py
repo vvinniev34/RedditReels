@@ -33,10 +33,11 @@ def count_non_empty_characters_in_directory(directory_path, output_file):
                     # Remove leading and trailing whitespace from the line
                     line = line.strip()
 
-                    # Check if the line is not empty
+                    # Remove spaces from the line and count non-empty characters
+                    line = line.replace(" ", "")  # This removes spaces
                     if line:
-                        # Count the non-empty characters in the line
                         non_empty_char_count += len(line)
+
 
                 mp3_file_path = f"{directory_path}/{filename.split('.')[0]}.mp3"
                 length_seconds = get_mp3_length(mp3_file_path)
@@ -106,3 +107,8 @@ if __name__ == "__main__":
 # 1 -- average: 14.123736865087512; least: 12.83466740270494; most: 15.492711115002407
 # 3 -- average: 42.371210595262525; least: 38.50400220811482; most: 46.47813334500722
 # 5 -- average: 70.61868432543753; least: 64.1733370135247; most: 77.46355557501204
+
+# video -- shortest : 60.29; longest: 345.0
+# 1 -- average: 11.417994679938143; least: 10.267733922163952; most: 12.564023989843715
+# 3 -- average: 34.25398403981442; least: 30.803201766491853; most: 37.69207196953115
+# 5 -- average: 57.089973399690706; least: 51.33866961081976; most: 62.82011994921858
