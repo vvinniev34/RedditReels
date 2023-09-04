@@ -86,44 +86,60 @@ def textOverlay(video_path, text_input, characters_per_second, output_video_path
 if __name__ == "__main__":
     background_video_path = "SubwaySurfers/subwaySurfers.mp4"
 
-    # folder_path = "RedditPosts/2023-09-02/Texts"
-    # for subreddit in os.listdir(folder_path):
-    #     post_path = f"{folder_path}/{subreddit}"
-    #     for post in os.listdir(post_path):
-    #         if post.endswith(".mp3"):
-    #             mp3_file_path = f"{post_path}/{post}"
-    #             output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
-    #             duration = get_mp3_length(mp3_file_path)
-    #             randomVideoSegment(background_video_path, mp3_file_path, output_video_path, duration)
+    folder_path = "RedditPosts/2023-09-02/Texts"
+    for subreddit in os.listdir(folder_path):
+        post_path = f"{folder_path}/{subreddit}"
+        for post in os.listdir(post_path):
+            if post.endswith(".mp3"):
+                mp3_file_path = f"{post_path}/{post}"
+                output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
+                duration = get_mp3_length(mp3_file_path)
+                randomVideoSegment(background_video_path, mp3_file_path, output_video_path, duration)
     
 
-    # for subreddit in os.listdir(folder_path):
-    #     post_path = f"{folder_path}/{subreddit}"
-    #     for post in os.listdir(post_path):
-    #         if post.endswith(".mp4"):
-    #             mp4_file_path = f"{post_path}/{post}"
-    #             mp4_output_path = f"{post_path}/{post.split('.')[0]}F.mp4"
-    #             textOverlay(mp4_file_path, text_input, characters_per_second, mp4_output_path)
+    for subreddit in os.listdir(folder_path):
+        post_path = f"{folder_path}/{subreddit}"
+        for post in os.listdir(post_path):
+            if post.endswith(".mp4"):
+                mp4_file_path = f"{post_path}/{post}"
+                mp4_output_path = f"{post_path}/{post.split('.')[0]}F.mp4"
+                text_input = []
+                non_empty_char_count = 0
+                text_file_path = f"{post_path}/{post.split('.')}.txt"
+                # Open the file for reading
+                with open(text_file_path, 'r', encoding='utf-8') as file:
+                    # Read each line and add it to the list
+                    for line in file:
+                        # Remove leading and trailing whitespace from the line
+                        line = line.strip()
+                        text_input.append(line)
 
-    mp4_file_path = "AmItheAsshole1.mp4"
-    mp4_output_path = "AmItheAsshole1F.mp4"
-    mp3_file_path = "AmItheAsshole1.mp3"
-    text_file_path = "AmItheAsshole1.txt"
-    text_input = []
-    non_empty_char_count = 0
-    # Open the file for reading
-    with open(text_file_path, 'r', encoding='utf-8') as file:
-        # Read each line and add it to the list
-        for line in file:
-            # Remove leading and trailing whitespace from the line
-            line = line.strip()
-            text_input.append(line)
+                        # Remove spaces from the line and count non-empty characters
+                        line = line.replace(" ", "")  # This removes spaces
+                        if line:
+                            non_empty_char_count += len(line)
+                    characters_per_second = non_empty_char_count / get_mp3_length(mp3_file_path)
+                textOverlay(mp4_file_path, text_input, characters_per_second, mp4_output_path)
 
-            # Remove spaces from the line and count non-empty characters
-            line = line.replace(" ", "")  # This removes spaces
-            if line:
-                non_empty_char_count += len(line)
+    # mp4_file_path = "AmItheAsshole1.mp4"
+    # mp4_output_path = "AmItheAsshole1F.mp4"
+    # mp3_file_path = "AmItheAsshole1.mp3"
+    # text_file_path = "AmItheAsshole1.txt"
+    
+    # non_empty_char_count = 0
+    # # Open the file for reading
+    # with open(text_file_path, 'r', encoding='utf-8') as file:
+    #     # Read each line and add it to the list
+    #     for line in file:
+    #         # Remove leading and trailing whitespace from the line
+    #         line = line.strip()
+    #         text_input.append(line)
 
-    characters_per_second = non_empty_char_count / get_mp3_length(mp3_file_path)
+    #         # Remove spaces from the line and count non-empty characters
+    #         line = line.replace(" ", "")  # This removes spaces
+    #         if line:
+    #             non_empty_char_count += len(line)
 
-    textOverlay(mp4_file_path, text_input, characters_per_second, mp4_output_path)
+    # characters_per_second = non_empty_char_count / get_mp3_length(mp3_file_path)
+
+    # textOverlay(mp4_file_path, text_input, characters_per_second, mp4_output_path)
