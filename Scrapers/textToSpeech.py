@@ -75,7 +75,7 @@ def convert(filename, folder_path):
                 print(f"Line duration: {duration / 1000} seconds")
         
         # Specify the output file (e.g., an MP3 file)
-        output_file = os.path.join(folder_path, f"{filename.split('.')[0]}_concatenated.mp3")
+        output_file = os.path.join(folder_path, f"{filename.split('.')[0]}.mp3")
         
         # Save the concatenated speech to the output file
         combined_audio.export(output_file, format="mp3")
