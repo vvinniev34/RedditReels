@@ -6,6 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from datetime import date
 import os
 import unicodedata
+import nltk
+nltk.download('punkt')  # Download the Punkt tokenizer data (only needs to be done once)
+from nltk.tokenize import sent_tokenize
 
 printable = {'Lu', 'Ll'}
 def filter_non_printable(str):
@@ -52,31 +55,13 @@ def getContent(url, download_path, subreddit, number):
         # write the post to the file
         p_elements = div_post.find_elements(By.TAG_NAME, "p")
         for p_element in p_elements:
-            line = p_element.text
-            chunk_size = 25
-            start = 0
-            end = chunk_size
-            while start < len(line):
-                # Find the nearest space character after the current chunk_size
-                if start + chunk_size >= len(line):
-                    end = len(line) - 1
-                else:
-                    end = start + chunk_size
+            # Tokenize the input text into sentences
+            sentences = sent_tokenize(p_element.text)
 
-                while end < len(line) and not line[end].isspace() and not line[end] == '.':
-                    end -= 1
-                
-                # If no space was found, use the next space after the current chunk_size
-                if end == start:
-                    end = start + chunk_size
-                    while end < len(line) and not line[end].isspace() and not line[end] == '.':
-                        end += 1
-                
-                # Print the chunk
-                getOneLine(line[start:end].strip(), output_file)
-                
-                # Update start for the next chunk
-                start = end
+            # Print the separated sentences
+            for sentence in sentences:
+                getOneLine(sentence, output_file)
+
         
 
     except Exception as e:
