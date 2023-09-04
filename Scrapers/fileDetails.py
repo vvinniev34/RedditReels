@@ -27,12 +27,10 @@ def count_non_empty_characters_in_directory(directory_path, output_file):
             with open(file_path, 'r', encoding='utf-8') as file:
                 # Initialize a counter for non-empty characters in the file
                 non_empty_char_count = 0
-
                 # Iterate through each line in the file
                 for line in file:
                     # Remove leading and trailing whitespace from the line
                     line = line.strip()
-
                     # Remove spaces from the line and count non-empty characters
                     line = line.replace(" ", "")  # This removes spaces
                     if line:
