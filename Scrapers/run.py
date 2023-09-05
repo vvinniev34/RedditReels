@@ -5,3 +5,4 @@ if __name__ == "main":
     subprocess.run(["python", "topKWeeklyPostsScraper.py"])
     subprocess.run(["python", "scrapeLinks.py"])
     subprocess.run(["python", "textToSpeech.py"])
+    subprocess.run(["python", "videoMaker.py"])
