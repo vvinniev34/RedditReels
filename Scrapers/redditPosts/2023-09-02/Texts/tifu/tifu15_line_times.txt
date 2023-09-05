@@ -1,0 +1,12 @@
+Line 3 duration (seconds): 3.672
+Line 6 duration (seconds): 4.896
+Line 7 duration (seconds): 1.44
+Line 9 duration (seconds): 4.44
+Line 10 duration (seconds): 8.952
+Line 11 duration (seconds): 6.264
+Line 12 duration (seconds): 3.936
+Line 14 duration (seconds): 8.472
+Line 15 duration (seconds): 4.704
+Line 16 duration (seconds): 2.448
+Line 18 duration (seconds): 5.928
+Line 20 duration (seconds): 5.52

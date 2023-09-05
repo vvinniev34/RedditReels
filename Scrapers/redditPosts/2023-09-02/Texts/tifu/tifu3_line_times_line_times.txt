@@ -1,0 +1,13 @@
+Line 1 duration (seconds): 4.032
+Line 2 duration (seconds): 4.92
+Line 3 duration (seconds): 4.608
+Line 4 duration (seconds): 4.464
+Line 5 duration (seconds): 4.608
+Line 6 duration (seconds): 4.464
+Line 7 duration (seconds): 4.776
+Line 8 duration (seconds): 4.08
+Line 9 duration (seconds): 4.632
+Line 10 duration (seconds): 4.92
+Line 11 duration (seconds): 4.824
+Line 12 duration (seconds): 4.848
+Line 13 duration (seconds): 4.296

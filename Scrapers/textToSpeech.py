@@ -98,6 +98,6 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
-            if filename.split('.')[-1] == "txt":
+            if filename.split('.')[-1] == "txt" and not filename.endswith("_line_times.txt"):
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
