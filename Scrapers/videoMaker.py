@@ -6,7 +6,22 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 from moviepy.editor import VideoClip, TextClip, VideoFileClip, AudioFileClip, clips_array, concatenate_videoclips
 from fileDetails import get_mp3_length
 
-# modify to return array of string lines instead of one string
+# def splitTextForWrap(input_str: str, line_length: int):
+#     words = input_str.split(" ")
+#     line_count = 0
+#     wrapped_lines = []
+#     cur_line = ""
+#     for word in words:
+#         line_count += (len(word) + 1)
+#         if line_count > line_length:
+#             wrapped_lines.append(cur_line[:-1])
+#             line_count = 0
+#         else:
+#             cur_line += word
+#             cur_line += " "
+    
+#     return wrapped_lines
+
 def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
     line_count = 0
@@ -70,8 +85,9 @@ def textOverlay(video_path, text_input, output_video_path):
     for i, text in enumerate(text_input):
         # print(f"{duration_i}, {text}")
         # Remove leading and trailing whitespace and normal spaces from the line
-        text = text.strip()
+        text = text.strip().replace(", ", " ")
         noWhitespaceText = text.replace(" ", "")
+        
         if not noWhitespaceText:
             continue
 
@@ -79,11 +95,31 @@ def textOverlay(video_path, text_input, output_video_path):
         print(start_time, " ", (start_time + durations[duration_i]), " ", durations[duration_i])
 
         print(f"{duration_i},\n{wrappedText}")
+        # cmd = [
+        #     ffmpeg_exe_path,
+        #     "-i", video_path, 
+        #     "-vf"
+        # ]
+        # i = 0
+        # drawtest_cmd = ""
+        # for text in wrappedText:
+        #     drawtest_cmd += f"drawtext=text='{text}':x=(w-text_w)/2:y=(h-text_h)/3+{i * 5}:fontsize=55:fontcolor=white:fontfile=C\\:/Windows/fonts/arial.ttf:bordercolor=black:borderw=5,"
+        #     i += 1
+        # cmd.extend([
+        #     drawtest_cmd[:-1],
+        #     "-c:a", "copy",
+        #     "-ss", str(start_time),     
+        #     "-t", str(durations[duration_i]),
+        #     "-y",
+        #     f"segment_{duration_i}.mp4"  # Output path for this segment
+        # ])
+        # Join the text elements into a single string without newlines
+
         cmd = [
             ffmpeg_exe_path,
             "-nostdin",  # Disable interaction with standard input
             "-i", video_path,
-            "-vf", f"drawtext=text='{wrappedText}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=55:fontcolor=white:fontfile=C\\:/Windows/fonts/arial.ttf:bordercolor=black:borderw=5:",
+            "-vf", f"drawtext=text='{wrappedText}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=55:fontcolor=white:fontfile=C\\:/Windows/fonts/arial.ttf:bordercolor=black:borderw=5",
             "-c:a", "copy",
             "-ss", str(start_time),     
             "-t", str(durations[duration_i]),
@@ -137,14 +173,14 @@ if __name__ == "__main__":
 
     today = "test" # "2023-09-02"
     folder_path = f"RedditPosts/{today}/Texts"
-    for subreddit in os.listdir(folder_path):
-        post_path = f"{folder_path}/{subreddit}"
-        for post in os.listdir(post_path):
-            if post.endswith(".mp3"):
-                mp3_file_path = f"{post_path}/{post}"
-                output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
-                duration = get_mp3_length(mp3_file_path)
-                randomVideoSegment(background_video_path, mp3_file_path, output_video_path, duration)
+    # for subreddit in os.listdir(folder_path):
+    #     post_path = f"{folder_path}/{subreddit}"
+    #     for post in os.listdir(post_path):
+    #         if post.endswith(".mp3"):
+    #             mp3_file_path = f"{post_path}/{post}"
+    #             output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
+    #             duration = get_mp3_length(mp3_file_path)
+    #             randomVideoSegment(background_video_path, mp3_file_path, output_video_path, duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
@@ -165,3 +201,4 @@ if __name__ == "__main__":
                             text_input.append(line)
                             
                 textOverlay(mp4_file_path, text_input, mp4_output_path)
+
