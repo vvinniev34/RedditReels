@@ -8,7 +8,30 @@ import os
 import unicodedata
 import nltk
 nltk.download('punkt')  # Download the Punkt tokenizer data (only needs to be done once)
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+def split_line(line, max_length):
+    words = line.split()
+    line_parts = []
+    current_part = []
+
+    # Calculate the desired number of parts based on the total length
+    num_parts = len(line) // max_length + 1
+
+    # Calculate the target length for each part
+    target_length = len(line) // num_parts
+
+    for word in words:
+        if len(' '.join(current_part + [word])) <= target_length:
+            current_part.append(word)
+        else:
+            line_parts.append(' '.join(current_part))
+            current_part = [word]
+
+    if current_part:
+        line_parts.append(' '.join(current_part))
+
+    return line_parts
 
 printable = {'Lu', 'Ll'}
 def filter_non_printable(str):
@@ -48,7 +71,7 @@ def getContent(url, download_path, subreddit, number):
 
         # create a file and write the title to it
         output_file = os.path.join(download_path, filename)
-        with open(output_file, 'a') as file:
+        with open(output_file, 'w') as file:
             file.write(title)
             file.write("\n")
         
@@ -58,9 +81,31 @@ def getContent(url, download_path, subreddit, number):
             # Tokenize the input text into sentences
             sentences = sent_tokenize(p_element.text)
 
-            # Print the separated sentences
+            # Initialize an empty list to store split sentences
+            split_sentences = []
+
+            # Define the maximum character limit for a sentence part
+            max_length = 35
+
+            # Split each sentence evenly into two parts if needed
             for sentence in sentences:
-                getOneLine(sentence, output_file)
+                # Tokenize the sentence into words
+                sentence = sentence.strip()
+                if sentence:
+                    sentence_parts = split_line(sentence, max_length)
+                    split_sentences.extend(sentence_parts)
+                
+            for sentence_part in split_sentences:
+                getOneLine(sentence_part, output_file)
+
+
+            # Print the split sentences
+            # for sentence_part in split_sentences:
+                        # sentences = sent_tokenize(p_element.text)
+
+                        # # Print the separated sentences
+                        # for sentence in sentences:
+                        #     getOneLine(sentence, output_file)
 
         
 
@@ -89,4 +134,3 @@ if __name__ == "__main__":
             else:
                 subreddit = link.strip()
                 count = 1
-
