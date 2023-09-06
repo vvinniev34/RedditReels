@@ -6,6 +6,7 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 from moviepy.editor import VideoClip, TextClip, VideoFileClip, AudioFileClip, clips_array, concatenate_videoclips
 from fileDetails import get_mp3_length
 
+# modify to return array of string lines instead of one string
 def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
     line_count = 0
@@ -90,8 +91,13 @@ def textOverlay(video_path, text_input, output_video_path):
             f"segment_{duration_i}.mp4"  # Output path for this segment
         ]
 
-        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        print("Command finished")
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if result.returncode == 0:
+            print("Command ran successfully")
+        else:
+            print("Command encountered an error")
+            print(result.stdout)  # Print the standard output for debugging
+            print(result.stderr)  # Print the standard error for debugging
         
         # Append the path of the generated segment to the list
         video_segments.append(f"segment_{duration_i}.mp4")
@@ -99,7 +105,6 @@ def textOverlay(video_path, text_input, output_video_path):
         # Update start time for the next segment
         start_time += durations[duration_i]
         duration_i += 1
-        
 
     # Load the video clips, List to store video clips
     video_clips = []
@@ -130,7 +135,7 @@ def textOverlay(video_path, text_input, output_video_path):
 if __name__ == "__main__":
     background_video_path = "SubwaySurfers/subwaySurfers.mp4"
 
-    today = "Test"
+    today = "test" # "2023-09-02"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"

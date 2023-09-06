@@ -4,7 +4,7 @@ from gtts import gTTS
 from datetime import date
 from pydub import utils, AudioSegment
 from pydub.effects import speedup
-
+import pyttsx3
 
 speed = 1.5  # Adjust this value to change the speed (1.0 is the default)
 # Get the current working directory of the script
@@ -32,6 +32,13 @@ def convert(filename, folder_path):
         # Create a file to write line durations
         line_times_file = open(f"{folder_path}/{filename.split('.')[0]}_line_times.txt", 'w', encoding='utf-8')
 
+        # Initialize pyttsx3
+        engine = pyttsx3.init("sapi5")
+        voices = engine.getProperty("voices")[0] 
+        rate = engine.getProperty('rate')
+        engine.setProperty('rate', rate-25)
+        engine.setProperty('voice', voices)
+
         with open(text_file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
@@ -41,12 +48,13 @@ def convert(filename, folder_path):
                 if not line:
                     continue
 
-                # Initialize the gTTS object and convert text to speech
-                tts = gTTS(text=line, slow=False)
-
                 # Save the speech to a temporary file (using line number)
                 temp_output_file = os.path.join(folder_path, f"temp_{line_number}.mp3")
-                tts.save(temp_output_file)
+                
+                # Convert text to speech using pyttsx3
+                engine.save_to_file(line, temp_output_file)  # Save the speech to a temporary file
+                # Wait until above command is not finished.
+                engine.runAndWait()
 
                 # Add this line before the while loop inside the for loop
                 print(f"Checking for file existence: {temp_output_file}")
@@ -55,8 +63,9 @@ def convert(filename, folder_path):
                     time.sleep(1)  # Sleep for 1 second
 
                 # Read the temporary file as an AudioSegment
-                print(temp_output_file)
+                AudioSegment.from_file(temp_output_file).export(temp_output_file, format="mp3") # audio file in mp3 format 
                 audio_segment = AudioSegment.from_mp3(temp_output_file)
+                audio_segment = audio_segment[:-700] # cut off last 0.18 seconds
 
                 # Measure the duration of the generated speech
                 duration = len(audio_segment)
@@ -88,7 +97,7 @@ def convert(filename, folder_path):
 
 if __name__ == "__main__":
     # today = date.today().strftime("%Y-%m-%d")
-    today = "Test"
+    today = "2023-09-02"
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder
     for subreddit in os.listdir(folder_path):
@@ -97,6 +106,6 @@ if __name__ == "__main__":
         for filename in os.listdir(subreddit_path):
             if filename.split('.')[-1] == "txt" and not filename.endswith("_line_times.txt"):
                 convert(filename, subreddit_path)
-                speedup_audio(filename, subreddit_path)
+                # speedup_audio(filename, subreddit_path)
                 print(f"Processed {filename}")
                 
