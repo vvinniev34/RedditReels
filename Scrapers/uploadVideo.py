@@ -85,7 +85,7 @@ def get_authenticated_service(args):
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
         http=credentials.authorize(httplib2.Http()))
 
-    def initialize_upload(youtube, options):
+def initialize_upload(youtube, options):
     tags = None
     if options.keywords:
         tags = options.keywords.split(",")
