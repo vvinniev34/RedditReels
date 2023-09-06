@@ -41,7 +41,7 @@ def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_
     random_segment = random_segment.set_audio(audio_clip)
 
     # Write the final video to the output file
-    random_segment.write_videofile(output_video_filepath, codec="libx264")
+    random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8)
 
 
 def textOverlay(video_path, text_input, output_video_path):
@@ -67,7 +67,7 @@ def textOverlay(video_path, text_input, output_video_path):
     duration_i = 0
     # Loop through the text_array and overlay text every 5 seconds
     for i, text in enumerate(text_input):
-        print(text)
+        # print(f"{duration_i}, {text}")
         # Remove leading and trailing whitespace and normal spaces from the line
         text = text.strip()
         noWhitespaceText = text.replace(" ", "")
@@ -75,6 +75,9 @@ def textOverlay(video_path, text_input, output_video_path):
             continue
 
         wrappedText = splitTextForWrap(text, 30)
+        print(start_time, " ", (start_time + durations[duration_i]), " ", durations[duration_i])
+
+        print(f"{duration_i},\n{wrappedText}")
         cmd = [
             ffmpeg_exe_path,
             "-nostdin",  # Disable interaction with standard input
@@ -87,8 +90,8 @@ def textOverlay(video_path, text_input, output_video_path):
             f"segment_{duration_i}.mp4"  # Output path for this segment
         ]
 
-        print(start_time, " ", (start_time + durations[duration_i]), " ", durations[duration_i])
         subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        print("Command finished")
         
         # Append the path of the generated segment to the list
         video_segments.append(f"segment_{duration_i}.mp4")
@@ -96,9 +99,9 @@ def textOverlay(video_path, text_input, output_video_path):
         # Update start time for the next segment
         start_time += durations[duration_i]
         duration_i += 1
+        
 
-    # Load the video clips
-    # List to store video clips
+    # Load the video clips, List to store video clips
     video_clips = []
     # Iterate through the list of segment paths
     for path in video_segments:
@@ -109,7 +112,7 @@ def textOverlay(video_path, text_input, output_video_path):
             # Handle non-existent files (you can print a message or take other actions)
             print(f"File not found: {path}")
     # Concatenate the video clips sequentially; maybe change compose to chain
-    final_video = concatenate_videoclips(video_clips, method="compose")
+    final_video = concatenate_videoclips(video_clips, method="chain")
     # Write the concatenated video to a file
     final_video.write_videofile(output_video_path, codec="libx264", threads=8)
     # Close the video clips
@@ -127,17 +130,17 @@ def textOverlay(video_path, text_input, output_video_path):
 if __name__ == "__main__":
     background_video_path = "SubwaySurfers/subwaySurfers.mp4"
 
-    folder_path = "RedditPosts/2023-09-02/Texts"
-    # for subreddit in os.listdir(folder_path):
-    #     post_path = f"{folder_path}/{subreddit}"
-    #     for post in os.listdir(post_path):
-    #         if post.endswith(".mp3"):
-    #             mp3_file_path = f"{post_path}/{post}"
-    #             output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
-    #             duration = get_mp3_length(mp3_file_path)
-    #             randomVideoSegment(background_video_path, mp3_file_path, output_video_path, duration)
+    today = "Test"
+    folder_path = f"RedditPosts/{today}/Texts"
+    for subreddit in os.listdir(folder_path):
+        post_path = f"{folder_path}/{subreddit}"
+        for post in os.listdir(post_path):
+            if post.endswith(".mp3"):
+                mp3_file_path = f"{post_path}/{post}"
+                output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
+                duration = get_mp3_length(mp3_file_path)
+                randomVideoSegment(background_video_path, mp3_file_path, output_video_path, duration)
     
-
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
@@ -145,7 +148,6 @@ if __name__ == "__main__":
                 mp4_file_path = f"{post_path}/{post}"
                 mp4_output_path = f"{post_path}/{post.split('.')[0]}F.mp4"
                 text_input = []
-                non_empty_char_count = 0
                 text_file_path = f"{post_path}/{post.split('.')[0]}.txt"
                 # Open the file for reading
                 with open(text_file_path, 'r', encoding='utf-8') as file:
@@ -155,8 +157,6 @@ if __name__ == "__main__":
                         line = line.strip()
                         removed_spaces_line = line.replace(" ", "")  # This removes spaces
                         if removed_spaces_line:
-                            non_empty_char_count += len(removed_spaces_line)
                             text_input.append(line)
                             
                 textOverlay(mp4_file_path, text_input, mp4_output_path)
-

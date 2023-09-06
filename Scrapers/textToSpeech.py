@@ -3,6 +3,7 @@ import time
 from gtts import gTTS
 from datetime import date
 from pydub import utils, AudioSegment
+from pydub.effects import speedup
 
 
 speed = 1.5  # Adjust this value to change the speed (1.0 is the default)
@@ -15,15 +16,11 @@ def get_prob_path():
     return os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffprobe.exe")
 utils.get_prober_name = get_prob_path
 
-def speedup():
-    today = date.today().strftime("%Y-%m-%d")
-    path = f"RedditPosts/{today}/Texts" + "/AITAfortellingmywifethelockonm.mp3"
-    # export to mp3
-    sound = AudioSegment.from_file(path)
-    velocidad_X = 1.25 
-    so = sound.speedup(velocidad_X, 150, 25)
-    so.export(path[:-4] + '_Out.mp3', format = 'mp3')
-
+def speedup_audio(filename, subreddit_path):
+    path = os.path.join(subreddit_path, f"{filename.split('.')[0]}.mp3")
+    audio = AudioSegment.from_mp3(path)
+    spedup_audio = speedup(audio, 1.3, 130) # speed up by 2x
+    spedup_audio.export(path, format="mp3") # export to mp3
 
 def convert(filename, folder_path):
     text_file_path = os.path.join(folder_path, filename)
@@ -45,7 +42,7 @@ def convert(filename, folder_path):
                     continue
 
                 # Initialize the gTTS object and convert text to speech
-                tts = gTTS(line)
+                tts = gTTS(text=line, slow=False)
 
                 # Save the speech to a temporary file (using line number)
                 temp_output_file = os.path.join(folder_path, f"temp_{line_number}.mp3")
@@ -71,8 +68,8 @@ def convert(filename, folder_path):
                 os.remove(temp_output_file)
 
                 # Write the line duration to the line_times_file and print for debugging
-                line_times_file.write(f"Line {line_number} duration (seconds): {duration / 1000}\n")
-                print(f"Line duration: {duration / 1000} seconds")
+                line_times_file.write(f"Line {line_number} duration (seconds): {duration / 1000 / 1.3}\n")
+                print(f"Line duration: {duration / 1000 / 1.3} seconds")
         
         # Specify the output file (e.g., an MP3 file)
         output_file = os.path.join(folder_path, f"{filename.split('.')[0]}.mp3")
@@ -91,7 +88,7 @@ def convert(filename, folder_path):
 
 if __name__ == "__main__":
     # today = date.today().strftime("%Y-%m-%d")
-    today = "2023-09-02"
+    today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder
     for subreddit in os.listdir(folder_path):
@@ -100,4 +97,6 @@ if __name__ == "__main__":
         for filename in os.listdir(subreddit_path):
             if filename.split('.')[-1] == "txt" and not filename.endswith("_line_times.txt"):
                 convert(filename, subreddit_path)
+                speedup_audio(filename, subreddit_path)
                 print(f"Processed {filename}")
+                
