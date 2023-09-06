@@ -4,38 +4,27 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import date
+import time
 import os
-import unicodedata
 import nltk
 nltk.download('punkt')  # Download the Punkt tokenizer data (only needs to be done once)
 from nltk.tokenize import sent_tokenize, word_tokenize
 
-def split_line(line, max_length):
-    words = line.split()
-    line_parts = []
-    current_part = []
+conjunctions = {", and", ", but", ", or", ", so", ", yet", ", nor"}
+def split_sentences_at_conjunctions(sentence):
+    split_sentences = []
+    
+    for conjunction in conjunctions:
+        if conjunction in sentence:
+            parts = sentence.split(conjunction, 1)  # Split at the first occurrence
+            if len(parts) == 2:
+                split_sentences.extend([parts[0].strip(), conjunction[2 : len(conjunction)] + " " + parts[1].strip() + "."])
+            break
+    if split_sentences == []:
+        split_sentences.append(sentence)
+    
+    return split_sentences
 
-    # Calculate the desired number of parts based on the total length
-    num_parts = len(line) // max_length + 1
-
-    # Calculate the target length for each part
-    target_length = len(line) // num_parts
-
-    for word in words:
-        if len(' '.join(current_part + [word])) <= target_length:
-            current_part.append(word)
-        else:
-            line_parts.append(' '.join(current_part))
-            current_part = [word]
-
-    if current_part:
-        line_parts.append(' '.join(current_part))
-
-    return line_parts
-
-printable = {'Lu', 'Ll'}
-def filter_non_printable(str):
-  return ''.join(c for c in str if unicodedata.category(c) in printable)
 
 
 options = webdriver.safari.options.Options()
@@ -53,7 +42,7 @@ def getContent(url, download_path, subreddit, number):
     # Check if the request was successful by ensuring the page title contains "reddit"
     try:
         driver.get(url)
-
+        time.sleep(2)
         # get the post ID from the share button
         idString = driver.find_element(By.TAG_NAME, "embed-snippet-share-button")
         postId = idString.get_attribute("postid")
@@ -81,32 +70,10 @@ def getContent(url, download_path, subreddit, number):
             # Tokenize the input text into sentences
             sentences = sent_tokenize(p_element.text)
 
-            # Initialize an empty list to store split sentences
-            split_sentences = []
-
-            # Define the maximum character limit for a sentence part
-            max_length = 35
-
-            # Split each sentence evenly into two parts if needed
             for sentence in sentences:
-                # Tokenize the sentence into words
-                sentence = sentence.strip()
-                if sentence:
-                    sentence_parts = split_line(sentence, max_length)
-                    split_sentences.extend(sentence_parts)
-                
-            for sentence_part in split_sentences:
-                getOneLine(sentence_part, output_file)
-
-
-            # Print the split sentences
-            # for sentence_part in split_sentences:
-                        # sentences = sent_tokenize(p_element.text)
-
-                        # # Print the separated sentences
-                        # for sentence in sentences:
-                        #     getOneLine(sentence, output_file)
-
+                split_up = split_sentences_at_conjunctions(sentence)
+                for sentence_part in split_up:
+                    getOneLine(sentence_part, output_file)
         
 
     except Exception as e:
