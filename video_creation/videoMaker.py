@@ -19,8 +19,8 @@ def splitTextForWrap(input_str: str, line_length: int):
         else:
             split_input += word
             split_input += " "
-    
     return split_input
+
 
 def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_filepath, duration):
     total_duration_seconds = 12 * 30 + 35
@@ -164,4 +164,4 @@ if __name__ == "__main__":
                             text_input.append(line)
                             
                 textOverlay(mp4_file_path, text_input, mp4_output_path)
-
+    print("Video Maker Completed")

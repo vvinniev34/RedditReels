@@ -36,7 +36,7 @@ def convert(filename, folder_path):
         engine = pyttsx3.init("sapi5")
         voices = engine.getProperty("voices")[0] 
         rate = engine.getProperty('rate')
-        engine.setProperty('rate', rate-25)
+        engine.setProperty('rate', rate)#-25)
         engine.setProperty('voice', voices)
 
         with open(text_file_path, 'r', encoding='utf-8') as file:
@@ -65,7 +65,7 @@ def convert(filename, folder_path):
                 # Read the temporary file as an AudioSegment
                 AudioSegment.from_file(temp_output_file).export(temp_output_file, format="mp3") # audio file in mp3 format 
                 audio_segment = AudioSegment.from_mp3(temp_output_file)
-                audio_segment = audio_segment[:-200] # cut off last 0.20 seconds
+                # audio_segment = audio_segment[:-200] # cut off last 0.20 seconds
 
                 # Measure the duration of the generated speech
                 duration = len(audio_segment)
@@ -77,8 +77,8 @@ def convert(filename, folder_path):
                 os.remove(temp_output_file)
 
                 # Write the line duration to the line_times_file and print for debugging
-                line_times_file.write(f"Line {line_number} duration (seconds): {duration / 1000 / 1.3}\n")
-                print(f"Line duration: {duration / 1000 / 1.3} seconds")
+                line_times_file.write(f"Line {line_number} duration (seconds): {duration / 1000}\n")
+                print(f"Line duration: {duration / 1000} seconds")
         
         # Specify the output file (e.g., an MP3 file)
         output_file = os.path.join(folder_path, f"{filename.split('.')[0]}.mp3")
