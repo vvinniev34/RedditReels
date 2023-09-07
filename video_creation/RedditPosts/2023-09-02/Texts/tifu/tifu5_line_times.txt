@@ -1,0 +1,17 @@
+Line 3 duration (seconds): 2.8838461538461537
+Line 5 duration (seconds): 3.5407692307692304
+Line 6 duration (seconds): 2.426153846153846
+Line 7 duration (seconds): 3.9599999999999995
+Line 8 duration (seconds): 3.3846153846153846
+Line 9 duration (seconds): 3.3376923076923077
+Line 10 duration (seconds): 5.792307692307692
+Line 11 duration (seconds): 2.42
+Line 12 duration (seconds): 2.422307692307692
+Line 13 duration (seconds): 2.6646153846153844
+Line 14 duration (seconds): 2.0915384615384616
+Line 15 duration (seconds): 2.572307692307692
+Line 16 duration (seconds): 2.6184615384615384
+Line 17 duration (seconds): 2.826153846153846
+Line 18 duration (seconds): 3.846153846153846
+Line 19 duration (seconds): 0.903076923076923
+Line 20 duration (seconds): 4.107692307692307

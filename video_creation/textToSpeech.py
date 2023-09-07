@@ -65,7 +65,7 @@ def convert(filename, folder_path):
                 # Read the temporary file as an AudioSegment
                 AudioSegment.from_file(temp_output_file).export(temp_output_file, format="mp3") # audio file in mp3 format 
                 audio_segment = AudioSegment.from_mp3(temp_output_file)
-                audio_segment = audio_segment[:-700] # cut off last 0.18 seconds
+                audio_segment = audio_segment[:-200] # cut off last 0.20 seconds
 
                 # Measure the duration of the generated speech
                 duration = len(audio_segment)
