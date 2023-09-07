@@ -3,7 +3,7 @@ from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 
 # Path to the service account key JSON file
-key_path = 'redditReelsServiceAccount.json'
+key_path = 'serviceAccount/redditReelsServiceAccount.json'
 
 # Define the scopes (permissions) you need
 scopes = []#'https://www.googleapis.com/auth/calendar.readonly']
