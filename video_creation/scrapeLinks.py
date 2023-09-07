@@ -8,22 +8,36 @@ import time
 import os
 import nltk
 nltk.download('punkt')  # Download the Punkt tokenizer data (only needs to be done once)
-from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize import sent_tokenize
 
-conjunctions = {", and", ", but", ", or", ", so", ", yet", ", nor"}
-def split_sentences_at_conjunctions(sentence):
-    split_sentences = []
-    
-    for conjunction in conjunctions:
-        if conjunction in sentence:
-            parts = sentence.split(conjunction, 1)  # Split at the first occurrence
-            if len(parts) == 2:
-                split_sentences.extend([parts[0].strip(), conjunction[2 : len(conjunction)] + " " + parts[1].strip() + "."])
-            break
-    if split_sentences == []:
-        split_sentences.append(sentence)
-    
-    return split_sentences
+def add_current_part(current_part, sentence_parts):
+    if current_part:
+        sentence_parts.append(', '.join(current_part))
+
+def split_sentences_at_comma(sentence):
+    # Initialize variables
+    max_length = 40
+    sentence_parts = []
+    current_part = []
+
+    # Split the sentence by commas while maintaining the character limit
+    for word in sentence.split(','):
+        word = word.strip()  # Remove leading/trailing spaces
+
+        # Check if adding the word to the current part exceeds the character limit
+        if len(' '.join(current_part)) <= max_length:
+            current_part.append(word)
+        else:
+            # Add the current part to sentence_parts
+            add_current_part(current_part, sentence_parts)
+            current_part.clear()
+            current_part.append(word)  # Add the word to a new part
+
+    # Add any remaining part to sentence_parts
+    add_current_part(current_part, sentence_parts)
+
+    # Print the split sentences
+    return sentence_parts
 
 
 
@@ -42,7 +56,7 @@ def getContent(url, download_path, subreddit, number):
     # Check if the request was successful by ensuring the page title contains "reddit"
     try:
         driver.get(url)
-        time.sleep(2)
+        time.sleep(1)
         # get the post ID from the share button
         idString = driver.find_element(By.TAG_NAME, "embed-snippet-share-button")
         postId = idString.get_attribute("postid")
@@ -71,7 +85,7 @@ def getContent(url, download_path, subreddit, number):
             sentences = sent_tokenize(p_element.text)
 
             for sentence in sentences:
-                split_up = split_sentences_at_conjunctions(sentence)
+                split_up = split_sentences_at_comma(sentence)
                 for sentence_part in split_up:
                     getOneLine(sentence_part, output_file)
         
@@ -82,7 +96,8 @@ def getContent(url, download_path, subreddit, number):
 
 if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
-    today = date.today().strftime("%Y-%m-%d")
+    # today = date.today().strftime("%Y-%m-%d")
+    today = "2023-09-02"
 
     filePath = f"RedditPosts/{today}/links.txt"
     download_path = f"RedditPosts/{today}/Texts"
