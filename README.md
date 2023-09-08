@@ -27,13 +27,13 @@ Overall, RedditReels is an automated script designed to streamline the process o
 # Setup
 
 **MSEDGEDRIVER**
-- Download Microsft Edge webdriver using https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/ and place executable in working directory and edit _edge_driver_path_ variable in topKWeeklyPostsScraper.py file to match the relative path to the edge driver executable. 
+- Download Microsft Edge webdriver using https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/ and place executable in working directory and edit the _edge_driver_path_ variable in topKWeeklyPostsScraper.py file to match the relative path to the edge driver executable. 
 
 **FFMPEG**
-- Download ffmpeg command line tool using https://ffmpeg.org/. Ensure downloaded file is in either in Sytem PATH or within working directory. Edit _ffmpeg_exe_path_ variable in videoMaker.py file to match ffmpeg executable location. 
+- Download ffmpeg command line tool using https://ffmpeg.org/. Ensure downloaded file is in either in System PATH or within working directory. Edit the _ffmpeg_exe_path_ variable in videoMaker.py file to match ffmpeg executable location. 
 
 **Google Cloud Platform**
-- Register application on Google Cloud Platform to enable OAUTH 2.0 and enable Youtube Data API for the project. Place a generated OAUTH clientID .json file in the working directory and edit the _CLIENT_SECRETS_FILE_ variable in uploadVideo.py to match the absolute path to the .json generated. 
+- Register application on Google Cloud Platform to enable OAuth 2.0 and enable Youtube Data API for the project. Place a generated OAuth clientID .json file in the working directory and edit the _CLIENT_SECRETS_FILE_ variable in uploadVideo.py to match the absolute path to the .json generated. 
 
 **PIP INSTALL**
 - selenium
