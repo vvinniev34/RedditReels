@@ -16,10 +16,33 @@ This script is designed to run independently every week.
 2. **Video Content Creation:**
    - Automatically transforms the extracted content into short-form video clips suitable for YouTube Shorts.
    - Transforms posted results from .txt file contents into .mp3 format, or the narration in the short-form video, using Python pytt3x and pydub libraries
-   - The script randomly selects a segment from tailored gameplay, matching the length of the TTS .mps. Narration from the generated .mp3 is then overlayed using the Python moviePy library and text matching the TTS speech is superimposed upon the video using the ffmpeg command line tool.
+   - The script randomly selects a segment from tailored gameplay, matching the length of the TTS .mp3. Narration from the generated .mp3 is then overlayed using the Python moviePy library and text matching the TTS speech is superimposed upon the video using the ffmpeg command line tool.
 
 3. **YouTube Upload and Management:**
    - Uploads the generated videos to YouTube channels managed by the user.
    - Handles video metadata, descriptions, and scheduling.
 
 Overall, RedditReels is an automated script designed to streamline the process of creating and uploading short-form video content to YouTube Shorts. It operates without the need for user intervention and runs on a weekly schedule. 
+
+# Setup
+
+**msedgedriver**
+Download Microsft Edge webdriver using https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/ and place executable in working directory and edit _ _edge_driver_path_ _ variable in topKWeeklyPostsScraper.py file to match the relative path to the edge driver executable. 
+
+**ffmpeg**
+Download ffmpeg command line tool using https://ffmpeg.org/. Ensure downloaded file is in either in Sytem PATH or within working directory. Edit _ _ffmpeg_exe_path_ _ variable in videoMaker.py file to match ffmpeg executable location. 
+
+**Google Cloud Platform**
+Register application on Google Cloud Platform to enable OAUTH 2.0 and enable Youtube Data API for the project. Place a generated OAUTH clientID .json file in the working directory and edit the _ _CLIENT_SECRETS_FILE_ _ variable in uploadVideo.py to match the absolute path to the .json generated. 
+
+**pip installs**
+- selenium
+- bs4
+- gtts
+- pydub
+- pyttsx3
+- moviepy
+- googleapiclient
+- oauth2client
+
+# Instructions
