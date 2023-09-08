@@ -4,6 +4,11 @@ import subprocess
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 from fileDetails import get_mp3_length
 
+# Get the current working directory of the script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+# Construct the relative path to ffmpeg.exe
+ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+
 def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
     line_count = 0
@@ -43,11 +48,6 @@ def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_
 
 
 def textOverlay(video_path, text_input, output_video_path):
-    # Get the current working directory of the script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Construct the relative path to ffmpeg.exe
-    ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
-
     start_time = 0
     video_segments = []  # To store paths of individual video segments
     durations = []  # Initialize an empty list to store the durations

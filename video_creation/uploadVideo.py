@@ -44,7 +44,7 @@ RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
 #   https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-CLIENT_SECRETS_FILE = os.path.join(script_dir, "accountCredentials", "client_secret_205473897086-857rs2bdut37ssspvs2a3vl37cifef6i.apps.googleusercontent.com.json")
+CLIENT_SECRETS_FILE = [os.path.join(script_dir, "accountCredentials", "client_secret_205473897086-857rs2bdut37ssspvs2a3vl37cifef6i.apps.googleusercontent.com.json")]
 
 # This OAuth 2.0 access scope allows an application to upload files to the
 # authenticated user's YouTube channel, but doesn't allow other types of access.
@@ -73,18 +73,18 @@ https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 
 
-def get_authenticated_service(args):
-    print(CLIENT_SECRETS_FILE)
-    flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
+def get_authenticated_service(args, index):
+    print(CLIENT_SECRETS_FILE[index])
+    flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE[index],
         scope=YOUTUBE_UPLOAD_SCOPE,
         message=MISSING_CLIENT_SECRETS_MESSAGE)
 
     storage = Storage("%s-oauth2.json" % sys.argv[0])
     credentials = storage.get()
-    print(2)
+
     if credentials is None or credentials.invalid:
         credentials = run_flow(flow, storage, args)
-    print(3)
+
     return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
         http=credentials.authorize(httplib2.Http()))
 
@@ -129,7 +129,7 @@ def initialize_upload(youtube, options):
 # failed upload.
 def resumable_upload(insert_request):
     response = None
-    error = False
+    error = None
     retry = 0
     while response is None:
         try:
@@ -152,13 +152,13 @@ def resumable_upload(insert_request):
         if error is not None:
             print(error)
             retry += 1
-        if retry > MAX_RETRIES:
-            exit("No longer attempting to retry.")
+            if retry > MAX_RETRIES:
+                exit("No longer attempting to retry.")
 
-        max_sleep = 2 ** retry
-        sleep_seconds = random.random() * max_sleep
-        print("Sleeping %f seconds and then retrying..." % sleep_seconds)
-        time.sleep(sleep_seconds)
+            max_sleep = 2 ** retry
+            sleep_seconds = random.random() * max_sleep
+            print("Sleeping %f seconds and then retrying..." % sleep_seconds)
+            time.sleep(sleep_seconds)
 
 
 if __name__ == '__main__':
@@ -177,10 +177,17 @@ if __name__ == '__main__':
 
     if not os.path.exists(args.file):
         exit("Please specify a valid file using the --file= parameter.")
-    
-    youtube = get_authenticated_service(args)
-    
-    try:
-        initialize_upload(youtube, args)
-    finally:
-        print("An HTTP error has occured")
+
+    index = 0
+    while index < len(CLIENT_SECRETS_FILE):
+        youtube = get_authenticated_service(args, index)
+        try:
+            initialize_upload(youtube, args)
+            break  # Exit the loop if the upload is successful
+        except HttpError as e:
+            print("An HTTP error has occurred:", e)
+            index += 1
+            if index < len(CLIENT_SECRETS_FILE):
+                print("Retrying with client secrets file at index: ", index)
+            else:
+                print("No client secrets file left\nExiting script")
