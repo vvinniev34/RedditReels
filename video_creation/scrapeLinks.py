@@ -19,6 +19,8 @@ def split_sentences_at_comma(sentence):
     max_length = 40
     sentence_parts = []
     current_part = []
+    sentence = sentence.replace(";", ",")
+    sentence = sentence.replace(":", ",")
 
     # Split the sentence by commas while maintaining the character limit
     for word in sentence.split(','):
@@ -96,8 +98,8 @@ def getContent(url, download_path, subreddit, number):
 
 if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
-    # today = date.today().strftime("%Y-%m-%d")
-    today = "2023-09-02"
+    today = date.today().strftime("%Y-%m-%d")
+    # today = "2023-09-02"
 
     filePath = f"RedditPosts/{today}/links.txt"
     download_path = f"RedditPosts/{today}/Texts"
