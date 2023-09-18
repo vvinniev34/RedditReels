@@ -46,3 +46,8 @@ Overall, RedditReels is an automated script designed to streamline the process o
 - oauth2client
 
 # Instructions
+
+1. Enter directory redditReels is located in
+2. Traverse into redditReels/video_creation folder
+3. Run file using $ python run.py
+4. Wait until script finishes
