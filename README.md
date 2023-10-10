@@ -1,5 +1,5 @@
 # RedditReels
-Scrapes top daily posts daily on reddit and creates short-form video content for TikTok, Youtube Shorts, Instagram Reels, etc...
+Automates creation of short-form video content for TikTok, YouTube Shorts, etc, using top weekly Reddit posts with upcoming support for automatic script execution scheduling
 
 # Overview
 
