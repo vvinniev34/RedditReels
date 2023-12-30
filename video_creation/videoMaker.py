@@ -48,8 +48,11 @@ def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_
 
 
 def textOverlay(video_path, text_input, output_video_path):
+    partNum = 0
+    currentVidTime = 60
+
     start_time = 0
-    video_segments = []  # To store paths of individual video segments
+    video_segments = [[]]  # To store paths of individual video segments
     durations = []  # Initialize an empty list to store the durations
     # Open the line_times file to fill line durations array
     with open(f"{video_path.split('.')[0]}_line_times.txt", "r") as file:
@@ -98,36 +101,47 @@ def textOverlay(video_path, text_input, output_video_path):
             print(result.stdout)  # Print the standard output for debugging
             print(result.stderr)  # Print the standard error for debugging
         
+
+        # if length is over 60 seconds, create a new part for the video
+        if (start_time + durations[duration_i] > currentVidTime):
+            currentVidTime += 60
+            partNum += 1
+            video_segments.push([])
+
         # Append the path of the generated segment to the list
-        video_segments.append(f"temp/segment_{duration_i}.mp4")
+        video_segments[partNum].append(f"temp/segment_{duration_i}.mp4")
 
         # Update start time for the next segment
         start_time += durations[duration_i]
         duration_i += 1
 
-    # Load the video clips, List to store video clips
-    video_clips = []
-    # Iterate through the list of segment paths
-    for path in video_segments:
-        if os.path.exists(path):
-            clip = VideoFileClip(path)
-            video_clips.append(clip)
-        else:
-            # Handle non-existent files (you can print a message or take other actions)
-            print(f"File not found: {path}")
-    # Concatenate the video clips sequentially; maybe change compose to chain
-    final_video = concatenate_videoclips(video_clips, method="chain")
-    # Write the concatenated video to a file
-    final_video.write_videofile(output_video_path, codec="libx264", threads=8)
-    # Close the video clips
-    for clip in video_clips:
-        clip.close()
+    partNum = 1
+    for part in video_segments:
+        # Load the video clips, List to store video clips
+        video_clips = []
+        # Iterate through the list of segment paths
+        for path in part:
+            if os.path.exists(path):
+                clip = VideoFileClip(path)
+                video_clips.append(clip)
+            else:
+                # Handle non-existent files (you can print a message or take other actions)
+                print(f"File not found: {path}")
+        # Concatenate the video clips sequentially; maybe change compose to chain
+        final_video = concatenate_videoclips(video_clips, method="chain")
+        # Write the concatenated video to a file
+        final_video.write_videofile(f"(part{partNum})_{output_video_path}", codec="libx264", threads=8)
+        # Close the video clips
+        for clip in video_clips:
+            clip.close()
 
-    # Clean up individual video segments
-    for segment in video_segments:
-        if os.path.exists(segment):
-            os.remove(segment)
+        # Clean up individual video segments
+        for segment in video_segments:
+            if os.path.exists(segment):
+                os.remove(segment)
 
+        partNum += 1
+        
     print("Overlay complete.")
 
 
