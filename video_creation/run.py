@@ -13,6 +13,7 @@ if __name__ == "main":
     subprocess.run(["python", "videoMaker.py"])
 
     # upload videos
+    # today = date.today().strftime("%Y-%m-%d")
     today = "2023-09-02"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):

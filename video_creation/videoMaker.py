@@ -90,6 +90,8 @@ def textOverlay(video_path, text_input, post_path, post):
             "-i", video_path,
             "-vf", f"drawtext=text='{wrappedText}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=55:fontcolor=white:fontfile=C\\:/Windows/fonts/arial.ttf:bordercolor=black:borderw=5",
             "-c:a", "copy",
+            "-preset", "ultrafast",  # Use a faster preset"
+            "-threads", "8",
             "-ss", str(start_time),     
             "-t", str(durations[duration_i]),
             "-y",
