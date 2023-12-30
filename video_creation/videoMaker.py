@@ -87,7 +87,7 @@ def textOverlay(video_path, text_input, output_video_path):
             "-ss", str(start_time),     
             "-t", str(durations[duration_i]),
             "-y",
-            f"segment_{duration_i}.mp4"  # Output path for this segment
+            f"temp/segment_{duration_i}.mp4"  # Output path for this segment
         ]
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -99,7 +99,7 @@ def textOverlay(video_path, text_input, output_video_path):
             print(result.stderr)  # Print the standard error for debugging
         
         # Append the path of the generated segment to the list
-        video_segments.append(f"segment_{duration_i}.mp4")
+        video_segments.append(f"temp/segment_{duration_i}.mp4")
 
         # Update start time for the next segment
         start_time += durations[duration_i]
