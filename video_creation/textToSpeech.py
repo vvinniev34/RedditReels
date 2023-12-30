@@ -97,7 +97,7 @@ def convert(filename, folder_path):
 
 if __name__ == "__main__":
     # today = date.today().strftime("%Y-%m-%d")
-    today = "2023-09-02"
+    today = "2023-12-29"
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder
     for subreddit in os.listdir(folder_path):
