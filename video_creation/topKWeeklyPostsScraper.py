@@ -28,11 +28,6 @@ headers = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 
-# # Set up Chrome WebDriver with the desired user agent
-# chrome_options = Options()
-# chrome_options.add_argument(f"user-agent={user_agents[1]}")
-# driver = webdriver.Chrome()
-
 # Configure Edge WebDriver options
 edge_options = EdgeOptions()
 edge_options.use_chromium = True  # Use Chromium-based Edge
@@ -77,7 +72,7 @@ def scrape(url, download_path, subreddit):
         link_elements = soup.find_all("a", {"slot": "full-post-link"})
 
         # Iterate through the div elements and filter based on your criteria
-        for i in range(min(len(link_elements), 5)):
+        for i in range(min(len(link_elements), 3)):
             link_element = link_elements[i]
             print(f"reddit.com{link_element.get('href')}")
 
@@ -89,7 +84,7 @@ def scrape(url, download_path, subreddit):
         print(f"Finished running {subreddit}")
 
 if __name__ == "__main__":
-    subreddits = ["tifu", "AmItheAsshole"]
+    subreddits = ["tifu", "AmItheAsshole", "relationship_advice", "pettyrevenge"]
     for subreddit in subreddits:
         # Define the URLs of the Reddit page you want to scrape
         url = f"https://www.reddit.com/r/{subreddit}/top/?t=daily"
