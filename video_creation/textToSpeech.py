@@ -6,6 +6,11 @@ from pydub import utils, AudioSegment
 from pydub.effects import speedup
 import pyttsx3
 
+from openai import OpenAI
+from accountCredentials.openai_key import OPENAI_API_KEY
+
+client = OpenAI(api_key=OPENAI_API_KEY)
+
 speed = 1.5  # Adjust this value to change the speed (1.0 is the default)
 # Get the current working directory of the script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,7 +24,7 @@ utils.get_prober_name = get_prob_path
 def speedup_audio(filename, subreddit_path):
     path = os.path.join(subreddit_path, f"{filename.split('.')[0]}.mp3")
     audio = AudioSegment.from_mp3(path)
-    spedup_audio = speedup(audio, 1.3, 130) # speed up by 2x
+    spedup_audio = speedup(audio, 1.2, 120)
     spedup_audio.export(path, format="mp3") # export to mp3
 
 def convert(filename, folder_path):
@@ -34,10 +39,10 @@ def convert(filename, folder_path):
 
         # Initialize pyttsx3
         engine = pyttsx3.init("sapi5")
-        voices = engine.getProperty("voices")[0] 
+        voice = engine.getProperty("voices")[0]  # 0 for male, 1 for female
         rate = engine.getProperty('rate')
-        engine.setProperty('rate', rate)#-25)
-        engine.setProperty('voice', voices)
+        engine.setProperty('rate', rate + 10)
+        engine.setProperty('voice', voice.id)
 
         with open(text_file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
@@ -45,16 +50,27 @@ def convert(filename, folder_path):
             for line_number, line in enumerate(lines, start=1):
                 # Remove leading and trailing whitespace from the line
                 line = line.strip()
-                if not line:
+                if not line or len(line) == 0:
                     continue
 
                 # Save the speech to a temporary file (using line number)
                 temp_output_file = os.path.join(folder_path, f"temp_{line_number}.mp3")
                 
-                # Convert text to speech using pyttsx3
-                engine.save_to_file(line, temp_output_file)  # Save the speech to a temporary file
-                # Wait until above command is not finished.
-                engine.runAndWait()
+                # # Convert text to speech using pyttsx3
+                # engine.save_to_file(line, temp_output_file)  # Save the speech to a temporary file
+                # # Wait until above command is not finished.
+                # engine.runAndWait()
+
+                response = client.audio.speech.create(
+                model="tts-1",
+                voice="alloy",
+                input=line
+                )
+                
+                response.stream_to_file(temp_output_file)
+
+                # tts = gTTS(text=line, lang='en')
+                # tts.save(temp_output_file)
 
                 # Add this line before the while loop inside the for loop
                 print(f"Checking for file existence: {temp_output_file}")
@@ -77,8 +93,8 @@ def convert(filename, folder_path):
                 os.remove(temp_output_file)
 
                 # Write the line duration to the line_times_file and print for debugging
-                line_times_file.write(f"Line {line_number} duration (seconds): {duration / 1000}\n")
-                print(f"Line duration: {duration / 1000} seconds")
+                line_times_file.write(f"Line {line_number} duration (seconds): {(duration / 1000) / 1.2}\n")
+                print(f"Line duration: {(duration / 1000) / 1.2} seconds")
         
         # Specify the output file (e.g., an MP3 file)
         output_file = os.path.join(folder_path, f"{filename.split('.')[0]}.mp3")
@@ -105,7 +121,9 @@ if __name__ == "__main__":
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
             if filename.split('.')[-1] == "txt" and not filename.endswith("_line_times.txt"):
-                convert(filename, subreddit_path)
-                # speedup_audio(filename, subreddit_path)
+                # convert(filename, subreddit_path)
+                # speedup if using gtts
+                speedup_audio(filename, subreddit_path)
                 print(f"Processed {filename}")
+                break
                 
