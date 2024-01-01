@@ -84,7 +84,9 @@ def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_
 
 def overlayText(mp3_file_path, video_path, post_path, postName):
     partNum = 0
-    currentVidTime = 60
+    currentMaxVidTime = 60
+    currentVidTime = 0
+    
     videoTitle = post
 
     start_time = 0
@@ -133,12 +135,14 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
             print(f"{start_time} {start_time + duration} {duration}\n'{wrappedText}'")
 
             # if length is over 60 seconds, create a new part for the video
-            if (endTime > currentVidTime):
+            if (endTime > currentMaxVidTime):
                 video_segments[partNum][1].append(start_time)
-                currentVidTime += 60
+                currentMaxVidTime += 60
                 partNum += 1
                 video_segments.append([[], []])
                 video_segments[partNum][1].append(start_time)
+
+                currentVidTime = 0
 
             width_x = 1080
             height_y = 1920
@@ -156,7 +160,7 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
                 method='label',
                 font='C:/Windows/fonts/GILBI___.TTF', 
                 size=(textbox_size_x, textbox_size_y)
-            ).set_start(start_time % 60).set_duration(duration).set_position((center_x, center_y))#.set_pos('center')
+            ).set_start(currentVidTime).set_duration(duration).set_position((center_x, center_y))#.set_pos('center')
 
             shadow_textclip = TextClip(
                 wrappedText, 
@@ -165,13 +169,14 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
                 bg_color='transparent', 
                 font='C:/Windows/fonts/GILBI___.TTF', 
                 size=(textbox_size_x, textbox_size_y)
-            ).set_start(start_time % 60).set_duration(duration).set_position((center_x + offset, center_y + offset))#.set_pos((5, 5))
+            ).set_start(currentVidTime).set_duration(duration).set_position((center_x + offset, center_y + offset))#.set_pos((5, 5))
 
             video_segments[partNum][0].append(shadow_textclip)
             video_segments[partNum][0].append(new_textclip)
 
             # Update start time for the next segment
             start_time = endTime
+            currentVidTime += duration
     video_segments[partNum][1].append(start_time)
 
     audio_clip = AudioFileClip(mp3_file_path)
