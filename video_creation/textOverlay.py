@@ -96,11 +96,12 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
 
     video_clip = VideoFileClip(video_path)
 
-    segment_num = 0
+    first_segment = True
     for segment in result['segments']:
         abbreviationFixedText = replace_ada(segment['text'])
-        if segment_num == 0:
+        if first_segment:
             videoTitle = abbreviationFixedText
+            first_segment = False
 
         # split segment into multiple if phrase is longer than 30 characters
         splitSegments = []
@@ -127,9 +128,17 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
             endTime = split[1]
 
             wrappedText = splitTextForWrap(text.strip(), 20)
-            # duration = (video_duration - start_time) if segment_num >= (total_segments - 1) else (endTime - start_time)
+
             duration = endTime - start_time
             print(f"{start_time} {start_time + duration} {duration}\n'{wrappedText}'")
+
+            # if length is over 60 seconds, create a new part for the video
+            if (endTime > currentVidTime):
+                video_segments[partNum][1].append(start_time)
+                currentVidTime += 60
+                partNum += 1
+                video_segments.append([[], []])
+                video_segments[partNum][1].append(start_time)
 
             width_x = 1080
             height_y = 1920
@@ -147,7 +156,7 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
                 method='label',
                 font='C:/Windows/fonts/GILBI___.TTF', 
                 size=(textbox_size_x, textbox_size_y)
-            ).set_start(start_time).set_duration(duration).set_position((center_x, center_y))#.set_pos('center')
+            ).set_start(start_time % 60).set_duration(duration).set_position((center_x, center_y))#.set_pos('center')
 
             shadow_textclip = TextClip(
                 wrappedText, 
@@ -156,18 +165,10 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
                 bg_color='transparent', 
                 font='C:/Windows/fonts/GILBI___.TTF', 
                 size=(textbox_size_x, textbox_size_y)
-            ).set_start(start_time).set_duration(duration).set_position((center_x + offset, center_y + offset))#.set_pos((5, 5))
+            ).set_start(start_time % 60).set_duration(duration).set_position((center_x + offset, center_y + offset))#.set_pos((5, 5))
 
             video_segments[partNum][0].append(shadow_textclip)
             video_segments[partNum][0].append(new_textclip)
-
-            # if length is over 60 seconds, create a new part for the video
-            if (endTime > currentVidTime):
-                video_segments[partNum][1].append(start_time)
-                currentVidTime += 60
-                partNum += 1
-                video_segments.append([[], []])
-                video_segments[partNum][1].append(start_time)
 
             # Update start time for the next segment
             start_time = endTime
@@ -192,7 +193,7 @@ def overlayText(mp3_file_path, video_path, post_path, postName):
             os.makedirs(f"{post_path}/{postName}")
         output_video_path = f"{post_path}/{postName}/part{partNum}.mp4"
         print(f"Writing output video: {output_video_path}")
-        video_with_text.write_videofile(output_video_path, codec="libx264")
+        video_with_text.write_videofile(output_video_path, codec="libx264", threads=8, logger = None)
         print(f"Finished writing part {partNum}")
 
         with open(f"{post_path}/{postName}/videoTitle.txt", 'w') as file:
@@ -206,6 +207,7 @@ if __name__ == "__main__":
     background_video_path = "SubwaySurfers/subwaySurfers.mp4"
     # today = date.today().strftime("%Y-%m-%d")
     today = "2023-12-29"
+    today = "Test"
 
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):

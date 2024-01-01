@@ -51,6 +51,7 @@ def convert(filename, folder_path):
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
+    today = "2023-12-29"
 
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder
@@ -59,7 +60,7 @@ if __name__ == "__main__":
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
             if filename.split('.')[-1] == "txt" and not filename.endswith("_line_times.txt"):
-                convert(filename, subreddit_path)
+                # convert(filename, subreddit_path)
                 # speedup if using gtts or openai
                 speedup_audio(filename, subreddit_path)
                 print(f"Processed {filename}")
