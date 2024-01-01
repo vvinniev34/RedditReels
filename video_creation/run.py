@@ -10,7 +10,7 @@ if __name__ == "main":
     # convert post content to mp3
     subprocess.run(["python", "textToSpeech.py"])
     # create videos
-    subprocess.run(["python", "videoMaker.py"])
+    subprocess.run(["python", "textOverlay.py"])
 
     # upload videos
     # today = date.today().strftime("%Y-%m-%d")

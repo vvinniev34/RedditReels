@@ -14,17 +14,37 @@ def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
     line_count = 0
     split_input = ""
+    line = ""
     for word in words:
-        line_count += 1
-        line_count += len(word)
-        if line_count > line_length:
-            split_input += "\n"
-            line_count = len(word) + 1
-            split_input += word
-            split_input += " "
+        if (line_count + len(word) + 1) > line_length:
+            paddingNeeded = line_length - line_count
+            alternatePadding = True
+            while (paddingNeeded > 0):
+                if alternatePadding:
+                    line = "\u00A0" + line
+                else:
+                    line = line + "\u00A0"
+                alternatePadding = not alternatePadding
+                paddingNeeded -= 1
+            line += "\n"
+
+            split_input += line
+            line = word
+            line_count = len(word)
         else:
-            split_input += word
-            split_input += " "
+            line += ("\u00A0" + word) 
+            line_count += len(word) + 1
+    
+    paddingNeeded = line_length - line_count
+    alternatePadding = True
+    while (paddingNeeded > 0):
+        if alternatePadding:
+            line = "\u00A0" + line
+        else:
+            line = line + "\u00A0"
+        alternatePadding = not alternatePadding
+        paddingNeeded -= 1
+    split_input += line
     return split_input
 
 
@@ -73,25 +93,25 @@ def textOverlay(video_path, text_input, post_path, post):
     for i, text in enumerate(text_input):
         # print(f"{duration_i}, {text}")
         # Remove leading and trailing whitespace and normal spaces from the line
-        text = text.strip().replace(", ", " ")
+        text = text.strip()#.replace(", ", " ")
         noWhitespaceText = text.replace(" ", "")
         
-        if not noWhitespaceText:
+        if not noWhitespaceText or len(noWhitespaceText) == 0:
             continue
 
-        wrappedText = splitTextForWrap(text, 30)
+        wrappedText = splitTextForWrap(text, 20)
         print(start_time, " ", (start_time + durations[duration_i]), " ", durations[duration_i])
 
-        print(f"{duration_i},\n{wrappedText}")
-
+        print(f"{duration_i},\n'{wrappedText}'")
+        
         cmd = [
             ffmpeg_exe_path,
             "-nostdin",  # Disable interaction with standard input
             "-i", video_path,
-            "-vf", f"drawtext=text='{wrappedText}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=55:fontcolor=white:fontfile=C\\:/Windows/fonts/arial.ttf:bordercolor=black:borderw=5",
+            "-vf", f"drawtext=text='{wrappedText}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=70:fontcolor=white:fontfile=C\\:/Windows/fonts/arlrdbd.ttf:bordercolor=black:borderw=5",
             "-c:a", "copy",
             "-preset", "ultrafast",  # Use a faster preset"
-            "-threads", "8",
+            "-threads", "4",
             "-ss", str(start_time),     
             "-t", str(durations[duration_i]),
             "-y",
