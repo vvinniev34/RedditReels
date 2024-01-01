@@ -84,12 +84,12 @@ def scrape(url, download_path, subreddit):
         print(f"Finished running {subreddit}")
 
 if __name__ == "__main__":
+    today = date.today().strftime("%Y-%m-%d")
     subreddits = ["tifu", "AmItheAsshole", "relationship_advice", "pettyrevenge"]
     for subreddit in subreddits:
         # Define the URLs of the Reddit page you want to scrape
         url = f"https://www.reddit.com/r/{subreddit}/top/?t=daily"
         # Get today's date
-        today = date.today().strftime("%Y-%m-%d")
         download_path = f"RedditPosts/{today}"
         scrape(url, download_path, subreddit)
     # Close the browser

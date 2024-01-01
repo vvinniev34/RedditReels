@@ -2,6 +2,7 @@
 .idea
 *.mp4
 *ffmpeg-2023-08-30-git-7aa71ab5c0-full_build
+ffmpeg.exe
 *Test
 *SubwaySurfers
 *__pycache__

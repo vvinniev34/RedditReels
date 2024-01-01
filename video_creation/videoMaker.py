@@ -1,5 +1,6 @@
 import random
 import os
+import time
 import subprocess
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 from fileDetails import get_mp3_length
@@ -13,17 +14,37 @@ def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
     line_count = 0
     split_input = ""
+    line = ""
     for word in words:
-        line_count += 1
-        line_count += len(word)
-        if line_count > line_length:
-            split_input += "\n"
-            line_count = len(word) + 1
-            split_input += word
-            split_input += " "
+        if (line_count + len(word) + 1) > line_length:
+            paddingNeeded = line_length - line_count
+            alternatePadding = True
+            while (paddingNeeded > 0):
+                if alternatePadding:
+                    line = "\u00A0" + line
+                else:
+                    line = line + "\u00A0"
+                alternatePadding = not alternatePadding
+                paddingNeeded -= 1
+            line += "\n"
+
+            split_input += line
+            line = word
+            line_count = len(word)
         else:
-            split_input += word
-            split_input += " "
+            line += ("\u00A0" + word) 
+            line_count += len(word) + 1
+    
+    paddingNeeded = line_length - line_count
+    alternatePadding = True
+    while (paddingNeeded > 0):
+        if alternatePadding:
+            line = "\u00A0" + line
+        else:
+            line = line + "\u00A0"
+        alternatePadding = not alternatePadding
+        paddingNeeded -= 1
+    split_input += line
     return split_input
 
 
@@ -32,7 +53,6 @@ def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_
     # Generate a random start time within the valid range
     random_start_time_seconds = random.uniform(0, total_duration_seconds - duration)
 
-    print(random_start_time_seconds)
     # Load the input video and audio
     video_clip = VideoFileClip(input_video_filepath)
     audio_clip = AudioFileClip(input_audio_filepath)
@@ -44,10 +64,13 @@ def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_
     random_segment = random_segment.set_audio(audio_clip)
 
     # Write the final video to the output file
-    random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8)
+    random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8, logger = None, preset='ultrafast')
+    
+    print(f"Snipped {duration} s length video starting at: {random_start_time_seconds}")
 
 
-def textOverlay(video_path, text_input, output_video_path):
+
+def textOverlay(video_path, text_input, post_path, post):
     partNum = 0
     currentVidTime = 60
 
@@ -70,23 +93,25 @@ def textOverlay(video_path, text_input, output_video_path):
     for i, text in enumerate(text_input):
         # print(f"{duration_i}, {text}")
         # Remove leading and trailing whitespace and normal spaces from the line
-        text = text.strip().replace(", ", " ")
+        text = text.strip()#.replace(", ", " ")
         noWhitespaceText = text.replace(" ", "")
         
-        if not noWhitespaceText:
+        if not noWhitespaceText or len(noWhitespaceText) == 0:
             continue
 
-        wrappedText = splitTextForWrap(text, 30)
+        wrappedText = splitTextForWrap(text, 20)
         print(start_time, " ", (start_time + durations[duration_i]), " ", durations[duration_i])
 
-        print(f"{duration_i},\n{wrappedText}")
-
+        print(f"{duration_i},\n'{wrappedText}'")
+        
         cmd = [
             ffmpeg_exe_path,
             "-nostdin",  # Disable interaction with standard input
             "-i", video_path,
-            "-vf", f"drawtext=text='{wrappedText}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=55:fontcolor=white:fontfile=C\\:/Windows/fonts/arial.ttf:bordercolor=black:borderw=5",
+            "-vf", f"drawtext=text='{wrappedText}':x=(w-text_w)/2:y=(h-text_h)/3:fontsize=70:fontcolor=white:fontfile=C\\:/Windows/fonts/arlrdbd.ttf:bordercolor=black:borderw=5",
             "-c:a", "copy",
+            "-preset", "ultrafast",  # Use a faster preset"
+            "-threads", "4",
             "-ss", str(start_time),     
             "-t", str(durations[duration_i]),
             "-y",
@@ -106,7 +131,7 @@ def textOverlay(video_path, text_input, output_video_path):
         if (start_time + durations[duration_i] > currentVidTime):
             currentVidTime += 60
             partNum += 1
-            video_segments.push([])
+            video_segments.append([])
 
         # Append the path of the generated segment to the list
         video_segments[partNum].append(f"temp/segment_{duration_i}.mp4")
@@ -130,25 +155,29 @@ def textOverlay(video_path, text_input, output_video_path):
         # Concatenate the video clips sequentially; maybe change compose to chain
         final_video = concatenate_videoclips(video_clips, method="chain")
         # Write the concatenated video to a file
-        final_video.write_videofile(f"(part{partNum})_{output_video_path}", codec="libx264", threads=8)
+        output_video_path = f"{post_path}/(part{partNum})_{post}"
+        print(f"Writing output video: {output_video_path}")
+        final_video.write_videofile(output_video_path, codec="libx264", threads=8, logger = None, preset='ultrafast')
+        print(f"Finished writing part {partNum}")
         # Close the video clips
         for clip in video_clips:
             clip.close()
 
         # Clean up individual video segments
-        for segment in video_segments:
+        for segment in part:
             if os.path.exists(segment):
                 os.remove(segment)
 
         partNum += 1
-        
+
     print("Overlay complete.")
 
 
 if __name__ == "__main__":
     background_video_path = "SubwaySurfers/subwaySurfers.mp4"
+    # today = date.today().strftime("%Y-%m-%d")
+    today = "2023-12-29"
 
-    today = "2023-09-02"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
@@ -164,7 +193,6 @@ if __name__ == "__main__":
         for post in os.listdir(post_path):
             if post.endswith(".mp4") and not post.endswith("F.mp4"):
                 mp4_file_path = f"{post_path}/{post}"
-                mp4_output_path = f"{post_path}/{post.split('.')[0]}F.mp4"
                 text_input = []
                 text_file_path = f"{post_path}/{post.split('.')[0]}.txt"
                 # Open the file for reading
@@ -177,5 +205,5 @@ if __name__ == "__main__":
                         if removed_spaces_line:
                             text_input.append(line)
                             
-                textOverlay(mp4_file_path, text_input, mp4_output_path)
+                textOverlay(mp4_file_path, text_input, post_path, f"{post.split('.')[0]}F.mp4")
     print("Video Maker Completed")

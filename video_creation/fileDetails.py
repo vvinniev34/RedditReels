@@ -11,6 +11,22 @@ def get_mp3_length(mp3_file_path):
     except Exception as e:
         print(f"Error: {e}")
         return None
+    
+def add_mp3_padding(file_path, padding_duration_seconds):
+    # Load the input MP3 file
+    audio = AudioSegment.from_file(file_path, format="mp3")
+
+    # Calculate the duration of the padding in milliseconds
+    padding_duration_ms = int(padding_duration_seconds * 1000)
+
+    # Create a silent audio segment for padding
+    padding = AudioSegment.silent(duration=padding_duration_ms)
+
+    # Concatenate the original audio with the padding
+    extended_audio = audio + padding
+
+    # Overwrite the original file with the extended audio
+    extended_audio.export(file_path, format="mp3")
 
 def count_non_empty_characters_in_directory(directory_path, output_file):
     # Initialize a counter for non-empty characters
