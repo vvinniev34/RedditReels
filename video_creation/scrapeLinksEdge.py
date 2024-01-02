@@ -58,8 +58,6 @@ def getContent(url, download_path, subreddit, number):
         contentId = postId + "-post-rtjson-content"
         more_button_id = postId + "-read-more-button"
 
-        
-        
         # click read more if possible
         try:
             driver.find_element(By.ID, more_button_id).click()
@@ -75,15 +73,6 @@ def getContent(url, download_path, subreddit, number):
             div_post = driver.find_element(By.ID, contentId)
         else:
             return False
-        # filter out non alphabet characters for the text file
-        # filename = subreddit + str(number) + ".txt"
-
-        # create a file and write the title to it
-        # output_file = os.path.join(download_path, filename)
-        # with open(output_file, 'w') as file:
-            # file.write(title)
-            # file.write("\n")
-    
         
         # get all text into a variable
         p_elements = div_post.find_elements(By.TAG_NAME, "p")
@@ -91,21 +80,29 @@ def getContent(url, download_path, subreddit, number):
             # Tokenize the input text into sentences
             entire_post += p_element.text + '\n'
 
-        # prompt = "Can you edit this text to get rid of grammar errors and to shorten long sentences?" + '\n' + entire_post
-        # client = OpenAI()
+        prompt = "Can you edit this text to get rid of grammar errors and to shorten long sentences?" + '\n' + entire_post
+        client = OpenAI()
 
-        # completion = client.chat.completions.create(
-        # model="gpt-3.5-turbo",
-        # messages=[
-        #     {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
-        #     {"role": "user", "content": prompt}
-        # ])
+        completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
+            {"role": "user", "content": prompt}
+        ])
         # print(completion.choices[0].message.content)
-            
-        print(entire_post)
+
+        # filter out non alphabet characters for the text file
+        filename = subreddit + str(number) + ".txt"
+
+        # create a file and write the title to it
+        output_file = os.path.join(download_path, filename)
+        with open(output_file, 'w') as file:
+            file.write(completion.choices[0].message.content)
+    
         return True
     except Exception as e:
         print("An error occurred:", str(e))
+        return False
   
 
 if __name__ == "__main__":
@@ -133,8 +130,8 @@ if __name__ == "__main__":
             path = download_path + '/' + subreddit
             if "reddit.com" in tryLink:
                 # print(link)
-                getContent(tryLink, path, subreddit, count)
-                count += 1
+                if getContent(tryLink, path, subreddit, count):
+                    count += 1
             else:
                 subreddit = link.strip()
                 count = 1
