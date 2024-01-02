@@ -72,7 +72,7 @@ def scrape(url, download_path, subreddit):
         link_elements = soup.find_all("a", {"slot": "full-post-link"})
 
         # Iterate through the div elements and filter based on your criteria
-        for i in range(min(len(link_elements), 3)):
+        for i in range(min(len(link_elements), 1)):
             link_element = link_elements[i]
             print(f"reddit.com{link_element.get('href')}")
 
@@ -80,6 +80,8 @@ def scrape(url, download_path, subreddit):
                 file.write(f"reddit.com{link_element.get('href')}\n")
         with open(output_file, 'a') as file:
             file.write("\n")
+    except:
+        print(f"No posts today on {subreddit}")
     finally:
         print(f"Finished running {subreddit}")
 
