@@ -85,28 +85,25 @@ def getContent(url, download_path, subreddit, number):
 
         prompt = "Can you edit this text to get rid of grammar errors and to shorten long sentences?" + '\n' + entire_post
         # client = OpenAI()
-        # client = OpenAI(api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=OPENAI_API_KEY)
 
-        # completion = client.chat.completions.create(
-        # model="gpt-3.5-turbo",
-        # messages=[
-        #     {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
-        #     {"role": "user", "content": prompt}
-        # ]) 
+        completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
+            {"role": "user", "content": prompt}
+        ]) 
 
         # create the file
         filename = subreddit + str(number) + ".txt"
 
-        # entire_post = title + '.\n' + completion.choices[0].message.content
-        # entire_post = remove_emojis(entire_post)
+        entire_post = title + '.\n' + completion.choices[0].message.content
+        entire_post = remove_emojis(entire_post)
 
         # create a file and write the title to it
         output_file = os.path.join(download_path, filename)
-        print(output_file)
         with open(output_file, 'w') as file:
-            # file.write(entire_post)
-            file.write(prompt)
-        print("found")
+            file.write(entire_post)
         return True
     except Exception as e:
         print("An error occurred:", str(e))
