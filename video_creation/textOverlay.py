@@ -68,10 +68,13 @@ def splitTextForWrap(input_str: str, line_length: int):
     split_input += line
     return split_input
 
-def randomVideoSegment(input_video_filepath, input_audio_filepath, output_video_filepath, duration):
-    total_duration_seconds = 12 * 30 + 35
+def randomVideoSegment(output_video_filepath, duration):
+    background_video_path = "backgroundVideos/subwaySurfers.mp4"
+    # total_duration_seconds = 12 * 60 + 34 # subway surfers
+    total_duration_seconds = 12 * 60 + 34 # minecraft parkour
+
     random_start_time_seconds = random.uniform(0, total_duration_seconds - duration)
-    video_clip = VideoFileClip(input_video_filepath)
+    video_clip = VideoFileClip(background_video_path)
     random_segment = video_clip.subclip(random_start_time_seconds, random_start_time_seconds + duration)
     random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8, logger = None, preset='ultrafast')
     print(f"Snipped {duration} s length video starting at: {random_start_time_seconds}")
@@ -87,24 +90,35 @@ def createTextClip(wrappedText, start, duration, title):
     new_textclip = TextClip(
         wrappedText, 
         fontsize=105 if not title else 60, 
-        color='white', 
+        color='white' if not title else 'black', 
         bg_color='transparent',
         method='caption',
         font='C:/Windows/fonts/GILBI___.TTF', 
-        size=(textbox_size_x, textbox_size_y)
-    ).set_start(start).set_duration(duration).set_position((center_x, center_y))#.set_pos('center')
+        size=(textbox_size_x, None)#, textbox_size_y)
+    ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
+
+    text_width, text_height = new_textclip.size
+    # if title:
+        # print(f"{text_width} {text_height} {wrappedText}")
+
+    image_path = 'titleBackground.png'
+    if text_height <= 200:
+        image_path = 'redditBackground.png'
+        text_height = 320
+    else:
+        text_height = 550
 
     shadow_textclip = TextClip(
         wrappedText, 
         fontsize=105 if not title else 60, 
         color='black', 
         bg_color='transparent', 
-        stroke_width=20 if not title else 10,
+        stroke_width=20 if not title else 0,
         stroke_color="black",
         method='caption',
         font='C:/Windows/fonts/GILBI___.TTF', 
-        size=(textbox_size_x, textbox_size_y)
-    ).set_start(start).set_duration(duration).set_position((center_x, center_y))#.set_pos((5, 5))
+        size=(textbox_size_x, None)#, textbox_size_y)
+    ).set_start(start).set_duration(duration).set_position(('center', 'center')) if not title else ImageClip(image_path, duration=duration).resize(width=text_width, height=text_height).set_pos(('center', 'center'))
 
     return new_textclip, shadow_textclip
 
@@ -119,7 +133,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
         video_title = file.read().strip()
     title_duration = get_mp3_length(mp3_title_file_path)
     multipleParts = title_duration + mp3_duration > 60
-    title_textclip, title_shadow_textclip = createTextClip(video_title + "\n(part 1)" if multipleParts else "", 0, title_duration, True)
+    title_textclip, title_shadow_textclip = createTextClip(video_title + ("\n(part 1)" if multipleParts else ""), 0, title_duration, True)
     
     title_last_word_time = 0
     title_audio = whisper.load_audio(mp3_title_file_path)
@@ -134,12 +148,8 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
     currentVidTime = 0
     currentMaxVidTime = 60
 
-    image_path = 'titleBackground.png'
-    title_background_image = ImageClip(image_path, duration=title_duration).set_pos(('center', 'center')).resize(width=900, height=600)
-
     video_segments = [[[], []]]  # To store paths of individual video segments
     video_segments[partNum][1].append(0)
-    video_segments[partNum][0].append(title_background_image)
     video_segments[partNum][0].append(title_shadow_textclip)
     video_segments[partNum][0].append(title_textclip)
 
@@ -183,14 +193,13 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
             print(f"{start_time} {start_time + duration} {duration}\n'{wrappedText}'")
 
             # if length is over 60 seconds, create a new part for the video
-            if ((endTime + title_duration * (partNum + 1)) > currentMaxVidTime):
+            if ((endTime + (title_duration + 1) * (partNum + 1)) > currentMaxVidTime):
                 video_segments[partNum][1].append(start_time)
                 currentMaxVidTime += 60
                 partNum += 1
                 video_segments.append([[], []])
                 video_segments[partNum][1].append(start_time)
                 title_textclip, title_shadow_textclip = createTextClip(video_title + f"\n(part {partNum + 1})", 0, title_duration, True)
-                video_segments[partNum][0].append(title_background_image)
                 video_segments[partNum][0].append(title_shadow_textclip)
                 video_segments[partNum][0].append(title_textclip)
 
@@ -205,8 +214,9 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
             start_time = endTime
             currentVidTime += duration
 
-        if (currentVidTime > 30):
-            break
+        # for video title testing purposes
+        # if (currentVidTime > 6):
+        #     break
     video_segments[partNum][1].append(start_time)
 
     audio_clip = AudioFileClip(mp3_file_path)
@@ -226,11 +236,11 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
         snipped_audio = audio_clip.subclip(start_time, end_time)
 
         title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
-        title_video_with_text = CompositeVideoClip([title_video_with_text] + part[0][:3])
+        title_video_with_text = CompositeVideoClip([title_video_with_text] + part[0][:2])
 
-        title_video_with_text.write_videofile("temp.mp4", codec="libx264", threads=8, preset='ultrafast', logger = None)
+        # title_video_with_text.write_videofile("temp.mp4", codec="libx264", threads=8, preset='ultrafast', logger = None)
 
-        video_with_text = CompositeVideoClip([snipped_video] + part[0][3:])
+        video_with_text = CompositeVideoClip([snipped_video] + part[0][2:])
         video_with_text = video_with_text.set_audio(snipped_audio)
 
         final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
@@ -247,9 +257,8 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
     print("Overlay complete.")
 
 if __name__ == "__main__":
-    background_video_path = "backgroundVideos/subwaySurfers.mp4"
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2023-12-29"
+    today = "2024-01-02"
     # today = "Test"
 
     folder_path = f"RedditPosts/{today}/Texts"
@@ -263,7 +272,7 @@ if __name__ == "__main__":
                 # add_mp3_padding(mp3_file_path, 1)
                 # duration = get_mp3_length(mp3_file_path)
                 # title_duration = get_mp3_length(mp3_title_file_path)
-                # randomVideoSegment(background_video_path, mp3_file_path, output_video_path, duration + title_duration)
+                # randomVideoSegment(output_video_path, duration + title_duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"

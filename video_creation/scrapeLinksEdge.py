@@ -9,7 +9,8 @@ import demoji
 import time
 import os
 
-s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
+# s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
+s=service.Service(r"edgedriver_win64/msedgedriver.exe")
 driver = webdriver.Edge(service=s)
 entire_post = ""
 
@@ -65,6 +66,9 @@ def getContent(url, download_path, subreddit, number):
         # get the title and post
         post_title = driver.find_element(By.ID, titleId)
         title = post_title.text
+        
+        if not title.endswith(('.', '!', '?', ';', ':')):
+            title += '.'
 
         div_post = ""
         if check_id(contentId):
