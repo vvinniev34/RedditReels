@@ -101,9 +101,9 @@ def createTextClip(wrappedText, start, duration, title):
     # if title:
         # print(f"{text_width} {text_height} {wrappedText}")
 
-    image_path = 'titleBackground.png'
+    image_path = 'images/large_post_background.png'
     if text_height <= 200:
-        image_path = 'redditBackground.png'
+        image_path = 'images/small_post_backgrund.png'
         text_height = 320
     else:
         text_height = 550
@@ -270,9 +270,9 @@ if __name__ == "__main__":
                 mp3_title_file_path = f"{post_path}/{post.split('.')[0]}_title.mp3"
                 output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
                 # add_mp3_padding(mp3_file_path, 1)
-                # duration = get_mp3_length(mp3_file_path)
-                # title_duration = get_mp3_length(mp3_title_file_path)
-                # randomVideoSegment(output_video_path, duration + title_duration)
+                duration = get_mp3_length(mp3_file_path)
+                title_duration = get_mp3_length(mp3_title_file_path)
+                randomVideoSegment(output_video_path, duration + title_duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
