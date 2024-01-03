@@ -72,7 +72,7 @@ def scrape(url, download_path, subreddit):
         link_elements = soup.find_all("a", {"slot": "full-post-link"})
 
         # Iterate through the div elements and filter based on your criteria
-        for i in range(min(len(link_elements), 1)):
+        for i in range(min(len(link_elements), 2)):
             link_element = link_elements[i]
             print(f"reddit.com{link_element.get('href')}")
 

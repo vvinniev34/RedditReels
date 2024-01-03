@@ -30,6 +30,7 @@ def speedup_audio(filename, subreddit_path):
 def convert(filename, folder_path):
     text_file_path = os.path.join(folder_path, filename)
     output_file = os.path.join(folder_path, f"{filename.split('.')[0]}.mp3")
+    output_title_file = os.path.join(folder_path, f"{filename.split('.')[0]}_title.mp3")
 
     # Initialize pyttsx3
     engine = pyttsx3.init("sapi5")
@@ -40,9 +41,15 @@ def convert(filename, folder_path):
     
     try:
         with open(text_file_path, 'r', encoding='utf-8') as file:
-            lines = file.read()
+            content = file.read()  # Read the rest of the file
+
+            first_punctuation_index = next((i for i, char in enumerate(content) if char in ['.', '!', '?']), None)
+            title = content[:first_punctuation_index + 1].strip()
+            lines = content[first_punctuation_index + 1:].strip()
 
             # tiktok tts
+            # tts(lines, "en_us_006", output_file, play_sound=False)
+            tts(title, "en_us_010", output_title_file, play_sound=False)
             tts(lines, "en_us_010", output_file, play_sound=False)
 
             # openai tts
@@ -56,6 +63,12 @@ def convert(filename, folder_path):
             # pyttsx3 tts
             # engine.save_to_file(lines, output_file)
             # engine.runAndWait()
+
+            output_directory = f"{folder_path}/{filename.split('.')[0]}"
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
+            with open(f"{output_directory}/videoTitle.txt", 'w') as file:
+                file.write(title)
         
         print(f"mp3 creation successful. Saved as {output_file}")
     
@@ -66,8 +79,8 @@ def convert(filename, folder_path):
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    today = "2023-12-29"
-    today = "Test"
+    # today = "2023-12-29"
+    # today = "Test"
 
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder
@@ -89,5 +102,5 @@ if __name__ == "__main__":
             elif filename.split('.')[-1] == "mp3":
                 # speedup if using gtts or openai
                 print(f"Spedup {filename} by 20%")
-                # speedup_audio(filename, subreddit_path)
+                speedup_audio(filename, subreddit_path)
                 

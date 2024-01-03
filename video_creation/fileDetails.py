@@ -1,6 +1,13 @@
 import os
+import math
+import pydub
 from pydub import AudioSegment
 from moviepy.editor import AudioFileClip
+
+# Construct the relative path to ffmpeg.exe
+script_dir = os.path.dirname(os.path.abspath(__file__))
+ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
+pydub.AudioSegment.ffmpeg = ffmpeg_exe_path
 
 def get_mp3_length(mp3_file_path):
     try:
@@ -27,6 +34,34 @@ def add_mp3_padding(file_path, padding_duration_seconds):
 
     # Overwrite the original file with the extended audio
     extended_audio.export(file_path, format="mp3")
+
+def calculate_db(input_file):
+    print(input_file)
+    audio_segment = AudioSegment.from_file(input_file)
+    # Calculate the dB level of an audio segment
+    rms = audio_segment.rms
+    if rms == 0:
+        return float('-inf')  # Avoid log(0)
+    return 20 * math.log10(rms)
+
+def increase_volume(input_file, output_file, gain_db):
+    # Load the audio file
+    audio = AudioSegment.from_file(input_file)
+
+    # Print the original dB level
+    original_db = calculate_db(audio)
+    print(f"Original dB level: {original_db:.2f} dB")
+
+    # Increase the volume
+    audio = audio + gain_db
+
+    # Export the modified audio to a new file
+    audio.export(output_file, format="mp3")
+
+    # Print the new dB level
+    new_db = calculate_db(audio)
+    print(f"New dB level: {new_db:.2f} dB")
+
 
 def count_non_empty_characters_in_directory(directory_path, output_file):
     # Initialize a counter for non-empty characters
@@ -70,59 +105,14 @@ def count_non_empty_characters_in_directory(directory_path, output_file):
 
 
 if __name__ == "__main__":
-    # Example usage:
-    directory_path = 'RedditPosts/2023-09-02/Texts'  # Replace with the path to your directory
-    output_file = "RedditPosts/2023-09-02/postDetails.txt"
+    date = "Test"    
+    directory_path = f'RedditPosts/{date}/Texts'  # Replace with the path to your directory
     all_files = []
     for subreddit in os.listdir(directory_path):
-        all_files.append(count_non_empty_characters_in_directory(f"{directory_path}/{subreddit}", output_file))
+        subredditFolder = f"{directory_path}/{subreddit}"
+        for post in os.listdir(subredditFolder):
+            if post.endswith(".mp3"):
+                postPath = f"{subredditFolder}/{post}"
+                print(calculate_db(postPath))
 
-    average_per_second = 0
-    most_per_second = 0
-    least_per_second = float('inf')
-
-    average_per_3_second = 0
-    most_per_3_second = 0
-    least_per_3_second = float('inf')
-
-    average_per_5_second = 0
-    most_per_5_second = 0
-    least_per_5_second = float('inf')
-
-    longest = 0
-    shortest = float('inf')
-
-    num_files = 0
-    for files in all_files:
-        for post in files:
-            shortest = min(shortest, post[1])
-            longest = max(longest, post[1])
-
-            average_per_second += post[2]
-            least_per_second = min(least_per_second, post[2])
-            most_per_second = max(most_per_second, post[2])
-
-            average_per_3_second += post[3]
-            least_per_3_second = min(least_per_3_second, post[3])
-            most_per_3_second = max(most_per_3_second, post[3])
-
-            average_per_5_second += post[4]
-            least_per_5_second = min(least_per_5_second, post[4])
-            most_per_5_second = max(most_per_5_second, post[4])
-
-            num_files += 1
-
-    print(f"video -- shortest : {shortest}; longest: {longest}")
-    print(f"1 -- average: {average_per_second / num_files}; least: {least_per_second}; most: {most_per_second}")
-    print(f"3 -- average: {average_per_3_second / num_files}; least: {least_per_3_second}; most: {most_per_3_second}")
-    print(f"5 -- average: {average_per_5_second / num_files}; least: {least_per_5_second}; most: {most_per_5_second}")
-
-# video -- shortest : 60.29; longest: 345.0
-# 1 -- average: 14.123736865087512; least: 12.83466740270494; most: 15.492711115002407
-# 3 -- average: 42.371210595262525; least: 38.50400220811482; most: 46.47813334500722
-# 5 -- average: 70.61868432543753; least: 64.1733370135247; most: 77.46355557501204
-
-# video -- shortest : 60.29; longest: 345.0
-# 1 -- average: 11.417994679938143; least: 10.267733922163952; most: 12.564023989843715
-# 3 -- average: 34.25398403981442; least: 30.803201766491853; most: 37.69207196953115
-# 5 -- average: 57.089973399690706; least: 51.33866961081976; most: 62.82011994921858
+    

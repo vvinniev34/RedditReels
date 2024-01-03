@@ -1,16 +1,16 @@
 import os
 import subprocess
 
-if __name__ == "main":
+if __name__ == "__main__":
     # Run the Python files
     # get top weekly posts
-    subprocess.run(["python", "topKWeeklyPostsScraper.py"])
+    subprocess.run(["python", "./topKWeeklyPostsScraper.py"])
     # get post content
-    subprocess.run(["python", "scrapeLinks.py"])
+    subprocess.run(["python", "./scrapeLinksEdge.py"])
     # convert post content to mp3
-    subprocess.run(["python", "textToSpeech.py"])
+    subprocess.run(["python", "./textToSpeech.py"])
     # create videos
-    subprocess.run(["python", "textOverlay.py"])
+    subprocess.run(["python", "./textOverlay.py"])
 
     # upload videos
     # today = date.today().strftime("%Y-%m-%d")
@@ -20,4 +20,5 @@ if __name__ == "main":
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
             if post.endswith("F.mp3"):
-                subprocess.run(["python", "uploadVideo", "--file", f"{post_path}/{post}"])
+                print("uploading...")
+                # subprocess.run(["python", "uploadVideo", "--file", f"{post_path}/{post}"])
