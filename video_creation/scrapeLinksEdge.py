@@ -5,17 +5,16 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.edge import service
 from openai import OpenAI
 from datetime import date
-# client = OpenAI()
-
+import demoji
 import time
 import os
-import nltk
-# nltk.download('punkt')  # Download the Punkt tokenizer data (only needs to be done once)
-from nltk.tokenize import sent_tokenize
 
 s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
 driver = webdriver.Edge(service=s)
 entire_post = ""
+
+def remove_emojis(text):
+    return demoji.replace(text, '')
 
 def check_id(id_name):
     try:
@@ -66,7 +65,6 @@ def getContent(url, download_path, subreddit, number):
         # get the title and post
         post_title = driver.find_element(By.ID, titleId)
         title = post_title.text
-        entire_post = title + '\n'
 
         div_post = ""
         if check_id(contentId):
@@ -88,16 +86,18 @@ def getContent(url, download_path, subreddit, number):
         messages=[
             {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
             {"role": "user", "content": prompt}
-        ])
-        # print(completion.choices[0].message.content)
+        ]) 
 
-        # filter out non alphabet characters for the text file
+        # create the file
         filename = subreddit + str(number) + ".txt"
+
+        entire_post = title + '.\n' + completion.choices[0].message.content
+        entire_post = remove_emojis(entire_post)
 
         # create a file and write the title to it
         output_file = os.path.join(download_path, filename)
         with open(output_file, 'w') as file:
-            file.write(completion.choices[0].message.content)
+            file.write(entire_post)
     
         return True
     except Exception as e:
