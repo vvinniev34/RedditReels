@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.edge import service
 from openai import OpenAI
+from accountCredentials.openai_key import OPENAI_API_KEY
 from datetime import date
 import demoji
 import time
@@ -83,7 +84,8 @@ def getContent(url, download_path, subreddit, number):
             entire_post += p_element.text + '\n'
 
         prompt = "Can you edit this text to get rid of grammar errors and to shorten long sentences?" + '\n' + entire_post
-        client = OpenAI()
+        # client = OpenAI()
+        client = OpenAI(api_key=OPENAI_API_KEY)
 
         completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -119,8 +121,8 @@ if __name__ == "__main__":
     # getContent(url, "", "", "")
 
     # Define the URL of the Reddit page you want to scrape
-    # today = date.today().strftime("%Y-%m-%d")
-    today = "2023-09-02"
+    today = date.today().strftime("%Y-%m-%d")
+    # today = "2023-09-02"
 
     filePath = f"RedditPosts/{today}/links.txt"
     download_path = f"RedditPosts/{today}/Texts"

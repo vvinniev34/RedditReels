@@ -71,7 +71,7 @@ def splitTextForWrap(input_str: str, line_length: int):
 def randomVideoSegment(output_video_filepath, duration):
     background_video_path = "backgroundVideos/subwaySurfers.mp4"
     # total_duration_seconds = 12 * 60 + 34 # subway surfers
-    total_duration_seconds = 12 * 60 + 34 # minecraft parkour
+    total_duration_seconds = 60 * 60 # minecraft parkour
 
     random_start_time_seconds = random.uniform(0, total_duration_seconds - duration)
     video_clip = VideoFileClip(background_video_path)
@@ -103,7 +103,7 @@ def createTextClip(wrappedText, start, duration, title):
 
     image_path = 'images/large_post_background.png'
     if text_height <= 200:
-        image_path = 'images/small_post_backgrund.png'
+        image_path = 'images/small_post_background.png'
         text_height = 320
     else:
         text_height = 550
@@ -130,16 +130,17 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
     video_title_path = f"{mp4_file_path.split('.')[0]}/videoTitle.txt"
     video_title = "Errors Reading From Title"
     with open(video_title_path, 'r') as file:
-        video_title = file.read().strip()
+        video_title = file.read().strip()[:-8]
+        print(video_title)
     title_duration = get_mp3_length(mp3_title_file_path)
     multipleParts = title_duration + mp3_duration > 60
     title_textclip, title_shadow_textclip = createTextClip(video_title + ("\n(part 1)" if multipleParts else ""), 0, title_duration, True)
     
-    title_last_word_time = 0
-    title_audio = whisper.load_audio(mp3_title_file_path)
-    title_audio_result = whisper.transcribe(model, title_audio, 'en')
-    for segment in title_audio_result['segments']:
-        title_last_word_time = segment['end']
+    # title_last_word_time = 0
+    # title_audio = whisper.load_audio(mp3_title_file_path)
+    # title_audio_result = whisper.transcribe(model, title_audio, 'en')
+    # for segment in title_audio_result['segments']:
+    #     title_last_word_time = segment['end']
 
     audio = whisper.load_audio(mp3_file_path)
     result = whisper.transcribe(model, audio, 'en')
@@ -215,13 +216,16 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
             currentVidTime += duration
 
         # for video title testing purposes
-        # if (currentVidTime > 6):
-        #     break
+        if (currentVidTime > 6):
+            break
     video_segments[partNum][1].append(start_time)
 
     audio_clip = AudioFileClip(mp3_file_path)
+
     # subclip to remove audio artifact, unusure why AudioFileclip makes, maybe a bug?
-    title_audio_clip = AudioFileClip(mp3_title_file_path).subclip(0, title_last_word_time)
+    title_audio_clip = AudioFileClip(mp3_title_file_path)
+    # title_audio_clip.write_audiofile("temp.mp3", codec='mp3')
+    # title_audio_clip = title_audio_clip.subclip(0, title_last_word_time)
     
     partNum = 1
     for part in video_segments:
@@ -230,7 +234,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
         snipped_title_video = video_clip.subclip(0, title_duration) if partNum == 1 else video_clip.subclip(start_time, start_time + title_duration)
         # print(str(snipped_title_video.duration) + " " + str(title_last_word_time))
-        snipped_title_audio_clip = title_audio_clip.audio_fadeout(snipped_title_video.duration - title_last_word_time)
+        snipped_title_audio_clip = title_audio_clip.subclip(0, -0.15)#.audio_fadeout(snipped_title_video.duration - title_last_word_time)
         
         snipped_video = video_clip.subclip(start_time + title_duration, end_time + title_duration)
         snipped_audio = audio_clip.subclip(start_time, end_time)
@@ -238,7 +242,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
         title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
         title_video_with_text = CompositeVideoClip([title_video_with_text] + part[0][:2])
 
-        # title_video_with_text.write_videofile("temp.mp4", codec="libx264", threads=8, preset='ultrafast', logger = None)
+        title_video_with_text.write_videofile("temp.mp4", codec="libx264", threads=8, preset='ultrafast', logger = None)
 
         video_with_text = CompositeVideoClip([snipped_video] + part[0][2:])
         video_with_text = video_with_text.set_audio(snipped_audio)
@@ -258,7 +262,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    today = "2024-01-02"
+    # today = "2024-01-02"
     # today = "Test"
 
     folder_path = f"RedditPosts/{today}/Texts"
