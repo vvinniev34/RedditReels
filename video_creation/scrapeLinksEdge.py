@@ -9,6 +9,7 @@ from datetime import date
 import demoji
 import time
 import os
+import re
 
 # s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
 s=service.Service(r"edgedriver_win64/msedgedriver.exe")
@@ -40,6 +41,72 @@ def check_selector(selector):
         return False
     return True
 
+from selenium.webdriver.support.ui import WebDriverWait 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+
+def login():
+    driver.get("https://www.reddit.com/login/")
+    username_field = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "loginUsername"))
+    )
+    password_field = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "loginPassword"))
+    )
+    username_field.send_keys("According-Tap-6413")
+    password_field.send_keys("redditreels09062023!")
+    login_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "AnimatedForm__submitButton"))
+    )
+    login_button.click()
+
+    time.sleep(5)
+
+def getContentLoggedIn(url, download_path, subreddit, number):
+    if not os.path.exists(download_path):
+        os.makedirs(download_path)
+    try:
+        driver.get(url)
+        driver.execute_script("return document.readyState")
+        div_post = ""
+        contentClass = "_3xX726aBn29LDbsDtzr_6E"
+        div_post = driver.find_element(By.CLASS_NAME, contentClass)
+        title_element = driver.find_element(By.TAG_NAME, "title")
+
+        title = title_element.get_attribute("text").split(':')[0].strip()
+        if not title.endswith(('.', '!', '?', ';', ':')):
+            title += '.'
+
+        entire_post = title + "\n"
+
+        # get all text into a variable
+        p_elements = div_post.find_elements(By.TAG_NAME, "p")
+        for p_element in p_elements:
+            # Tokenize the input text into sentences
+            entire_post += p_element.text + '\n'
+
+        pattern = re.compile(r'edit:', re.IGNORECASE)
+        match = pattern.search(entire_post)
+        if match:
+            entire_post = entire_post[:match.start()]
+
+        # create the file
+        filename = subreddit + str(number) + ".txt"
+
+        entire_post = entire_post
+        # entire_post = title + '.\n' + completion.choices[0].message.content
+        entire_post = remove_emojis(entire_post)
+
+        # create a file and write the title to it
+        output_file = os.path.join(download_path, filename)
+        with open(output_file, 'w', encoding='utf-8') as file:
+            file.write(entire_post)
+        return True
+    
+    except Exception as e:
+        print("An error occurred:", str(e))
+        return False
+
 
 def getContent(url, download_path, subreddit, number):
     if not os.path.exists(download_path):
@@ -68,7 +135,7 @@ def getContent(url, download_path, subreddit, number):
         post_title = driver.find_element(By.ID, titleId)
         title = post_title.text
         
-        if not title.endswith(('.', '!', '?', ';', ':')):
+        if not title.strip().endswith(('.', '!', '?', ';', ':')):
             title += '.'
 
         div_post = ""
@@ -83,26 +150,32 @@ def getContent(url, download_path, subreddit, number):
             # Tokenize the input text into sentences
             entire_post += p_element.text + '\n'
 
-        prompt = "Can you edit this text to get rid of grammar errors and to shorten long sentences?" + '\n' + entire_post
-        # client = OpenAI()
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        pattern = re.compile(r'edit:', re.IGNORECASE)
+        match = pattern.search(entire_post)
+        if match:
+            entire_post = entire_post[:match.start()]
 
-        completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
-            {"role": "user", "content": prompt}
-        ]) 
+        # prompt = "Can you edit this text to get rid of grammar errors and to shorten long sentences?" + '\n' + entire_post
+        # # client = OpenAI()
+        # client = OpenAI(api_key=OPENAI_API_KEY)
+
+        # completion = client.chat.completions.create(
+        # model="gpt-3.5-turbo",
+        # messages=[
+        #     {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
+        #     {"role": "user", "content": prompt}
+        # ]) 
 
         # create the file
         filename = subreddit + str(number) + ".txt"
 
-        entire_post = title + '.\n' + completion.choices[0].message.content
+        entire_post = title + '.\n' + entire_post
+        # entire_post = title + '.\n' + completion.choices[0].message.content
         entire_post = remove_emojis(entire_post)
 
         # create a file and write the title to it
         output_file = os.path.join(download_path, filename)
-        with open(output_file, 'w') as file:
+        with open(output_file, 'w', encoding='utf-8') as file:
             file.write(entire_post)
         return True
     except Exception as e:
@@ -115,13 +188,13 @@ if __name__ == "__main__":
     # today = date.today().strftime("%Y-%m-%d")
     # today = "2023-09-02"
 
-
     # url = "https://www.reddit.com/r/AmItheAsshole/comments/167chip/aita_for_not_disclosing_to_my_daughter_she_wasnt/"
     # getContent(url, "", "", "")
 
     # Define the URL of the Reddit page you want to scrape
     today = date.today().strftime("%Y-%m-%d")
     # today = "2023-09-02"
+    login()
 
     filePath = f"RedditPosts/{today}/links.txt"
     download_path = f"RedditPosts/{today}/Texts"
@@ -135,7 +208,7 @@ if __name__ == "__main__":
             path = download_path + '/' + subreddit
             if "reddit.com" in tryLink:
                 # print(link)
-                if getContent(tryLink, path, subreddit, count):
+                if getContentLoggedIn(tryLink, path, subreddit, count):
                     count += 1
             else:
                 subreddit = link.strip()

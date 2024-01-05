@@ -70,7 +70,7 @@ def convert(filename, folder_path):
             output_directory = f"{folder_path}/{filename.split('.')[0]}"
             if not os.path.exists(output_directory):
                 os.makedirs(output_directory)
-            with open(f"{output_directory}/videoTitle.txt", 'w') as file:
+            with open(f"{output_directory}/videoTitle.txt", 'w', encoding='utf-8') as file:
                 file.write(title)
         
         print(f"mp3 creation successful. Saved as {output_file}")

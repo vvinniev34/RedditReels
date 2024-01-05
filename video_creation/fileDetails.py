@@ -2,12 +2,14 @@ import os
 import math
 import pydub
 from pydub import AudioSegment
-from moviepy.editor import AudioFileClip
+from moviepy.editor import AudioFileClip, VideoFileClip
 
 # Construct the relative path to ffmpeg.exe
 script_dir = os.path.dirname(os.path.abspath(__file__))
 ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 pydub.AudioSegment.ffmpeg = ffmpeg_exe_path
+# pydub.AudioSegment.converter = ffmpeg_exe_path
+# pydub.utils.get_prober_name = lambda: ffmpeg_exe_path
 
 def get_mp3_length(mp3_file_path):
     try:
@@ -62,57 +64,57 @@ def increase_volume(input_file, output_file, gain_db):
     new_db = calculate_db(audio)
     print(f"New dB level: {new_db:.2f} dB")
 
+def convert_video_to_audio(input_video_path, output_audio_path):
+    # Load the video clip
+    video_clip = VideoFileClip(input_video_path)
 
-def count_non_empty_characters_in_directory(directory_path, output_file):
-    # Initialize a counter for non-empty characters
-    files = []
+    # Extract the audio from the video
+    audio_clip = video_clip.audio
 
-    # Iterate through files in the directory
-    for filename in os.listdir(directory_path):
-        # Check if the file has a .txt extension
-        if filename.endswith(".txt"):
-            # Get the full file path
-            file_path = os.path.join(directory_path, filename)
+    # Write the audio to an MP3 file
+    audio_clip.write_audiofile(output_audio_path, codec='mp3')
 
-            # Open the file for reading
-            with open(file_path, 'r', encoding='utf-8') as file:
-                # Initialize a counter for non-empty characters in the file
-                non_empty_char_count = 0
-                # Iterate through each line in the file
-                for line in file:
-                    # Remove leading and trailing whitespace from the line
-                    line = line.strip()
-                    # Remove spaces from the line and count non-empty characters
-                    line = line.replace(" ", "")  # This removes spaces
-                    if line:
-                        non_empty_char_count += len(line)
+    # Close the clips
+    video_clip.close()
+    audio_clip.close()
 
+def make_mp4_audio_louder(video_path, audio_path, volume_factor):
+    # Load the video clip
+    video_clip = VideoFileClip(video_path)
 
-                mp3_file_path = f"{directory_path}/{filename.split('.')[0]}.mp3"
-                length_seconds = get_mp3_length(mp3_file_path)
-                with open(output_file, 'a') as file:
-                    file.write(f"{filename}\n\n")
-                    file.write(f"Non-empty characters: {non_empty_char_count}\n")
-                    file.write(f"Length of MP3 file: {length_seconds:.2f} seconds\n")
-                    file.write(f"Average characters per second: {non_empty_char_count / length_seconds:.2f}\n")
-                    file.write(f"Average characters per 3 seconds: {3 * non_empty_char_count / length_seconds:.2f}\n")
-                    file.write(f"Average characters per 5 seconds: {5 * non_empty_char_count / length_seconds:.2f}\n\n")
+    # Load the audio clip
+    audio_clip = AudioFileClip(audio_path)
 
-                files.append([non_empty_char_count, length_seconds, (non_empty_char_count / length_seconds),
-                              3 * non_empty_char_count / length_seconds, 5 * non_empty_char_count / length_seconds])
-            
-    return files
+    # Adjust the volume
+    loud_audio = audio_clip.volumex(volume_factor)
 
+    # Set the loud audio to the video clip
+    video_clip = video_clip.set_audio(loud_audio)
+
+    # Return the modified video clip
+    return video_clip
+
+def make_mp3_audio_louder(input_audio_path, output_audio_path, volume_factor):
+    audio_clip = AudioSegment.from_file(input_audio_path)
+    loud_audio = audio_clip + volume_factor
+    loud_audio.export(output_audio_path, format="mp3")
 
 if __name__ == "__main__":
-    date = "Test"    
-    directory_path = f'RedditPosts/{date}/Texts'  # Replace with the path to your directory
-    all_files = []
-    for subreddit in os.listdir(directory_path):
-        subredditFolder = f"{directory_path}/{subreddit}"
-        for post in os.listdir(subredditFolder):
-            if post.endswith(".mp3"):
-                postPath = f"{subredditFolder}/{post}"
-                print(calculate_db(postPath))
+    # date = "Test"    
+    # directory_path = f'RedditPosts/{date}/Texts'  # Replace with the path to your directory
+    # all_files = []
+    # for subreddit in os.listdir(directory_path):
+    #     subredditFolder = f"{directory_path}/{subreddit}"
+    #     for post in os.listdir(subredditFolder):
+    #         if post.endswith(".mp3"):
+    #             postPath = f"{subredditFolder}/{post}"
+    #             print(calculate_db(postPath))
+
+    input_video_path = 'audio/snowfall_volume_boosted.mp4'
+    output_audio_path = 'audio/snowfall_volume_boosted.mp3'
+
+    convert_video_to_audio(input_video_path, output_audio_path)
+
+    # make_mp3_audio_louder("audio/snowfall.mp3", "audio/snowfall2x.mp3", 2.0)
 
     
