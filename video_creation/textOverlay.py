@@ -91,12 +91,16 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
     video_title_path = f"{mp4_file_path.split('.')[0]}/videoTitle.txt"
     video_title = "Errors Reading From Title"
     with open(video_title_path, 'r', encoding='utf-8') as file:
-        video_title = file.read().strip()[:-8]
+        video_title = file.read().strip()
         # print(video_title)
     title_duration = get_mp3_length(mp3_title_file_path)
     multipleParts = title_duration + mp3_duration > 60
     b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts else ""), 0, title_duration)
     
+    # if more than a 6 parter, create long form content intead
+    long_form = False
+    if (mp3_duration + title_duration) >= 360:
+        long_form = True
     # title_last_word_time = 0
     # title_audio = whisper.load_audio(mp3_title_file_path)
     # title_audio_result = whisper.transcribe(model, title_audio, 'en')
@@ -157,7 +161,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
             print(f"{start_time} {start_time + duration} {duration}\n'{wrappedText}'")
 
             # if length is over 60 seconds, create a new part for the video
-            if ((endTime + (title_duration + 1) * (partNum + 1)) > currentMaxVidTime):
+            if ((endTime + (title_duration + 1) * (partNum + 1)) > currentMaxVidTime and not long_form):
                 video_segments[partNum][1].append(start_time)
                 currentMaxVidTime += 60
                 partNum += 1
@@ -214,8 +218,9 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
         final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
         
-        dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix"]
-        if any(text.lower() in postName.lower() for text in dark_theme_subreddits):
+        # add dark theme to some subreddits and if it's not long form content
+        dark_theme_subreddits = ["nosleep", "creepyencounters", "letsnotmeet", "glitch_in_the_matrix"]
+        if any(text.lower() in postName.lower() for text in dark_theme_subreddits) and not long_form:
             # add snowfall background music for horror stories
             random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
             snowfall_audio = AudioFileClip("audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
@@ -248,8 +253,7 @@ if __name__ == "__main__":
                 # add_mp3_padding(mp3_file_path, 1)
                 duration = get_mp3_length(mp3_file_path)
                 title_duration = get_mp3_length(mp3_title_file_path)
-                if (duration + title_duration) < 360:
-                    randomVideoSegment(output_video_path, duration + title_duration)
+                randomVideoSegment(output_video_path, duration + title_duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"

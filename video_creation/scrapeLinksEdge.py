@@ -5,6 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.edge import service
 from openai import OpenAI
 from accountCredentials.openai_key import OPENAI_API_KEY
+from accountCredentials.reddit_account import reddit_username, reddit_password
 from datetime import date
 import demoji
 import time
@@ -53,8 +54,8 @@ def login():
     password_field = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, "loginPassword"))
     )
-    username_field.send_keys("According-Tap-6413")
-    password_field.send_keys("redditreels09062023!")
+    username_field.send_keys(reddit_username)
+    password_field.send_keys(reddit_password)
     login_button = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.CLASS_NAME, "AnimatedForm__submitButton"))
     )
@@ -73,7 +74,8 @@ def getContentLoggedIn(url, download_path, subreddit, number):
         div_post = driver.find_element(By.CLASS_NAME, contentClass)
         title_element = driver.find_element(By.TAG_NAME, "title")
 
-        title = title_element.get_attribute("text").split(':')[0].strip()
+        # title = title_element.get_attribute("text").split(':')[0].strip()
+        title = title_element.get_attribute("text").rsplit(':', 1)[0].strip()
         if not title.endswith(('.', '!', '?', ';', ':')):
             title += '.'
 

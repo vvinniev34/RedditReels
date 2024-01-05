@@ -45,7 +45,7 @@ def convert(filename, folder_path):
             content = file.read()  # Read the rest of the file
 
             first_punctuation_index = next((i for i, char in enumerate(content) if char in ['.', '!', '?']), None)
-            title = content[:first_punctuation_index + 1].strip() + ' " ... "'
+            title = content[:first_punctuation_index + 1].strip()
             lines = content[first_punctuation_index + 1:].strip()
 
             # tiktok tts
