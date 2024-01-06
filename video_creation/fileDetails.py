@@ -1,5 +1,7 @@
 import os
 import math
+import shutil
+import numpy as np
 import pydub
 from pydub import AudioSegment
 from moviepy.editor import AudioFileClip, VideoFileClip
@@ -22,82 +24,48 @@ def get_mp3_length(mp3_file_path):
         return None
     
 def add_mp3_padding(file_path, padding_duration_seconds):
-    # Load the input MP3 file
     audio = AudioSegment.from_file(file_path, format="mp3")
-
-    # Calculate the duration of the padding in milliseconds
     padding_duration_ms = int(padding_duration_seconds * 1000)
-
-    # Create a silent audio segment for padding
     padding = AudioSegment.silent(duration=padding_duration_ms)
-
-    # Concatenate the original audio with the padding
     extended_audio = audio + padding
-
-    # Overwrite the original file with the extended audio
     extended_audio.export(file_path, format="mp3")
 
 def calculate_db(input_file):
     print(input_file)
     audio_segment = AudioSegment.from_file(input_file)
-    # Calculate the dB level of an audio segment
     rms = audio_segment.rms
     if rms == 0:
         return float('-inf')  # Avoid log(0)
     return 20 * math.log10(rms)
 
-def increase_volume(input_file, output_file, gain_db):
-    # Load the audio file
-    audio = AudioSegment.from_file(input_file)
-
-    # Print the original dB level
-    original_db = calculate_db(audio)
-    print(f"Original dB level: {original_db:.2f} dB")
-
-    # Increase the volume
-    audio = audio + gain_db
-
-    # Export the modified audio to a new file
-    audio.export(output_file, format="mp3")
-
-    # Print the new dB level
-    new_db = calculate_db(audio)
-    print(f"New dB level: {new_db:.2f} dB")
-
-def convert_video_to_audio(input_video_path, output_audio_path):
-    # Load the video clip
-    video_clip = VideoFileClip(input_video_path)
-
-    # Extract the audio from the video
-    audio_clip = video_clip.audio
-
-    # Write the audio to an MP3 file
-    audio_clip.write_audiofile(output_audio_path, codec='mp3')
-
-    # Close the clips
-    video_clip.close()
-    audio_clip.close()
-
-def make_mp4_audio_louder(video_path, audio_path, volume_factor):
-    # Load the video clip
-    video_clip = VideoFileClip(video_path)
-
-    # Load the audio clip
-    audio_clip = AudioFileClip(audio_path)
-
-    # Adjust the volume
-    loud_audio = audio_clip.volumex(volume_factor)
-
-    # Set the loud audio to the video clip
-    video_clip = video_clip.set_audio(loud_audio)
-
-    # Return the modified video clip
-    return video_clip
-
 def make_mp3_audio_louder(input_audio_path, output_audio_path, volume_factor):
     audio_clip = AudioSegment.from_file(input_audio_path)
     loud_audio = audio_clip + volume_factor
     loud_audio.export(output_audio_path, format="mp3")
+
+def convert_video_to_audio(input_video_path, output_audio_path):
+    # Load the video clip
+    video_clip = VideoFileClip(input_video_path)
+    audio_clip = video_clip.audio
+    audio_clip.write_audiofile(output_audio_path, codec='mp3')
+    video_clip.close()
+    audio_clip.close()
+
+def adjust_mp4_volume(file_path, target_dB):
+    video_clip = VideoFileClip(file_path)
+    mean_volume_dB = 20 * np.log10(np.sqrt(np.mean(video_clip.audio.to_soundarray()**2)))
+    volume_factor = 10**((target_dB - mean_volume_dB) / 20)
+    print(f"{volume_factor} {mean_volume_dB}")
+    # new_video_clip = video_clip.volumex(volume_factor)
+    new_video_clip = video_clip.multiply_volume(volume_factor).set_audio(video_clip.audio)
+
+    print(f"Adjusting {file_path} to -14dB")
+    temp_file_path = f"{file_path.split('.')[0]}_temp.mp4"
+    # new_video_clip.write_videofile(temp_file_path, codec='libx264', audio_codec='aac', logger=None)
+    new_video_clip.write_videofile(temp_file_path, codec='libx264', audio_codec='aac', logger=None, temp_audiofile="temp-audio.m4a", remove_temp=True)
+    # shutil.move(temp_file_path, file_path)
+    video_clip.close()
+    new_video_clip.close()
 
 if __name__ == "__main__":
     # date = "Test"    
@@ -110,11 +78,12 @@ if __name__ == "__main__":
     #             postPath = f"{subredditFolder}/{post}"
     #             print(calculate_db(postPath))
 
-    input_video_path = 'audio/snowfall_volume_boosted.mp4'
-    output_audio_path = 'audio/snowfall_volume_boosted.mp3'
+    # input_video_path = 'audio/snowfall_volume_boosted.mp4'
+    # output_audio_path = 'audio/snowfall_volume_boosted.mp3'
 
-    convert_video_to_audio(input_video_path, output_audio_path)
+    # convert_video_to_audio(input_video_path, output_audio_path)
 
     # make_mp3_audio_louder("audio/snowfall.mp3", "audio/snowfall2x.mp3", 2.0)
+    calculate_db("RedditPosts/2024-01-05/Texts/creepyencounters/creepyencounters1/part1.mp4")
 
     

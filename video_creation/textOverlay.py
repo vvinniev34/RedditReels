@@ -6,7 +6,7 @@ from datetime import date
 import subprocess
 import whisper_timestamped as whisper
 from moviepy.editor import VideoFileClip, ImageClip, TextClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, concatenate_videoclips
-from fileDetails import get_mp3_length, add_mp3_padding
+from fileDetails import get_mp3_length, add_mp3_padding, adjust_mp4_volume
 from generateClips import createTitleClip, createTextClip
 
 # Get the current working directory of the script
@@ -94,13 +94,15 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
         video_title = file.read().strip()
         # print(video_title)
     title_duration = get_mp3_length(mp3_title_file_path)
-    multipleParts = title_duration + mp3_duration > 60
-    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts else ""), 0, title_duration)
-    
-    # if more than a 6 parter, create long form content intead
+
+     # if more than a 6 parter, create long form content intead
     long_form = False
-    if (mp3_duration + title_duration) >= 360:
+    if (mp3_duration + title_duration) >= 180:
         long_form = True
+    multipleParts = title_duration + mp3_duration > 60
+
+    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts and not long_form else ""), 0, title_duration)
+    
     # title_last_word_time = 0
     # title_audio = whisper.load_audio(mp3_title_file_path)
     # title_audio_result = whisper.transcribe(model, title_audio, 'en')
@@ -123,7 +125,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
     video_clip = VideoFileClip(video_path)
 
-    print("Overlaying Text on Video...")
+    print(f"Overlaying Text on {postName}...")
     first_segment = True
     for segment in result['segments']:
         abbreviationFixedText = replace_abbreviations(segment['text'])
@@ -132,13 +134,13 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
         # split segment into multiple if phrase is longer than 30 characters
         splitSegments = []
-        if (len(abbreviationFixedText) <= 30):
+        if (len(abbreviationFixedText) <= 30 and (len(abbreviationFixedText) < 20 or len(abbreviationFixedText) > 21)):
             splitSegments.append([abbreviationFixedText, segment['end']])
         else:
             currentText = ""
             prevEnd = start_time
             for word in segment['words']:
-                if (len(word['text']) + len(currentText) + 1) <= 15:
+                if (len(word['text']) + len(currentText) + 1) < 15:
                     currentText += (word['text'] + " ")
                 else:
                     splitSegments.append([replace_abbreviations(currentText), prevEnd])
@@ -151,14 +153,14 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
         # create text overlay for each segment
         for split in splitSegments:
-            text = split[0]
+            text = split[0].strip()
             endTime = split[1]
 
             # wrappedText = splitTextForWrap(text.strip(), 15)
             wrappedText = text
 
             duration = endTime - start_time
-            print(f"{start_time} {start_time + duration} {duration}\n'{wrappedText}'")
+            # print(f"{start_time} {start_time + duration} {duration}\n'{wrappedText}'")
 
             # if length is over 60 seconds, create a new part for the video
             if ((endTime + (title_duration + 1) * (partNum + 1)) > currentMaxVidTime and not long_form):
@@ -253,7 +255,7 @@ if __name__ == "__main__":
                 # add_mp3_padding(mp3_file_path, 1)
                 duration = get_mp3_length(mp3_file_path)
                 title_duration = get_mp3_length(mp3_title_file_path)
-                randomVideoSegment(output_video_path, duration + title_duration)
+                # randomVideoSegment(output_video_path, duration + title_duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
@@ -263,4 +265,14 @@ if __name__ == "__main__":
                 mp3_title_file_path = f"{post_path}/{post.split('.')[0]}_title.mp3"
                 mp4_file_path = f"{post_path}/{post}"
                 overlayText(mp3_file_path, mp3_title_file_path, mp4_file_path, post_path, f"{post.split('.')[0]}")
+
+    # adjust audio to -14dB for youtube
+    # for subreddit in os.listdir(folder_path):
+    #     post_path = f"{folder_path}/{subreddit}"
+    #     for post in os.listdir(post_path):
+    #         video_path = f"{post_path}/{post}"
+    #         if os.path.isdir(video_path):
+    #             for video in os.listdir(video_path):
+    #                 if video.endswith(".mp4"):
+    #                     adjust_mp4_volume(f"{video_path}/{video}", -14)
     print("Video Maker Completed")

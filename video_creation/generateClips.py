@@ -42,7 +42,7 @@ def createTitleClip(wrappedText, start, duration):
     banner_path = 'images/banner.png'
     banner_clip = ImageClip(banner_path, duration=duration).resize(width=900)
     banner_clip = banner_clip.set_pos((center_x, height_y / 2 - (text_height / 2) - banner_clip.size[1] - 10))
-    print(f"text size: {new_textclip.size}; Image Size: {banner_clip.size}")
+    # print(f"text size: {new_textclip.size}; Image Size: {banner_clip.size}")
     comment_path = 'images/comments.png'
     comment_clip = ImageClip(comment_path, duration=duration).resize(width=900)
     comment_clip = comment_clip.set_pos((center_x, height_y / 2 + (text_height / 2) + 10))
@@ -63,6 +63,7 @@ def createTextClip(wrappedText, start, duration):
         color='white', 
         bg_color='transparent',
         method='caption',
+        # method='label',
         font='C:/Windows/fonts/GILBI___.TTF', 
         size=(textbox_size_x, None)#, textbox_size_y)
     ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
@@ -75,9 +76,10 @@ def createTextClip(wrappedText, start, duration):
         stroke_width=20,
         stroke_color="black",
         method='caption',
+        # method='label',
         font='C:/Windows/fonts/GILBI___.TTF', 
         size=(textbox_size_x, None)#, textbox_size_y)
-    ).set_start(start).set_duration(duration).set_position(('center', 'center'))
+    ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
 
     return new_textclip, shadow_textclip
 

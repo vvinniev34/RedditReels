@@ -51,14 +51,14 @@ driver = webdriver.Edge(service=s)
 def scroll_page(by_pixels):
     driver.execute_script(f"window.scrollBy(0, {by_pixels});")
     
-def scrape(url, download_path, subreddit, max_stories):
+def scrape(url, download_path, subreddit):
     # Create the download directory if it doesn't exist
     if not os.path.exists(download_path):
         os.makedirs(download_path)
 
     output_file = os.path.join(download_path, "links.txt")
     with open(output_file, 'a') as file:
-        file.write(f"{subreddit}\n\n")
+        file.write(f"{subreddit[0]}\n\n")
 
     try:
         # Send an HTTP GET request to the URL using Selenium
@@ -79,7 +79,7 @@ def scrape(url, download_path, subreddit, max_stories):
         link_elements = soup.find_all("a", {"slot": "full-post-link"})
 
         # Iterate through the div elements and filter based on your criteria
-        for i in range(min(len(link_elements), max_stories)):
+        for i in range(min(len(link_elements), subreddit[1])):
             link_element = link_elements[i]
             print(f"reddit.com{link_element.get('href')}")
 
@@ -88,30 +88,30 @@ def scrape(url, download_path, subreddit, max_stories):
         with open(output_file, 'a') as file:
             file.write("\n")
     except:
-        print(f"No posts today on {subreddit}")
+        print(f"No posts today on {subreddit[0]}")
     finally:
-        print(f"Finished running {subreddit}")
+        print(f"Finished running {subreddit[0]}")
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     current_date = datetime.datetime.now()
     
     long_form_subreddits = ["nosleep"]
-    daily_subreddits = ["nosleep", "LetsNotMeet", "TrueOffMyChest", "MaliciousCompliance", "creepyencounters"]
-    weekly_subreddits = ["entitledparents", "pettyrevenge", "tifu", "AmItheAsshole", "relationship_advice", "Glitch_in_the_Matrix"]
+    daily_subreddits = [["LetsNotMeet", 2], ["TrueOffMyChest", 5], ["creepyencounters", 2]]
+    weekly_subreddits = ["entitledparents", "pettyrevenge", "tifu", ["MaliciousCompliance", 4], "AmItheAsshole", "relationship_advice", "Glitch_in_the_Matrix", "relationships"]
     for subreddit in daily_subreddits:
         # Define the URLs of the Reddit page you want to scrape
-        url = f"https://www.reddit.com/r/{subreddit}/top/?t=daily"
+        url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=daily"
         # Get today's date
         download_path = f"RedditPosts/{today}"
-        scrape(url, download_path, subreddit, 3)
+        scrape(url, download_path, subreddit)
     # run weekly scraper on sundays
     if current_date.weekday() == 6:
         for subreddit in weekly_subreddits:
             # Define the URLs of the Reddit page you want to scrape
-            url = f"https://www.reddit.com/r/{subreddit}/top/?t=weekly"
+            url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=weekly"
             # Get today's date
             download_path = f"RedditPosts/{today}"
-            scrape(url, download_path, subreddit, 5)
+            scrape(url, download_path, subreddit)
     # Close the browser
     driver.quit()
