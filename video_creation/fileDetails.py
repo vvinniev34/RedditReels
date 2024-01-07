@@ -3,6 +3,7 @@ import math
 import shutil
 import numpy as np
 import pydub
+import wave
 from pydub import AudioSegment
 from moviepy.editor import AudioFileClip, VideoFileClip
 
@@ -12,6 +13,16 @@ ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 pydub.AudioSegment.ffmpeg = ffmpeg_exe_path
 # pydub.AudioSegment.converter = ffmpeg_exe_path
 # pydub.utils.get_prober_name = lambda: ffmpeg_exe_path
+
+def get_wav_length(wav_file_path):
+    try:
+        with wave.open(wav_file_path, 'rb') as wav_file:
+            # Get the duration in seconds
+            duration_seconds = wav_file.getnframes() / float(wav_file.getframerate())
+            return duration_seconds
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 def get_mp3_length(mp3_file_path):
     try:

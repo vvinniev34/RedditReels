@@ -1,13 +1,12 @@
 import os
 import time
 from datetime import date
-from pydub import utils, AudioSegment
+from pydub import utils, AudioSegment, effects
+from pydub.utils import mediainfo
 from pydub.effects import speedup
 from fileDetails import get_mp3_length, add_mp3_padding
 import pyttsx3
-
 from tiktokvoice import tts
-
 from openai import OpenAI
 from accountCredentials.openai_key import OPENAI_API_KEY
 
@@ -23,10 +22,20 @@ utils.get_prober_name = get_prob_path
 
 def speedup_audio(filename, subreddit_path):
     path = os.path.join(subreddit_path, f"{filename.split('.')[0]}.mp3")
-    # audio = AudioSegment.from_mp3(path)
+    original_bitrate = mediainfo(path)['bit_rate']
     audio = AudioSegment.from_file(path)
-    spedup_audio = speedup(audio, 1.2)#, 130)
-    spedup_audio.export(path, format="mp3") # export to mp3
+
+    audio = speedup(audio, 1.2) # use either 1.25 or 1.3
+
+    # Calculate the dB adjustment
+    print("Audio Level (dBFS):", audio.dBFS)
+    effects.normalize(audio)  
+    dB_adjustment = min(-14 - audio.dBFS, -1 * audio.max_dBFS)
+    audio = audio + dB_adjustment 
+    effects.normalize(audio)  
+
+    print("Audio Level (dBFS):", audio.dBFS)
+    audio.export(path, format="mp3", bitrate=original_bitrate) # export to mp3
 
 def convert(filename, folder_path):
     text_file_path = os.path.join(folder_path, filename)
@@ -37,21 +46,17 @@ def convert(filename, folder_path):
     engine = pyttsx3.init("sapi5")
     voices = engine.getProperty("voices")[1] 
     rate = engine.getProperty('rate')
-    engine.setProperty('rate', rate + 10)
+    engine.setProperty('rate', rate)
     engine.setProperty('voice', voices)
     
     try:
         with open(text_file_path, 'r', encoding='utf-8') as file:
-            content = file.read()  # Read the rest of the file
-
-            first_punctuation_index = next((i for i, char in enumerate(content) if char in ['.', '!', '?']), None)
-            title = content[:first_punctuation_index + 1].strip()
-            lines = content[first_punctuation_index + 1:].strip()
+            title = file.readline().strip()
+            lines = file.read()
 
             # tiktok tts
-            # tts(lines, "en_us_006", output_file, play_sound=False)
-            # tts(title, "en_us_010", output_title_file, play_sound=False)
-            # tts(lines, "en_us_010", output_file, play_sound=False)
+            tts(title, "en_us_010", output_title_file, play_sound=False)
+            tts(lines, "en_us_010", output_file, play_sound=False)
 
             # openai tts
             # response = client.audio.speech.create(
@@ -62,10 +67,10 @@ def convert(filename, folder_path):
             # response.stream_to_file(output_file)
 
             # pyttsx3 tts
-            engine.save_to_file(title, output_title_file)
-            engine.runAndWait()
-            engine.save_to_file(lines, output_file)
-            engine.runAndWait()
+            # engine.save_to_file(title, output_title_file)
+            # engine.runAndWait()
+            # engine.save_to_file(lines, output_file)
+            # engine.runAndWait()
 
             output_directory = f"{folder_path}/{filename.split('.')[0]}"
             if not os.path.exists(output_directory):
@@ -82,7 +87,7 @@ def convert(filename, folder_path):
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2023-12-29"
+    # today = "2024-01-05"
     # today = "Test"
 
     folder_path = f"RedditPosts/{today}/Texts"
@@ -99,12 +104,12 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         for filename in os.listdir(subreddit_path):
             mp3_file_path = f"{subreddit_path}/{filename}"
-            if filename.split('.')[-1] == "mp3" and get_mp3_length(mp3_file_path) == 0:
+            if filename.split('.')[-1] == "mp3" and get_mp3_length(mp3_file_path) == 0 :
                 os.remove(mp3_file_path)
                 print(f"Deleted {filename} for 0s length")
             elif filename.split('.')[-1] == "mp3":
                 # speedup if using gtts or openai
                 speedup_audio(filename, subreddit_path)
-                print(f"Spedup {filename} by 20%")
+                print(f"Spedup and Increased Volume of {filename}")
 
                 

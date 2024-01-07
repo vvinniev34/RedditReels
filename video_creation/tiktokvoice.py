@@ -6,6 +6,7 @@
 
 import threading, requests, base64
 from playsound import playsound
+import re
 
 VOICES = [
     # ENGLISH VOICES
@@ -20,23 +21,60 @@ VOICES = [
 ENDPOINTS = ['https://tiktok-tts.weilnet.workers.dev/api/generation', "https://tiktoktts.com/api/tiktok-tts"]
 current_endpoint = 0
 # in one conversion, the text can have a maximum length of 300 characters
-TEXT_BYTE_LIMIT = 300
+TEXT_BYTE_LIMIT = 270
 
 # create a list by splitting a string, every element has n chars
-def split_string(string: str, chunk_size: int) -> list[str]:
-    words = string.split()
-    result = []
-    current_chunk = ''
-    for word in words:
-        if len(current_chunk) + len(word) + 1 <= chunk_size:  # Check if adding the word exceeds the chunk size
-            current_chunk += ' ' + word
+# def split_string(string: str, chunk_size: int) -> list[str]:
+#     words = string.split()
+#     result = []
+#     current_chunk = ''
+#     for word in words:
+#         if len(current_chunk) + len(word) + 1 <= chunk_size:  # Check if adding the word exceeds the chunk size
+#             current_chunk += ' ' + word
+#         else:
+#             if current_chunk:  # Append the current chunk if not empty
+#                 result.append(current_chunk.strip())
+#             current_chunk = word
+#     if current_chunk:  # Append the last chunk if not empty
+#         result.append(current_chunk.strip())
+#     return result
+
+def split_string(text, max_length=TEXT_BYTE_LIMIT):
+    parts = []
+    current_part = ""
+
+    # Split sentences using regular expression to handle "?", ".", and "!"
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    for sentence in sentences:
+        # fits
+        if len(current_part) + len(sentence) + 1 < max_length:
+            current_part += sentence + ' '
+        # new sentence too long, split up into fragments by ","
+        elif len(sentence) >= max_length:
+            print(sentence)
+            if current_part:
+                parts.append(current_part.strip())
+                current_part = ""
+
+            sentence_parts = sentence.split(',')
+            current_fragment = ""
+            for part in sentence_parts:
+                if len(current_fragment) + len(part) + 1 <= max_length:
+                    current_fragment += part + ' '
+                else:
+                    parts.append(current_fragment.strip())
+                    current_fragment = part + ' '
+            if current_fragment:
+                parts.append(current_fragment.strip())
+
+        # new sentence fits within max length, but not with old sentences
         else:
-            if current_chunk:  # Append the current chunk if not empty
-                result.append(current_chunk.strip())
-            current_chunk = word
-    if current_chunk:  # Append the last chunk if not empty
-        result.append(current_chunk.strip())
-    return result
+            parts.append(current_part.strip())
+            current_part = sentence + ' '
+
+    if current_part:
+        parts.append(current_part.strip())
+    return parts
 
 # checking if the website that provides the service is available
 def get_api_response() -> requests.Response:
@@ -49,6 +87,13 @@ def save_audio_file(base64_data: str, filename: str = "output.mp3") -> None:
     audio_bytes = base64.b64decode(base64_data)
     with open(filename, "wb") as file:
         file.write(audio_bytes)
+
+# def write_wav_file(output_path, audio_bytes, sample_width, channels, framerate):
+#     with wave.open(output_path, 'wb') as wav_file:
+#         wav_file.setnchannels(channels)
+#         wav_file.setsampwidth(sample_width)
+#         wav_file.setframerate(framerate)
+#         wav_file.writeframes(audio_bytes)
 
 # send POST request to get the audio data
 def generate_audio(text: str, voice: str) -> bytes:
@@ -63,13 +108,15 @@ def tts(text: str, voice: str = "none", filename: str = "output.mp3", play_sound
     # checking if the website is available
     global current_endpoint
 
-    if get_api_response().status_code == 200:
-        print("Service available!")
-    else:
+    # if get_api_response().status_code == 200:
+    #     print("Service available!")
+    # else:
+    if not get_api_response().status_code == 200:
         current_endpoint = (current_endpoint + 1) % 2
-        if get_api_response().status_code == 200:
-            print("Service available!")
-        else:
+        # if get_api_response().status_code == 200:
+        #     print("Service available!")
+        # else:
+        if not get_api_response().status_code == 200:
             print(f"Service not available and probably temporarily rate limited, try again later...")
             return
     
@@ -101,7 +148,7 @@ def tts(text: str, voice: str = "none", filename: str = "output.mp3", play_sound
                 
         else:
             # Split longer text into smaller parts
-            text_parts = split_string(text, 299)
+            text_parts = split_string(text, TEXT_BYTE_LIMIT)
             audio_base64_data = [None] * len(text_parts)
             
             # Define a thread function to generate audio for each text part
@@ -115,7 +162,7 @@ def tts(text: str, voice: str = "none", filename: str = "output.mp3", play_sound
                 if audio_base64_data == "error":
                     print("This voice is unavailable right now")
                     return "error"
-            
+                
                 audio_base64_data[index] = base64_data
 
             threads = []

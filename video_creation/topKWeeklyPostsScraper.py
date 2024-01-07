@@ -14,6 +14,7 @@ from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.edge.options import Options as EdgeOptions
 from datetime import date
 
+from accountCredentials.reddit_account import reddit_username, reddit_password
 
 # Set the desired user agent string
 user_agents = [
@@ -50,6 +51,23 @@ driver = webdriver.Edge(service=s)
 # Function to scroll the page by a specified amount (in pixels)
 def scroll_page(by_pixels):
     driver.execute_script(f"window.scrollBy(0, {by_pixels});")
+
+def login():
+    driver.get("https://www.reddit.com/login/")
+    username_field = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "loginUsername"))
+    )
+    password_field = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "loginPassword"))
+    )
+    username_field.send_keys(reddit_username)
+    password_field.send_keys(reddit_password)
+    login_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "AnimatedForm__submitButton"))
+    )
+    login_button.click()
+
+    time.sleep(5)
     
 def scrape(url, download_path, subreddit):
     # Create the download directory if it doesn't exist
@@ -68,7 +86,8 @@ def scrape(url, download_path, subreddit):
         time.sleep(3)
 
         wait = WebDriverWait(driver, 5)
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'a[slot="full-post-link"]')))
+        # wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'a[slot="full-post-link"]')))
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "SQnoC3ObvgnGjWt90zD9Z")))
         # Get the page source (HTML content) using Selenium
         page_source = driver.page_source
 
@@ -76,12 +95,13 @@ def scrape(url, download_path, subreddit):
         soup = BeautifulSoup(page_source, "html.parser")
 
         # Find all <div> elements with the specified class
-        link_elements = soup.find_all("a", {"slot": "full-post-link"})
+        # link_elements = soup.find_all("a", {"slot": "full-post-link"})
+        link_elements = soup.find_all("a", class_="SQnoC3ObvgnGjWt90zD9Z")
 
         # Iterate through the div elements and filter based on your criteria
         for i in range(min(len(link_elements), subreddit[1])):
             link_element = link_elements[i]
-            print(f"reddit.com{link_element.get('href')}")
+            print(f"reddit.com{link_element['href']}")
 
             with open(output_file, 'a') as file:
                 file.write(f"reddit.com{link_element.get('href')}\n")
@@ -95,10 +115,16 @@ def scrape(url, download_path, subreddit):
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     current_date = datetime.datetime.now()
-    
+    login()
     long_form_subreddits = ["nosleep"]
-    daily_subreddits = [["LetsNotMeet", 2], ["TrueOffMyChest", 5], ["creepyencounters", 2]]
-    weekly_subreddits = ["entitledparents", "pettyrevenge", "tifu", ["MaliciousCompliance", 4], "AmItheAsshole", "relationship_advice", "Glitch_in_the_Matrix", "relationships"]
+    daily_subreddits = [
+        ["LetsNotMeet", 1], ["TrueOffMyChest", 5], ["creepyencounters", 1], 
+        ["tifu", 1], ["AmItheAsshole", 1], ["relationship_advice", 1]
+    ]
+    weekly_subreddits = [
+        ["entitledparents", 2], ["pettyrevenge", 3], ["MaliciousCompliance", 2], 
+        ["Glitch_in_the_Matrix", 2], ["relationships", 3], ["confessions", 3]
+    ]
     for subreddit in daily_subreddits:
         # Define the URLs of the Reddit page you want to scrape
         url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=daily"

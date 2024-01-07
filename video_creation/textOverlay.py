@@ -6,7 +6,7 @@ from datetime import date
 import subprocess
 import whisper_timestamped as whisper
 from moviepy.editor import VideoFileClip, ImageClip, TextClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, concatenate_videoclips
-from fileDetails import get_mp3_length, add_mp3_padding, adjust_mp4_volume
+from fileDetails import get_mp3_length, get_wav_length, adjust_mp4_volume
 from generateClips import createTitleClip, createTextClip
 
 # Get the current working directory of the script
@@ -26,6 +26,16 @@ def replace_abbreviations(sentence):
     modified_sentence = re.sub(pattern_tifu2, 'TIFU', modified_sentence, flags=re.IGNORECASE)
 
     return modified_sentence
+
+def title_to_print(video_title):
+    first_5_words = video_title[:-1].split()[:5]
+    words_until_10_chars = ""
+    for word in first_5_words:
+        if len(words_until_10_chars) > 15:
+              break
+        else:
+            words_until_10_chars += word + "_"
+    return words_until_10_chars[:-1]
 
 def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
@@ -99,15 +109,12 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
     long_form = False
     if (mp3_duration + title_duration) >= 180:
         long_form = True
+    insta_reel = False
+    if (mp3_duration + title_duration) < 90:
+        insta_reel = True
     multipleParts = title_duration + mp3_duration > 60
-
-    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts and not long_form else ""), 0, title_duration)
     
-    # title_last_word_time = 0
-    # title_audio = whisper.load_audio(mp3_title_file_path)
-    # title_audio_result = whisper.transcribe(model, title_audio, 'en')
-    # for segment in title_audio_result['segments']:
-    #     title_last_word_time = segment['end']
+    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts and not long_form else ""), 0, title_duration)
 
     audio = whisper.load_audio(mp3_file_path)
     result = whisper.transcribe(model, audio, 'en')
@@ -122,6 +129,9 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
     video_segments[partNum][0].append(title_clip)
     video_segments[partNum][0].append(banner_clip)
     video_segments[partNum][0].append(comment_clip)
+
+    reels_video_segments = [[], []]
+    reels_video_segments[1].append(0)
 
     video_clip = VideoFileClip(video_path)
 
@@ -158,6 +168,8 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
             # wrappedText = splitTextForWrap(text.strip(), 15)
             wrappedText = text
+            if len(wrappedText) == 0:
+                continue
 
             duration = endTime - start_time
             # print(f"{start_time} {start_time + duration} {duration}\n'{wrappedText}'")
@@ -178,23 +190,26 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
                 currentVidTime = 0
 
             new_textclip, shadow_textclip = createTextClip(wrappedText, currentVidTime, duration)
-
             video_segments[partNum][0].append(shadow_textclip)
             video_segments[partNum][0].append(new_textclip)
+
+            if insta_reel:
+                reels_new_textclip, reels_shadow_textclip = createTextClip(wrappedText, start_time, duration)
+                reels_video_segments[0].append(reels_shadow_textclip)
+                reels_video_segments[0].append(reels_new_textclip)
 
             # Update start time for the next segment
             start_time = endTime
             currentVidTime += duration
 
-        # for video title testing purposes
-        # if (currentVidTime > 6):
-        #     break
     video_segments[partNum][1].append(start_time)
+    reels_video_segments[1].append(start_time)
 
     audio_clip = AudioFileClip(mp3_file_path)
 
     # subclip to remove audio artifact, unusure why AudioFileclip makes, maybe a bug?
     title_audio_clip = AudioFileClip(mp3_title_file_path)
+    print_title = title_to_print(video_title)
     # title_audio_clip.write_audiofile("temp.mp3", codec='mp3')
     # title_audio_clip = title_audio_clip.subclip(0, title_last_word_time)
     
@@ -231,18 +246,44 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
         if not os.path.exists(f"{post_path}/{postName}"):
             os.makedirs(f"{post_path}/{postName}")
-        output_video_path = f"{post_path}/{postName}/part{partNum}.mp4"
+        video_num = f"_p{partNum}" if multipleParts and not long_form else ""
+        output_video_path = f"{post_path}/{postName}/{print_title}{video_num}.mp4"
         print(f"Writing output video: {output_video_path}")
         final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
         print(f"Finished writing part {partNum}")
-
         partNum += 1
+
+    # write seperate if fits within instagram reels
+    if insta_reel:
+        end_time = reels_video_segments[1][1]
+        b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title, 0, title_duration)
+        snipped_title_video = video_clip.subclip(0, title_duration)
+        snipped_title_audio_clip = title_audio_clip.subclip(0, -0.15)
+        snipped_video = video_clip.subclip(title_duration, end_time + title_duration)
+        snipped_audio = audio_clip.subclip(0, end_time)
+        title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
+        title_video_with_text = CompositeVideoClip([title_video_with_text] + [b_clip, title_clip, banner_clip, comment_clip])
+        video_with_text = CompositeVideoClip([snipped_video] + reels_video_segments[0])
+        video_with_text = video_with_text.set_audio(snipped_audio)
+        final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
+        # add dark theme to some subreddits and if it's not long form content
+        dark_theme_subreddits = ["nosleep", "creepyencounters", "letsnotmeet", "glitch_in_the_matrix"]
+        if any(text.lower() in postName.lower() for text in dark_theme_subreddits) and not long_form:
+            # add snowfall background music for horror stories
+            random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
+            snowfall_audio = AudioFileClip("audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
+            final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
+            final_video_clip.audio = final_audio
+        output_video_path = f"{post_path}/{postName}/{print_title}_reel.mp4"
+        print(f"Writing reel: {output_video_path}")
+        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+        print(f"Finished writing reel: {output_video_path}")
 
     print("Overlay complete.")
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2024-01-03"
+    # today = "2024-01-05"
     # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):
@@ -252,7 +293,6 @@ if __name__ == "__main__":
                 mp3_file_path = f"{post_path}/{post}"
                 mp3_title_file_path = f"{post_path}/{post.split('.')[0]}_title.mp3"
                 output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
-                # add_mp3_padding(mp3_file_path, 1)
                 duration = get_mp3_length(mp3_file_path)
                 title_duration = get_mp3_length(mp3_title_file_path)
                 # randomVideoSegment(output_video_path, duration + title_duration)
