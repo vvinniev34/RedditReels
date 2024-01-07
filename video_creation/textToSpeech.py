@@ -52,11 +52,20 @@ def convert(filename, folder_path):
     try:
         with open(text_file_path, 'r', encoding='utf-8') as file:
             title = file.readline().strip()
-            lines = file.read()
 
             # tiktok tts
             tts(title, "en_us_010", output_title_file, play_sound=False)
-            tts(lines, "en_us_010", output_file, play_sound=False)
+
+            if filename.startswith("askreddit"):
+                num_comments = 0
+                for line in file:
+                    if not line.isspace():
+                        print(line.strip())
+                        tts(line.strip(), "en_us_010", f"{output_file.split('.')[0]}_{num_comments}.mp3", play_sound=False)
+                        num_comments += 1
+            else:
+                lines = file.read()
+                tts(lines, "en_us_010", output_file, play_sound=False)
 
             # openai tts
             # response = client.audio.speech.create(
@@ -87,7 +96,7 @@ def convert(filename, folder_path):
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2024-01-05"
+    today = "2024-01-06"
     # today = "Test"
 
     folder_path = f"RedditPosts/{today}/Texts"
@@ -96,20 +105,20 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
-            if filename.split('.')[-1] == "txt" and not filename.endswith("_line_times.txt"):
+            if filename.split('.')[-1] == "txt" and not filename.endswith("_line_times.txt") and filename.startswith("askreddit"):
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
                 
-    for subreddit in os.listdir(folder_path):
-        subreddit_path = f"{folder_path}/{subreddit}"
-        for filename in os.listdir(subreddit_path):
-            mp3_file_path = f"{subreddit_path}/{filename}"
-            if filename.split('.')[-1] == "mp3" and get_mp3_length(mp3_file_path) == 0 :
-                os.remove(mp3_file_path)
-                print(f"Deleted {filename} for 0s length")
-            elif filename.split('.')[-1] == "mp3":
-                # speedup if using gtts or openai
-                speedup_audio(filename, subreddit_path)
-                print(f"Spedup and Increased Volume of {filename}")
+    # for subreddit in os.listdir(folder_path):
+    #     subreddit_path = f"{folder_path}/{subreddit}"
+    #     for filename in os.listdir(subreddit_path):
+    #         mp3_file_path = f"{subreddit_path}/{filename}"
+    #         if filename.split('.')[-1] == "mp3" and get_mp3_length(mp3_file_path) == 0:
+    #             os.remove(mp3_file_path)
+    #             print(f"Deleted {filename} for 0s length")
+    #         elif filename.split('.')[-1] == "mp3":
+    #             # speedup if using gtts or openai
+    #             speedup_audio(filename, subreddit_path)
+    #             print(f"Spedup and Increased Volume of {filename}")
 
                 

@@ -295,7 +295,7 @@ if __name__ == "__main__":
                 output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
                 duration = get_mp3_length(mp3_file_path)
                 title_duration = get_mp3_length(mp3_title_file_path)
-                # randomVideoSegment(output_video_path, duration + title_duration)
+                randomVideoSegment(output_video_path, duration + title_duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"

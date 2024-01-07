@@ -6,7 +6,7 @@ if __name__ == "__main__":
     # get top weekly posts
     subprocess.run(["python", "./topKWeeklyPostsScraper.py"])
     # get post content
-    subprocess.run(["python", "./scrapeLinksEdge.py"])
+    subprocess.run(["python", "./scrapeLinks.py"])
     # convert post content to mp3
     subprocess.run(["python", "./textToSpeech.py"])
     # create videos

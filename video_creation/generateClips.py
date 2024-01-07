@@ -49,7 +49,7 @@ def createTitleClip(wrappedText, start, duration):
 
     return background_clip, new_textclip, banner_clip, comment_clip
 
-def createTextClip(wrappedText, start, duration):
+def createTextClip(wrappedText, start, duration, color='white'):
     width_x = 1080
     height_y = 1920
     textbox_size_x = 900
@@ -60,7 +60,7 @@ def createTextClip(wrappedText, start, duration):
     new_textclip = TextClip(
         wrappedText, 
         fontsize=105, 
-        color='white', 
+        color=color, 
         bg_color='transparent',
         method='caption',
         # method='label',

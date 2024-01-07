@@ -118,8 +118,8 @@ if __name__ == "__main__":
     login()
     long_form_subreddits = ["nosleep"]
     daily_subreddits = [
-        ["LetsNotMeet", 1], ["TrueOffMyChest", 5], ["creepyencounters", 1], 
-        ["tifu", 1], ["AmItheAsshole", 1], ["relationship_advice", 1]
+        ["LetsNotMeet", 1], ["TrueOffMyChest", 4], ["creepyencounters", 1], 
+        ["tifu", 1], ["AmItheAsshole", 1], ["relationship_advice", 1], ["askreddit", 1]
     ]
     weekly_subreddits = [
         ["entitledparents", 2], ["pettyrevenge", 3], ["MaliciousCompliance", 2], 
