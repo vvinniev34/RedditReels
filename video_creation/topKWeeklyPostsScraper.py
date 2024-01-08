@@ -120,17 +120,19 @@ if __name__ == "__main__":
     login()
     
     long_form_subreddits = ["nosleep"]
+    # considered = [["entitledparents", 1, 6], ["Glitch_in_the_Matrix", 1, 6], ["creepyencounters", 1, 6], ["LetsNotMeet", 1, 6]]
     subreddits = [
-        ["entitledparents", 3, 6], ["pettyrevenge", 1, 6], ["MaliciousCompliance", 2, 6], 
-        ["Glitch_in_the_Matrix", 1, 6], ["relationships", 3, 6], ["confessions", 3, 6],
-        ["LetsNotMeet", 1, 6], ["TrueOffMyChest", 4, 6], ["creepyencounters", 1, 6], 
-        ["tifu", 2, 6], ["AmItheAsshole", 4, 6], ["relationship_advice", 4, 6], ["askreddit", 1, 6]
+        ["relationships", 1, 6], ["relationship_advice", 2, 6], 
+        ["confessions", 2, 6], ["confession", 2, 6],
+        ["TrueOffMyChest", 3, 6], ["tifu", 2, 6], ["legaladvice", 1, 6], 
+        ["AmItheAsshole", 2, 6], ["AITAH", 3, 6],  
+        ["askreddit", 2, 6]
     ]
 
     for subreddit in subreddits:
         # if current_date.weekday() == subreddit[2]:
         if True:
-            url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=weekly"
+            url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=week"
             download_path = f"RedditPosts/{today}"
             scrape(url, download_path, subreddit)
 

@@ -69,6 +69,9 @@ def convert(filename, folder_path):
                 synth_speech(title, output_title_file)
 
                 lines = file.read().replace("&", "and")
+                if len(lines) > 3000:
+                    print(f"Exiting file tts, {filename} too large")
+                    return False
                 # tts(lines, "en_us_010", output_file, play_sound=False)
 
                 # Microsoft Azure tts
