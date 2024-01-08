@@ -114,30 +114,25 @@ def scrape(url, download_path, subreddit):
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
+    # today = "Test"
     current_date = datetime.datetime.now()
+
     login()
+    
     long_form_subreddits = ["nosleep"]
-    daily_subreddits = [
-        ["LetsNotMeet", 1], ["TrueOffMyChest", 4], ["creepyencounters", 1], 
-        ["tifu", 1], ["AmItheAsshole", 1], ["relationship_advice", 1], ["askreddit", 1]
+    subreddits = [
+        ["entitledparents", 3, 6], ["pettyrevenge", 1, 6], ["MaliciousCompliance", 2, 6], 
+        ["Glitch_in_the_Matrix", 1, 6], ["relationships", 3, 6], ["confessions", 3, 6],
+        ["LetsNotMeet", 1, 6], ["TrueOffMyChest", 4, 6], ["creepyencounters", 1, 6], 
+        ["tifu", 2, 6], ["AmItheAsshole", 4, 6], ["relationship_advice", 4, 6], ["askreddit", 1, 6]
     ]
-    weekly_subreddits = [
-        ["entitledparents", 2], ["pettyrevenge", 3], ["MaliciousCompliance", 2], 
-        ["Glitch_in_the_Matrix", 2], ["relationships", 3], ["confessions", 3]
-    ]
-    for subreddit in daily_subreddits:
-        # Define the URLs of the Reddit page you want to scrape
-        url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=daily"
-        # Get today's date
-        download_path = f"RedditPosts/{today}"
-        scrape(url, download_path, subreddit)
-    # run weekly scraper on sundays
-    if current_date.weekday() == 6:
-        for subreddit in weekly_subreddits:
-            # Define the URLs of the Reddit page you want to scrape
+
+    for subreddit in subreddits:
+        # if current_date.weekday() == subreddit[2]:
+        if True:
             url = f"https://www.reddit.com/r/{subreddit[0]}/top/?t=weekly"
-            # Get today's date
             download_path = f"RedditPosts/{today}"
             scrape(url, download_path, subreddit)
+
     # Close the browser
     driver.quit()
