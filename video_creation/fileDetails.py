@@ -22,7 +22,7 @@ def get_wav_length(wav_file_path):
             return duration_seconds
     except Exception as e:
         print(f"Error: {e}")
-        return None
+        return 0
 
 def get_mp3_length(mp3_file_path):
     try:

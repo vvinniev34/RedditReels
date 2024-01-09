@@ -198,6 +198,7 @@ if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
     today = date.today().strftime("%Y-%m-%d")
     # today = "2023-09-02"
+    # today = "Test"
     login()
 
     filePath = f"RedditPosts/{today}/links.txt"

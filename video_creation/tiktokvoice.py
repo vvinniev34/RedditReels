@@ -51,7 +51,6 @@ def split_string(text, max_length=TEXT_BYTE_LIMIT):
             current_part += sentence + ' '
         # new sentence too long, split up into fragments by ","
         elif len(sentence) >= max_length:
-            print(sentence)
             if current_part:
                 parts.append(current_part.strip())
                 current_part = ""

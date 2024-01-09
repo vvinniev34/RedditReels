@@ -9,3 +9,4 @@ ffmpeg.exe
 *node_modules
 *accountCredentials
 *RedditPosts
+*.env

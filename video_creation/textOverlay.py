@@ -16,12 +16,17 @@ ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-ful
 
 model = whisper.load_model("base")
 
+MAX_SHORTS_TIME = 60
+MAX_REEL_TIME = 90
+
 def replace_abbreviations(sentence):
-    pattern_aita = r'\bada\b'
+    pattern_aita1 = r'\bada\b'
+    pattern_aita2 = r'\bida\b'
     pattern_tifu1 = r'\btyphoo\b'
     pattern_tifu2 = r'\bTIF(?:\s*,*\s*)you\b'
     
-    modified_sentence = re.sub(pattern_aita, 'AITA', sentence, flags=re.IGNORECASE)
+    modified_sentence = re.sub(pattern_aita1, 'AITA', sentence, flags=re.IGNORECASE)
+    modified_sentence = re.sub(pattern_aita2, 'AITA', sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu1, 'TIFU', modified_sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu2, 'TIFU', modified_sentence, flags=re.IGNORECASE)
 
@@ -80,7 +85,8 @@ def splitTextForWrap(input_str: str, line_length: int):
     return split_input
 
 def randomVideoSegment(output_video_filepath, duration):
-    background_video_path = "backgroundVideos/minecraft_parkour.mp4"
+    # background_video_path = "backgroundVideos/minecraft_parkour.mp4"
+    background_video_path = "backgroundVideos/zachchoicompilation.mp4"
     total_duration_seconds = 60 * 60 # minecraft parkour
     dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
     if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
@@ -94,29 +100,37 @@ def randomVideoSegment(output_video_filepath, duration):
     print(f"Snipped {duration} s length video starting at: {random_start_time_seconds} for {output_video_path.split('/')[-1]}")
 
 
-def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postName):
+def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postName):
+    text_colors = ['white', 'cyan', 'yellow', 'olive', 'magenta', 'lightseagreen', 
+            'antiquewhite', 'orange', 'pink', 'gold', 'lavender', 'purple']
+    askreddit_comment_times = []
+    if (postName.startswith("askreddit")):
+        with open(f"{video_path.split('.')[0]}/comment_times.txt", 'r', encoding='utf-8') as comment_times:
+            askreddit_comment_times = [float(value) for value in comment_times.read().split(',')]
+        # for i in range(1, len(askreddit_comment_times)):
+        #     askreddit_comment_times[i] += askreddit_comment_times[i - 1]
     partNum = 0 
-    mp3_duration = get_mp3_length(mp3_file_path)
+    wav_duration = get_wav_length(wav_file_path)
 
     video_title_path = f"{mp4_file_path.split('.')[0]}/videoTitle.txt"
     video_title = "Errors Reading From Title"
     with open(video_title_path, 'r', encoding='utf-8') as file:
         video_title = file.read().strip()
         # print(video_title)
-    title_duration = get_mp3_length(mp3_title_file_path)
+    title_duration = get_wav_length(wav_title_file_path)
 
      # if more than a 6 parter, create long form content intead
     long_form = False
-    if (mp3_duration + title_duration) >= 180:
+    if (wav_duration + title_duration) >= 180:
         long_form = True
     insta_reel = False
-    if (mp3_duration + title_duration) < 90:
+    if (wav_duration + title_duration) < 90:
         insta_reel = True
-    multipleParts = title_duration + mp3_duration > 60
+    multipleParts = title_duration + wav_duration > 60
     
     b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts and not long_form else ""), 0, title_duration)
 
-    audio = whisper.load_audio(mp3_file_path)
+    audio = whisper.load_audio(wav_file_path)
     result = whisper.transcribe(model, audio, 'en')
 
     start_time = 0
@@ -189,12 +203,23 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
 
                 currentVidTime = 0
 
-            new_textclip, shadow_textclip = createTextClip(wrappedText, currentVidTime, duration)
+            color = 'white'
+            if postName.startswith("askreddit"):
+                colorI = 0
+                for time in askreddit_comment_times:
+                    if time <= start_time + duration:
+                        colorI += 1
+                    else:
+                        break
+                color = text_colors[colorI]
+                # print(f"{start_time} {color}")
+
+            new_textclip, shadow_textclip = createTextClip(wrappedText, currentVidTime, duration, color)
             video_segments[partNum][0].append(shadow_textclip)
             video_segments[partNum][0].append(new_textclip)
 
             if insta_reel:
-                reels_new_textclip, reels_shadow_textclip = createTextClip(wrappedText, start_time, duration)
+                reels_new_textclip, reels_shadow_textclip = createTextClip(wrappedText, start_time, duration, color)
                 reels_video_segments[0].append(reels_shadow_textclip)
                 reels_video_segments[0].append(reels_new_textclip)
 
@@ -205,12 +230,12 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
     video_segments[partNum][1].append(start_time)
     reels_video_segments[1].append(start_time)
 
-    audio_clip = AudioFileClip(mp3_file_path)
+    audio_clip = AudioFileClip(wav_file_path)
 
     # subclip to remove audio artifact, unusure why AudioFileclip makes, maybe a bug?
-    title_audio_clip = AudioFileClip(mp3_title_file_path)
+    title_audio_clip = AudioFileClip(wav_title_file_path)
     print_title = title_to_print(video_title)
-    # title_audio_clip.write_audiofile("temp.mp3", codec='mp3')
+    # title_audio_clip.write_audiofile("temp.wav", codec='wav')
     # title_audio_clip = title_audio_clip.subclip(0, title_last_word_time)
     
     partNum = 1
@@ -239,6 +264,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
         dark_theme_subreddits = ["nosleep", "creepyencounters", "letsnotmeet", "glitch_in_the_matrix"]
         if any(text.lower() in postName.lower() for text in dark_theme_subreddits) and not long_form:
             # add snowfall background music for horror stories
+            print(f"adding snowfall background music to {postName}")
             random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
             snowfall_audio = AudioFileClip("audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
             final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
@@ -270,6 +296,7 @@ def overlayText(mp3_file_path, mp3_title_file_path, video_path, post_path, postN
         dark_theme_subreddits = ["nosleep", "creepyencounters", "letsnotmeet", "glitch_in_the_matrix"]
         if any(text.lower() in postName.lower() for text in dark_theme_subreddits) and not long_form:
             # add snowfall background music for horror stories
+            print(f"adding snowfall background music to {postName}")
             random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
             snowfall_audio = AudioFileClip("audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
             final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
@@ -289,30 +316,21 @@ if __name__ == "__main__":
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
-            if post.endswith(".mp3") and not post.endswith("title.mp3"):
-                mp3_file_path = f"{post_path}/{post}"
-                mp3_title_file_path = f"{post_path}/{post.split('.')[0]}_title.mp3"
+            if post.endswith(".wav") and not post.endswith("title.wav"):
+                wav_file_path = f"{post_path}/{post}"
+                wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
-                duration = get_mp3_length(mp3_file_path)
-                title_duration = get_mp3_length(mp3_title_file_path)
-                randomVideoSegment(output_video_path, duration + title_duration)
+                duration = get_wav_length(wav_file_path)
+                title_duration = get_wav_length(wav_title_file_path)
+                # randomVideoSegment(output_video_path, duration + title_duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
-            if post.endswith(".mp4"):
-                mp3_file_path = f"{post_path}/{post.split('.')[0]}.mp3"
-                mp3_title_file_path = f"{post_path}/{post.split('.')[0]}_title.mp3"
+            if post.endswith(".mp4") and post.startswith("askreddit"):
+                wav_file_path = f"{post_path}/{post.split('.')[0]}.wav"
+                wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 mp4_file_path = f"{post_path}/{post}"
-                overlayText(mp3_file_path, mp3_title_file_path, mp4_file_path, post_path, f"{post.split('.')[0]}")
+                overlayText(wav_file_path, wav_title_file_path, mp4_file_path, post_path, f"{post.split('.')[0]}")
 
-    # adjust audio to -14dB for youtube
-    # for subreddit in os.listdir(folder_path):
-    #     post_path = f"{folder_path}/{subreddit}"
-    #     for post in os.listdir(post_path):
-    #         video_path = f"{post_path}/{post}"
-    #         if os.path.isdir(video_path):
-    #             for video in os.listdir(video_path):
-    #                 if video.endswith(".mp4"):
-    #                     adjust_mp4_volume(f"{video_path}/{video}", -14)
     print("Video Maker Completed")
