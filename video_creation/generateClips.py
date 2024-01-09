@@ -39,7 +39,7 @@ def createTitleClip(wrappedText, start, duration):
         align='West',
     ).set_start(start).set_duration(duration).set_position(('center', 'center'))
 
-    banner_path = 'images/banner.png'
+    banner_path = 'images/medalled_banner.png'
     banner_clip = ImageClip(banner_path, duration=duration).resize(width=900)
     banner_clip = banner_clip.set_pos((center_x, height_y / 2 - (text_height / 2) - banner_clip.size[1] - 10))
     # print(f"text size: {new_textclip.size}; Image Size: {banner_clip.size}")
