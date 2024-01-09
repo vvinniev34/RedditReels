@@ -85,7 +85,8 @@ def splitTextForWrap(input_str: str, line_length: int):
     return split_input
 
 def randomVideoSegment(output_video_filepath, duration):
-    background_video_path = "backgroundVideos/minecraft_parkour.mp4"
+    # background_video_path = "backgroundVideos/minecraft_parkour.mp4"
+    background_video_path = "backgroundVideos/zachchoicompilation.mp4"
     total_duration_seconds = 60 * 60 # minecraft parkour
     dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
     if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
@@ -100,6 +101,14 @@ def randomVideoSegment(output_video_filepath, duration):
 
 
 def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postName):
+    text_colors = ['white', 'cyan', 'yellow', 'olive', 'magenta', 'lightseagreen', 
+            'antiquewhite', 'orange', 'pink', 'gold', 'lavender', 'purple']
+    askreddit_comment_times = []
+    if (postName.startswith("askreddit")):
+        with open(f"{video_path.split('.')[0]}/comment_times.txt", 'r', encoding='utf-8') as comment_times:
+            askreddit_comment_times = [float(value) for value in comment_times.read().split(',')]
+        # for i in range(1, len(askreddit_comment_times)):
+        #     askreddit_comment_times[i] += askreddit_comment_times[i - 1]
     partNum = 0 
     wav_duration = get_wav_length(wav_file_path)
 
@@ -194,12 +203,23 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
                 currentVidTime = 0
 
-            new_textclip, shadow_textclip = createTextClip(wrappedText, currentVidTime, duration)
+            color = 'white'
+            if postName.startswith("askreddit"):
+                colorI = 0
+                for time in askreddit_comment_times:
+                    if time <= start_time + duration:
+                        colorI += 1
+                    else:
+                        break
+                color = text_colors[colorI]
+                # print(f"{start_time} {color}")
+
+            new_textclip, shadow_textclip = createTextClip(wrappedText, currentVidTime, duration, color)
             video_segments[partNum][0].append(shadow_textclip)
             video_segments[partNum][0].append(new_textclip)
 
             if insta_reel:
-                reels_new_textclip, reels_shadow_textclip = createTextClip(wrappedText, start_time, duration)
+                reels_new_textclip, reels_shadow_textclip = createTextClip(wrappedText, start_time, duration, color)
                 reels_video_segments[0].append(reels_shadow_textclip)
                 reels_video_segments[0].append(reels_new_textclip)
 
@@ -296,30 +316,21 @@ if __name__ == "__main__":
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
-            if post.endswith(".wav") and not post.endswith("title.wav") and not post.startswith("askreddit"):
+            if post.endswith(".wav") and not post.endswith("title.wav"):
                 wav_file_path = f"{post_path}/{post}"
                 wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
                 duration = get_wav_length(wav_file_path)
                 title_duration = get_wav_length(wav_title_file_path)
-                randomVideoSegment(output_video_path, duration + title_duration)
+                # randomVideoSegment(output_video_path, duration + title_duration)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
-            if post.endswith(".mp4"):
+            if post.endswith(".mp4") and post.startswith("askreddit"):
                 wav_file_path = f"{post_path}/{post.split('.')[0]}.wav"
                 wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 mp4_file_path = f"{post_path}/{post}"
                 overlayText(wav_file_path, wav_title_file_path, mp4_file_path, post_path, f"{post.split('.')[0]}")
 
-    # adjust audio to -14dB for youtube
-    # for subreddit in os.listdir(folder_path):
-    #     post_path = f"{folder_path}/{subreddit}"
-    #     for post in os.listdir(post_path):
-    #         video_path = f"{post_path}/{post}"
-    #         if os.path.isdir(video_path):
-    #             for video in os.listdir(video_path):
-    #                 if video.endswith(".mp4"):
-    #                     adjust_mp4_volume(f"{video_path}/{video}", -14)
     print("Video Maker Completed")

@@ -47,24 +47,62 @@ def convert(filename, folder_path):
     output_title_file = os.path.join(folder_path, f"{filename.split('.')[0]}_title.wav")
 
     # Initialize pyttsx3
-    engine = pyttsx3.init("sapi5")
-    voices = engine.getProperty("voices")[1] 
-    rate = engine.getProperty('rate')
-    engine.setProperty('rate', rate)
-    engine.setProperty('voice', voices)
+    # engine = pyttsx3.init("sapi5")
+    # voices = engine.getProperty("voices")[1] 
+    # rate = engine.getProperty('rate')
+    # engine.setProperty('rate', rate)
+    # engine.setProperty('voice', voices)
     
     try:
         with open(text_file_path, 'r', encoding='utf-8') as file:
             title = file.readline().replace("&", "and").strip()
 
+            output_directory = f"{folder_path}/{filename.split('.')[0]}"
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
+            with open(f"{output_directory}/videoTitle.txt", 'w', encoding='utf-8') as title_file:
+                title_file.write(title)
+
             if filename.startswith("askreddit"):
-                tts(title, "en_us_010", output_title_file, play_sound=False)
+                swoosh_transition = AudioSegment.from_file("static/swoosh_transition.mp3")
+                swoosh_transition_length = len(swoosh_transition) / 1000
+
+                synth_speech(title, output_title_file)
+                segment_files = []
+                total_time = []
+                cur_time = 0
                 num_comments = 0
                 for line in file:
-                    if not line.isspace():
-                        # print(line.strip())
-                        tts(line.strip(), "en_us_010", f"{output_file.split('.')[0]}_{num_comments}.wav", play_sound=False)
+                    if not line.isspace() and cur_time < 60:
+                        segment_file = f"{output_file.split('.')[0]}_seg{num_comments}.wav"
+                        synth_speech(line.strip().replace("&", "and"), segment_file)
+                        new_segment_time = get_wav_length(segment_file)
+                        if cur_time + new_segment_time >= 60:
+                            os.remove(segment_file)
+                            break
+                        cur_time += (swoosh_transition_length + new_segment_time)
+                        total_time.append(cur_time)
+                        # total_time.append(new_segment_time)
+                        segment_files.append(segment_file)
                         num_comments += 1
+
+                # concatenate audio into single audio
+                askreddit_segments = [AudioSegment.from_wav(segment_file) for segment_file in segment_files]
+                askreddit_audio = AudioSegment.empty()
+                first = True
+                for segment in askreddit_segments:
+                    askreddit_audio += segment if first else (swoosh_transition + segment)
+                    first = False
+                askreddit_audio.export(output_file, format="wav")
+                with open(f"{output_directory}/comment_times.txt", 'w', encoding='utf-8') as comment_time_file:
+                    comment_time_file.write(','.join(map(str, total_time)))
+
+                # cleanup individual comment files
+                for segment_file in segment_files:
+                    try:
+                        os.remove(segment_file)
+                    except OSError as e:
+                        print(f"Error deleting file {segment_file}")
             else:
                 synth_speech(title, output_title_file)
 
@@ -72,6 +110,8 @@ def convert(filename, folder_path):
                 if len(lines) > 3000:
                     print(f"Exiting file tts, {filename} too large")
                     return False
+                
+                # tiktok TTS
                 # tts(lines, "en_us_010", output_file, play_sound=False)
 
                 # Microsoft Azure tts
@@ -90,12 +130,6 @@ def convert(filename, folder_path):
             # engine.runAndWait()
             # engine.save_to_file(lines, output_file)
             # engine.runAndWait()
-
-            output_directory = f"{folder_path}/{filename.split('.')[0]}"
-            if not os.path.exists(output_directory):
-                os.makedirs(output_directory)
-            with open(f"{output_directory}/videoTitle.txt", 'w', encoding='utf-8') as file:
-                file.write(title)
         
         print(f"wav creation successful. Saved as {output_file}")
     
@@ -115,7 +149,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
-            if filename.split('.')[-1] == "txt":# and filename.startswith("askreddit"):
+            if filename.split('.')[-1] == "txt" and filename.startswith("askreddit"):
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
                 
@@ -124,7 +158,7 @@ if __name__ == "__main__":
         for filename in os.listdir(subreddit_path):
             wav_file_path = f"{subreddit_path}/{filename}"
             if filename.split('.')[-1] == "wav":
-                speedup_audio(filename, subreddit_path)
+                # speedup_audio(filename, subreddit_path)
                 print(f"Increased Volume of {wav_file_path}")
 
                 
