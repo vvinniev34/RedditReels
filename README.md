@@ -1,4 +1,4 @@
-# RedditReels (IN PROGRESS)
+# RedditReels
 Automates creation of short-form video content for TikTok, YouTube Shorts, etc, using top weekly Reddit posts with upcoming support for automatic script execution scheduling
 
 # Overview
