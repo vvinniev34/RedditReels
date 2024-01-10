@@ -1,7 +1,9 @@
 import requests
 import json
 import time
+import html
 import demoji
+from bs4 import BeautifulSoup
 
 MAX_COMMENTS = 5
 
@@ -24,9 +26,13 @@ def getAskRedditComments(output_file, url):
         for thread in data[1]["data"]["children"]:
             thread_data = thread["data"]
             if "body" in thread_data:
-                top_thread_body = thread_data["body"]
+                top_thread_body = html.unescape(thread_data["body"])
+                soup = BeautifulSoup(top_thread_body, 'html.parser')
+                top_thread_body = soup.get_text()
+                print(top_thread_body)
                 # top_comments.append(remove_emojis(top_thread_body))
-
+                if (top_thread_body == '[removed]' or top_thread_body == '[deleted]'):
+                    continue
                 with open(output_file, 'a', encoding='utf-8') as file:
                     file.write(str(remove_emojis(top_thread_body).replace("\n", " ")) + "\n\n")
 

@@ -21,6 +21,8 @@ def get_prob_path():
     return os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffprobe.exe")
 utils.get_prober_name = get_prob_path
 
+MAX_PART_TIME = 59
+
 def speedup_audio(filename, subreddit_path):
     path = os.path.join(subreddit_path, f"{filename.split('.')[0]}.wav")
     media_info = mediainfo(path)
@@ -52,7 +54,7 @@ def convert(filename, folder_path):
     # rate = engine.getProperty('rate')
     # engine.setProperty('rate', rate)
     # engine.setProperty('voice', voices)
-    
+    max_video_time = MAX_PART_TIME
     try:
         with open(text_file_path, 'r', encoding='utf-8') as file:
             title = file.readline().replace("&", "and").strip()
@@ -73,16 +75,19 @@ def convert(filename, folder_path):
                 cur_time = 0
                 num_comments = 0
                 for line in file:
-                    if not line.isspace() and cur_time < 60:
+                    if not line.isspace() and cur_time < max_video_time:
                         segment_file = f"{output_file.split('.')[0]}_seg{num_comments}.wav"
                         synth_speech(line.strip().replace("&", "and"), segment_file)
                         new_segment_time = get_wav_length(segment_file)
-                        if cur_time + new_segment_time >= 60:
+                        if cur_time + new_segment_time >= max_video_time and cur_time != 0:
                             os.remove(segment_file)
+                            break
+                        elif cur_time + new_segment_time >= max_video_time and cur_time == 0:
+                            total_time.append((cur_time + (swoosh_transition_length + new_segment_time)))
+                            segment_files.append(segment_file)
                             break
                         cur_time += (swoosh_transition_length + new_segment_time)
                         total_time.append(cur_time)
-                        # total_time.append(new_segment_time)
                         segment_files.append(segment_file)
                         num_comments += 1
 

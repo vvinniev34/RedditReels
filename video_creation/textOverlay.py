@@ -19,6 +19,9 @@ model = whisper.load_model("base")
 MAX_SHORTS_TIME = 60
 MAX_REEL_TIME = 90
 
+TIKTOK_AND_INSTAGRAM_REELS_QUEUE = []
+YOUTUBE_SHORTS_QUEUE = []
+
 def replace_abbreviations(sentence):
     pattern_aita1 = r'\bada\b'
     pattern_aita2 = r'\bida\b'
@@ -86,8 +89,10 @@ def splitTextForWrap(input_str: str, line_length: int):
 
 def randomVideoSegment(output_video_filepath, duration):
     # background_video_path = "backgroundVideos/minecraft_parkour.mp4"
+    # background_video_path = "backgroundVideos/bayashicompilation.mp4"
     background_video_path = "backgroundVideos/zachchoicompilation.mp4"
-    total_duration_seconds = 60 * 60 # minecraft parkour
+    total_duration_seconds = 63 * 60 # bayashi
+    total_duration_seconds = 60 * 60 # minecraft parkour, zachchoi
     dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
     if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
         background_video_path = "backgroundVideos/nighttime_minecraft_parkour.mp4"
@@ -101,6 +106,8 @@ def randomVideoSegment(output_video_filepath, duration):
 
 
 def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postName):
+    global TIKTOK_AND_INSTAGRAM_REELS_QUEUE
+    global YOUTUBE_SHORTS_QUEUE
     text_colors = ['white', 'cyan', 'yellow', 'olive', 'magenta', 'lightseagreen', 
             'antiquewhite', 'orange', 'pink', 'gold', 'lavender', 'purple']
     askreddit_comment_times = []
@@ -126,7 +133,8 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     insta_reel = False
     if (wav_duration + title_duration) < 90:
         insta_reel = True
-    multipleParts = title_duration + wav_duration > 60
+    # only create multiple parts if proceeding clips are of valulable length
+    multipleParts = title_duration + wav_duration > MAX_SHORTS_TIME + 10
     
     b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts and not long_form else ""), 0, title_duration)
 
@@ -158,9 +166,10 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
         # split segment into multiple if phrase is longer than 30 characters
         splitSegments = []
-        if (len(abbreviationFixedText) <= 30 and (len(abbreviationFixedText) < 20 or len(abbreviationFixedText) > 21)):
-            splitSegments.append([abbreviationFixedText, segment['end']])
-        else:
+        # if (len(abbreviationFixedText) <= 30 and (len(abbreviationFixedText) < 20 or len(abbreviationFixedText) > 21)):
+        #     splitSegments.append([abbreviationFixedText, segment['end']])
+        # else:
+        if True:
             currentText = ""
             prevEnd = start_time
             for word in segment['words']:
@@ -241,6 +250,9 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     for part in video_segments:
         start_time = part[1][0]
         end_time = part[1][1]
+        # last clip is too short to make
+        if end_time - start_time < 10:
+            continue
 
         snipped_title_video = video_clip.subclip(0, title_duration) if partNum == 1 else video_clip.subclip(start_time, start_time + title_duration)
         # print(str(snipped_title_video.duration) + " " + str(title_last_word_time))
@@ -275,6 +287,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         output_video_path = f"{post_path}/{postName}/{print_title}{video_num}.mp4"
         print(f"Writing output video: {output_video_path}")
         final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+        YOUTUBE_SHORTS_QUEUE.append(output_video_path)
         print(f"Finished writing part {partNum}")
         partNum += 1
 
@@ -303,13 +316,14 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         output_video_path = f"{post_path}/{postName}/{print_title}_reel.mp4"
         print(f"Writing reel: {output_video_path}")
         final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+        TIKTOK_AND_INSTAGRAM_REELS_QUEUE.append(output_video_path)
         print(f"Finished writing reel: {output_video_path}")
 
     print("Overlay complete.")
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2024-01-05"
+    # today = "2024-01-08"
     # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):
@@ -331,5 +345,16 @@ if __name__ == "__main__":
                 wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 mp4_file_path = f"{post_path}/{post}"
                 overlayText(wav_file_path, wav_title_file_path, mp4_file_path, post_path, f"{post.split('.')[0]}")
+    
+    upload_queue_folder_path = f"RedditPosts/{today}/uploadQueue"
+    if not os.path.exists(upload_queue_folder_path):
+        os.makedirs(upload_queue_folder_path)
+
+    with open(f"{upload_queue_folder_path}/tiktok_queue.txt", 'w', encoding='utf-8') as tiktok_upload_queue:
+        tiktok_upload_queue.write('\n'.join(TIKTOK_AND_INSTAGRAM_REELS_QUEUE))
+    with open(f"{upload_queue_folder_path}/instagram_queue.txt", 'w', encoding='utf-8') as insta_upload_queue:
+        insta_upload_queue.write('\n'.join(TIKTOK_AND_INSTAGRAM_REELS_QUEUE))
+    with open(f"{upload_queue_folder_path}/youtube_queue.txt", 'w', encoding='utf-8') as youtube_upload_queue:
+        youtube_upload_queue.write('\n'.join(YOUTUBE_SHORTS_QUEUE))
 
     print("Video Maker Completed")
