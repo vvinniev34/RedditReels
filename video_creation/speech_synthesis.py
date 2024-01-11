@@ -21,16 +21,14 @@ def synth_speech(text, output_file):
                         </prosody>
                     </voice>
                 </speak>"""
-    # audio_config = speechsdk.audio.AudioOutputConfig(filename=output_file)
 
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
-    # speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
     result = speech_synthesizer.speak_ssml_async(ssml_text).get()
     stream = speechsdk.AudioDataStream(result)
     stream.save_to_wav_file(output_file)
     
     if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-        print("Speech synthesized")# for text [{}]".format(text))
+        print("Speech synthesized")
     elif result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = result.cancellation_details
         print("Speech synthesis canceled: {}".format(cancellation_details.reason))

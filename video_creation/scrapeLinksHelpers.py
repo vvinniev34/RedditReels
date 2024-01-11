@@ -5,7 +5,7 @@ import html
 import demoji
 from bs4 import BeautifulSoup
 
-MAX_COMMENTS = 5
+MAX_COMMENTS = 8
 
 def remove_emojis(text):
     return demoji.replace(text, '')
@@ -37,7 +37,7 @@ def getAskRedditComments(output_file, url):
                     file.write(str(remove_emojis(top_thread_body).replace("\n", " ")) + "\n\n")
 
             i += 1
-            if (i >= 8):
+            if (i >= MAX_COMMENTS):
                 break
         return True
     else:

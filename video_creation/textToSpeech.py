@@ -109,8 +109,6 @@ def convert(filename, folder_path):
                     except OSError as e:
                         print(f"Error deleting file {segment_file}")
             else:
-                synth_speech(title, output_title_file)
-
                 lines = file.read().replace("&", "and")
                 if len(lines) > 3000:
                     print(f"Exiting file tts, {filename} too large")
@@ -120,6 +118,7 @@ def convert(filename, folder_path):
                 # tts(lines, "en_us_010", output_file, play_sound=False)
 
                 # Microsoft Azure tts
+                synth_speech(title, output_title_file)
                 synth_speech(lines, output_file)
 
             # openai tts
