@@ -120,11 +120,12 @@ if __name__ == "__main__":
     login()
     
     long_form_subreddits = ["nosleep"]
-    # considered = [["entitledparents", 1, 6], ["Glitch_in_the_Matrix", 1, 6], ["creepyencounters", 1, 6], ["LetsNotMeet", 1, 6]]
+    # considered = [["entitledparents", 1, 6], ["Glitch_in_the_Matrix", 1, 6], ["creepyencounters", 1, 6], ["LetsNotMeet", 1, 6], ["confession", 2, 6],]
     subreddits = [
         ["relationships", 1, 6], ["relationship_advice", 2, 6], 
-        ["confessions", 2, 6], ["confession", 2, 6],
-        ["TrueOffMyChest", 3, 6], ["tifu", 2, 6], ["legaladvice", 1, 6], 
+        ["confessions", 2, 6], 
+        ["TrueOffMyChest", 1, 6], ["offmychest", 3, 6],
+        ["tifu", 1, 6], ["legaladvice", 1, 6], 
         ["AmItheAsshole", 3, 6], ["AITAH", 4, 6],  
         ["askreddit", 4, 6]
     ]

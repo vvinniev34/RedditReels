@@ -29,7 +29,7 @@ def getNextSchedule():
 
     if (hour < 12):
         SCHEDULE_DATE = f"{month}/{day}/{year}, 12:00"
-    elif (hour < 18 and minutes < 30):
+    elif (hour < 17 or (hour <= 17 and minutes < 30)):
         SCHEDULE_DATE = f"{month}/{day}/{year}, 17:30"
     else:
         next_day = datetime(year=year, month=month, day=day) + timedelta(days=1)
@@ -51,6 +51,7 @@ def main(video_path: str,
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
+    today = "Test"
 
     YOUTUBE_UPLOADS = []
     with open(f"../RedditPosts/{today}/uploadQueue/youtube_queue.txt", "r", encoding="utf-8") as file:
@@ -67,15 +68,17 @@ if __name__ == "__main__":
         with open(f"../RedditPosts/{today}/Texts/{subreddit}/{video_num}/videoTitle.txt", "r", encoding="utf-8") as file:
             title = file.readline().strip()
         json = {
-            "title":title,
-            "description":"",
-            "tags": ["reddit", "redditstories", subreddit],
-            "schedule":f"{getNextSchedule()}"
+            "title": title,
+            "description": f"{title}\n\n#shorts #redditstories #{subreddit} #cooking",
+            "tags": [],
+            "schedule": f"{getNextSchedule()}"
         }
+
         # youtube_json_list.append(json)
+        print(json)
 
-        main(upload, json)
+        # main(upload, json)
 
-        max_uploads -= 1
-        if max_uploads <= 0:
-            break
+        # max_uploads -= 1
+        # if max_uploads <= 0:
+        #     break

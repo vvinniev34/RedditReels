@@ -98,6 +98,10 @@ def getContentLoggedIn(url, download_path, subreddit, number):
         match = pattern.search(entire_post)
         if match:
             entire_post = entire_post[:match.start()]
+        pattern = re.compile(r'update:', re.IGNORECASE)
+        match = pattern.search(entire_post)
+        if match and (match.start() > (len(entire_post) / 4)):
+            entire_post = entire_post[:match.start()]
 
         entire_post = entire_post
         # entire_post = title + '.\n' + completion.choices[0].message.content
