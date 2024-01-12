@@ -78,8 +78,8 @@ def createTextClip(wrappedText, start, duration, color='white'):
         method='caption',
         # method='label',
         font='C:/Windows/fonts/GILBI___.TTF', 
-        size=(textbox_size_x, None)#, textbox_size_y)
-    ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
+        size=(textbox_size_x + 20, None)#, textbox_size_y)
+    ).set_start(start).set_duration(duration).resize(width=920).set_position(('center', 'center'))
 
     return new_textclip, shadow_textclip
 

@@ -17,6 +17,19 @@ s=service.Service(r"edgedriver_win64/msedgedriver.exe")
 driver = webdriver.Edge(service=s)
 entire_post = ""
 
+subreddits = {
+    "relationships": 1, 
+    "relationship_advice": 2, 
+    "confessions": 2, 
+    "TrueOffMyChest": 1, 
+    "offmychest": 3,
+    "tifu": 1, 
+    "legaladvice": 1, 
+    "AmItheAsshole": 3, 
+    "AITAH": 4,  
+    "askreddit": 4
+}   
+
 def check_id(id_name):
     try:
         driver.find_element(By.ID, id_name)
@@ -61,6 +74,12 @@ def login():
     time.sleep(5)
 
 def getContentLoggedIn(url, download_path, subreddit, number):
+    global subreddits
+    if subreddits[subreddit] <= 0:
+        print("Reached quota for subreddit")
+        return False
+    subreddits[subreddit] -= 1
+
     if not os.path.exists(download_path):
         os.makedirs(download_path)
 
@@ -106,6 +125,10 @@ def getContentLoggedIn(url, download_path, subreddit, number):
         entire_post = entire_post
         # entire_post = title + '.\n' + completion.choices[0].message.content
         entire_post = remove_emojis(entire_post)
+
+        if len(entire_post) < 900 or len(entire_post) > 4000:
+            print("Post is too short or long, skipping...")
+            return False
 
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write(entire_post)

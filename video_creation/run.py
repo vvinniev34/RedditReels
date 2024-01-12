@@ -11,14 +11,5 @@ if __name__ == "__main__":
     subprocess.run(["python", "./textToSpeech.py"])
     # create videos
     subprocess.run(["python", "./textOverlay.py"])
-
-    # upload videos
-    # today = date.today().strftime("%Y-%m-%d")
-    today = "2023-09-02"
-    folder_path = f"RedditPosts/{today}/Texts"
-    for subreddit in os.listdir(folder_path):
-        post_path = f"{folder_path}/{subreddit}"
-        for post in os.listdir(post_path):
-            if post.endswith("F.mp3"):
-                print("uploading...")
-                # subprocess.run(["python", "uploadVideo", "--file", f"{post_path}/{post}"])
+    # upload videos to YouTube
+    subprocess.run(["python", "./youtube_upload/upload.py"])

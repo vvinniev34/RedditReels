@@ -75,10 +75,9 @@ if __name__ == "__main__":
         }
 
         # youtube_json_list.append(json)
-        print(json)
 
-        # main(upload, json)
+        main(upload, json)
 
-        # max_uploads -= 1
-        # if max_uploads <= 0:
-        #     break
+        max_uploads -= 1
+        if max_uploads <= 0:
+            break
