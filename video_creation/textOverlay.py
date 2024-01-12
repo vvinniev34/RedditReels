@@ -88,16 +88,16 @@ def splitTextForWrap(input_str: str, line_length: int):
     return split_input
 
 def randomVideoSegment(output_video_filepath, duration):
-    # background_video_path = "backgroundVideos/minecraft_parkour.mp4"
-    # background_video_path = "backgroundVideos/bayashicompilation.mp4"
-    # background_video_path = "backgroundVideos/zachchoicompilation.mp4"
-    background_video_path = "backgroundVideos/gta5.mp4"
+    # background_video_path = "static/backgroundVideos/minecraft_parkour.mp4"
+    # background_video_path = "static/backgroundVideos/bayashicompilation.mp4"
+    # background_video_path = "static/backgroundVideos/zachchoicompilation.mp4"
+    background_video_path = "static/backgroundVideos/gta5.mp4"
     total_duration_seconds = 63 * 60 # bayashi
     total_duration_seconds = 60 * 60 # minecraft parkour, zachchoi
     total_duration_seconds = 28 * 60 + 15 # gta5
     dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
     if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
-        background_video_path = "backgroundVideos/nighttime_minecraft_parkour.mp4"
+        background_video_path = "static/backgroundVideos/nighttime_minecraft_parkour.mp4"
         total_duration_seconds = 33 * 60 + 33 # nightime minecraft parkour
 
     random_start_time_seconds = random.uniform(0, total_duration_seconds - duration)
@@ -279,7 +279,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
             # add snowfall background music for horror stories
             print(f"adding snowfall background music to {postName}")
             random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
-            snowfall_audio = AudioFileClip("audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
+            snowfall_audio = AudioFileClip("static/audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
             final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
             final_video_clip.audio = final_audio
 
@@ -312,7 +312,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
             # add snowfall background music for horror stories
             print(f"adding snowfall background music to {postName}")
             random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
-            snowfall_audio = AudioFileClip("audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
+            snowfall_audio = AudioFileClip("static/audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
             final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
             final_video_clip.audio = final_audio
         output_video_path = f"{post_path}/{postName}/{print_title}_reel.mp4"
@@ -326,7 +326,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-08"
-    # today = "Test"
+    today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
