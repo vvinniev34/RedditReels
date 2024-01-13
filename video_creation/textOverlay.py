@@ -265,7 +265,6 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
             continue
 
         snipped_title_video = video_clip.subclip(0, title_duration) if partNum == 1 else video_clip.subclip(start_time, start_time + title_duration)
-        # print(str(snipped_title_video.duration) + " " + str(title_last_word_time))
         snipped_title_audio_clip = title_audio_clip.subclip(0, -0.15)#.audio_fadeout(snipped_title_video.duration - title_last_word_time)
         
         snipped_video = video_clip.subclip(start_time + title_duration, end_time + title_duration)
@@ -273,8 +272,6 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
         title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
         title_video_with_text = CompositeVideoClip([title_video_with_text] + part[0][:4])
-
-        # title_video_with_text.write_videofile("temp.mp4", codec="libx264", threads=8, preset='ultrafast', logger = None)
 
         video_with_text = CompositeVideoClip([snipped_video] + part[0][4:])
         video_with_text = video_with_text.set_audio(snipped_audio)
@@ -302,7 +299,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         partNum += 1
 
     # write seperate if fits within instagram reels
-    if insta_reel:
+    if insta_reel and multipleParts:
         end_time = reels_video_segments[1][1]
         b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title, 0, title_duration)
         snipped_title_video = video_clip.subclip(0, title_duration)
@@ -319,6 +316,10 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
         INSTAGRAM_REELS_QUEUE.append(output_video_path)
         print(f"Finished writing reel: {output_video_path}")
+    elif insta_reel:
+        output_video_path = f"{post_path}/{postName}/{print_title}.mp4"
+        print(f"Using short {output_video_path} as Instagram Reel")
+        INSTAGRAM_REELS_QUEUE.append(output_video_path)
 
     # write seperate tiktok
     if not insta_reel:
@@ -338,10 +339,14 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
         TIKTOK_QUEUE.append(output_video_path)
         print(f"Finished writing tiktok: {output_video_path}")
-    else:
+    elif insta_reel and multipleParts:
         output_video_path = f"{post_path}/{postName}/{print_title}_reel.mp4"
-        print(f"Using reel {output_video_path} as tiktok video")
+        print(f"Using reel {output_video_path} as Tiktok")
         TIKTOK_QUEUE.append(output_video_path)
+    else:
+        output_video_path = f"{post_path}/{postName}/{print_title}.mp4"
+        print(f"Using short {output_video_path} as Tiktok")
+        INSTAGRAM_REELS_QUEUE.append(output_video_path)
 
     print("Overlay complete.")
 
