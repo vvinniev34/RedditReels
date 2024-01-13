@@ -2,8 +2,8 @@ import random
 import os
 import re
 import string
+import random
 from datetime import date
-import subprocess
 import whisper_timestamped as whisper
 from moviepy.editor import VideoFileClip, ImageClip, TextClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, concatenate_videoclips
 from fileDetails import get_mp3_length, get_wav_length, adjust_mp4_volume
@@ -321,22 +321,27 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         print(f"Finished writing reel: {output_video_path}")
 
     # write seperate tiktok
-    end_time = tiktok_video_segments[1][1]
-    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title, 0, title_duration)
-    snipped_title_video = video_clip.subclip(0, title_duration)
-    snipped_title_audio_clip = title_audio_clip.subclip(0, -0.15)
-    snipped_video = video_clip.subclip(title_duration, end_time + title_duration)
-    snipped_audio = audio_clip.subclip(0, end_time)
-    title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
-    title_video_with_text = CompositeVideoClip([title_video_with_text] + [b_clip, title_clip, banner_clip, comment_clip])
-    video_with_text = CompositeVideoClip([snipped_video] + tiktok_video_segments[0])
-    video_with_text = video_with_text.set_audio(snipped_audio)
-    final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
-    output_video_path = f"{post_path}/{postName}/{print_title}_tiktok.mp4"
-    print(f"Writing tiktok: {output_video_path}")
-    final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
-    TIKTOK_QUEUE.append(output_video_path)
-    print(f"Finished writing tiktok: {output_video_path}")
+    if not insta_reel:
+        end_time = tiktok_video_segments[1][1]
+        b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title, 0, title_duration)
+        snipped_title_video = video_clip.subclip(0, title_duration)
+        snipped_title_audio_clip = title_audio_clip.subclip(0, -0.15)
+        snipped_video = video_clip.subclip(title_duration, end_time + title_duration)
+        snipped_audio = audio_clip.subclip(0, end_time)
+        title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
+        title_video_with_text = CompositeVideoClip([title_video_with_text] + [b_clip, title_clip, banner_clip, comment_clip])
+        video_with_text = CompositeVideoClip([snipped_video] + tiktok_video_segments[0])
+        video_with_text = video_with_text.set_audio(snipped_audio)
+        final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
+        output_video_path = f"{post_path}/{postName}/{print_title}_tiktok.mp4"
+        print(f"Writing tiktok: {output_video_path}")
+        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+        TIKTOK_QUEUE.append(output_video_path)
+        print(f"Finished writing tiktok: {output_video_path}")
+    else:
+        output_video_path = f"{post_path}/{postName}/{print_title}_reel.mp4"
+        print(f"Using reel {output_video_path} as tiktok video")
+        TIKTOK_QUEUE.append(output_video_path)
 
     print("Overlay complete.")
 
