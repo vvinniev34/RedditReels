@@ -110,7 +110,7 @@ def convert(filename, folder_path):
                         print(f"Error deleting file {segment_file}")
             else:
                 lines = file.read().replace("&", "and")
-                if len(lines) > 3000:
+                if len(lines) > 4000:
                     print(f"Exiting file tts, {filename} too large")
                     return False
                 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
-            if filename.split('.')[-1] == "txt" and filename.startswith("askreddit"):
+            if filename.split('.')[-1] == "txt":# and filename.startswith("askreddit"):
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
                 

@@ -73,10 +73,10 @@ def login():
 
     time.sleep(5)
 
-def getContentLoggedIn(url, download_path, subreddit, number):
+def getContentLoggedIn(url, download_path, subreddit, number, custom):
     global subreddits
-    if subreddits[subreddit] <= 0:
-        print("Reached quota for subreddit")
+    if not custom and subreddits[subreddit] <= 0:
+        # print(f"Reached quota for {subreddit}")
         return False
     subreddits[subreddit] -= 1
 
@@ -126,7 +126,7 @@ def getContentLoggedIn(url, download_path, subreddit, number):
         # entire_post = title + '.\n' + completion.choices[0].message.content
         entire_post = remove_emojis(entire_post)
 
-        if len(entire_post) < 900 or len(entire_post) > 4000:
+        if len(entire_post) < 1000 or len(entire_post) > 4000:
             print("Post is too short or long, skipping...")
             return False
 
@@ -137,82 +137,6 @@ def getContentLoggedIn(url, download_path, subreddit, number):
     except Exception as e:
         print("An error occurred:", str(e))
         return False
-
-
-def getContent(url, download_path, subreddit, number):
-    if not os.path.exists(download_path):
-        os.makedirs(download_path)
-
-    # Check if the request was successful by ensuring the page title contains "reddit"
-    try:
-        driver.get(url)
-        entire_post = ""
-        driver.execute_script("return document.readyState")
-
-        # get the post ID from the share button
-        idString = driver.find_element(By.TAG_NAME, "shreddit-post")
-        postId = idString.get_attribute("id")
-        # add the post ID where it should be for the title, content, and button
-        titleId = "post-title-" + postId
-        contentId = postId + "-post-rtjson-content"
-        more_button_id = postId + "-read-more-button"
-
-        # click read more if possible
-        try:
-            driver.find_element(By.ID, more_button_id).click()
-        except Exception as e:
-            pass
-        # get the title and post
-        post_title = driver.find_element(By.ID, titleId)
-        title = post_title.text
-        
-        if not title.strip().endswith(('.', '!', '?', ';', ':')):
-            title += '.'
-
-        div_post = ""
-        if check_id(contentId):
-            div_post = driver.find_element(By.ID, contentId)
-        else:
-            return False
-        
-        # get all text into a variable
-        p_elements = div_post.find_elements(By.TAG_NAME, "p")
-        for p_element in p_elements:
-            # Tokenize the input text into sentences
-            entire_post += p_element.text + '\n'
-
-        pattern = re.compile(r'edit:', re.IGNORECASE)
-        match = pattern.search(entire_post)
-        if match:
-            entire_post = entire_post[:match.start()]
-
-        # prompt = "Can you edit this text to get rid of grammar errors and to shorten long sentences?" + '\n' + entire_post
-        # # client = OpenAI()
-        # client = OpenAI(api_key=OPENAI_API_KEY)
-
-        # completion = client.chat.completions.create(
-        # model="gpt-3.5-turbo",
-        # messages=[
-        #     {"role": "system", "content": "You are a writing assistant, skilled in correcting grammatical errors and reviewing texts."},
-        #     {"role": "user", "content": prompt}
-        # ]) 
-
-        # create the file
-        filename = subreddit + str(number) + ".txt"
-
-        entire_post = title + '.\n' + entire_post
-        # entire_post = title + '.\n' + completion.choices[0].message.content
-        entire_post = remove_emojis(entire_post)
-
-        # create a file and write the title to it
-        output_file = os.path.join(download_path, filename)
-        with open(output_file, 'w', encoding='utf-8') as file:
-            file.write(entire_post)
-        return True
-    except Exception as e:
-        print("An error occurred:", str(e))
-        return False
-  
 
 if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
@@ -226,8 +150,9 @@ if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2023-09-02"
     # today = "Test"
-    login()
 
+    login()
+    custom = True if today == "Test" else False
     filePath = f"RedditPosts/{today}/links.txt"
     download_path = f"RedditPosts/{today}/Texts"
     file = open(filePath, 'r')
@@ -240,7 +165,7 @@ if __name__ == "__main__":
             path = download_path + '/' + subreddit
             if "reddit.com" in tryLink:
                 # print(link)
-                if getContentLoggedIn(tryLink, path, subreddit, count):
+                if getContentLoggedIn(tryLink, path, subreddit, count, custom):
                     count += 1
             else:
                 subreddit = link.strip()

@@ -20,7 +20,8 @@ logging.basicConfig()
 def load_metadata(metadata_json_path: Optional[str] = None) -> DefaultDict[str, str]:
 	if metadata_json_path is None:
 		return defaultdict(str)
-	return json.dumps(metadata_json_path)
+	# return json.dumps(metadata_json_path)
+	return defaultdict(str, metadata_json_path)
 	# with open(metadata_json_path, encoding='utf-8') as metadata_json_file:
 	# 	return defaultdict(str, json.load(metadata_json_file))
 
@@ -31,7 +32,8 @@ class YouTubeUploader:
 
 	def __init__(self, video_path: str, metadata_json_path: Optional[str] = None,
 	             thumbnail_path: Optional[str] = None,
-	             profile_path: Optional[str] = str(Path.cwd()) + "/profile") -> None:
+	             profile_path: Optional[str] = str(Path.cwd().parent) + "/profile") -> None: # 
+				 
 		self.video_path = video_path
 		self.thumbnail_path = thumbnail_path
 		self.metadata_dict = load_metadata(metadata_json_path)
@@ -60,7 +62,7 @@ class YouTubeUploader:
 
 	def upload(self):
 		try:
-			self.__login()
+			# self.__login()
 			return self.__upload()
 		except Exception as e:
 			print(e)
@@ -113,7 +115,7 @@ class YouTubeUploader:
 			time.sleep(Constant.USER_WAITING_TIME)
 			self.browser.get(Constant.YOUTUBE_UPLOAD_URL)
 			time.sleep(Constant.USER_WAITING_TIME)
-			absolute_video_path = str(Path.cwd() / self.video_path)
+			absolute_video_path = str(Path.cwd().parent / self.video_path)
 			self.browser.find(By.XPATH, Constant.INPUT_FILE_VIDEO).send_keys(
 				absolute_video_path)
 			self.logger.debug('Attached video {}'.format(self.video_path))
@@ -125,7 +127,7 @@ class YouTubeUploader:
 				uploading_status_container = self.browser.find(By.XPATH, Constant.UPLOADING_STATUS_CONTAINER)
 
 		if self.thumbnail_path is not None:
-			absolute_thumbnail_path = str(Path.cwd() / self.thumbnail_path)
+			absolute_thumbnail_path = str(Path.cwd().parent / self.thumbnail_path)
 			self.browser.find(By.XPATH, Constant.INPUT_FILE_THUMBNAIL).send_keys(
 				absolute_thumbnail_path)
 			change_display = "document.getElementById('file-loader').style = 'display: block! important'"

@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import re
 import html
 import demoji
 from bs4 import BeautifulSoup
@@ -12,7 +13,7 @@ def remove_emojis(text):
 
 def getAskRedditComments(output_file, url):
     # Send a GET request to the URL
-    response = requests.get(f"{url}.json")
+    response = requests.get(f"{url}.json?sort=top")
     while response.status_code != 200:
         print(f"Status code of {response.status_code}: Trying again...")
         time.sleep(1)
@@ -29,7 +30,16 @@ def getAskRedditComments(output_file, url):
                 top_thread_body = html.unescape(thread_data["body"])
                 soup = BeautifulSoup(top_thread_body, 'html.parser')
                 top_thread_body = soup.get_text()
-                print(top_thread_body)
+
+                pattern = re.compile(r'edit:', re.IGNORECASE)
+                match = pattern.search(top_thread_body)
+                if match:
+                    top_thread_body = top_thread_body[:match.start()]
+                pattern = re.compile(r'update:', re.IGNORECASE)
+                match = pattern.search(top_thread_body)
+                if match and (match.start() > (len(top_thread_body) / 4)):
+                    top_thread_body = top_thread_body[:match.start()]
+
                 # top_comments.append(remove_emojis(top_thread_body))
                 if (top_thread_body == '[removed]' or top_thread_body == '[deleted]'):
                     continue

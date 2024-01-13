@@ -19,7 +19,8 @@ model = whisper.load_model("base")
 MAX_SHORTS_TIME = 60
 MAX_REEL_TIME = 90
 
-TIKTOK_AND_INSTAGRAM_REELS_QUEUE = []
+INSTAGRAM_REELS_QUEUE = []
+TIKTOK_QUEUE = []
 YOUTUBE_SHORTS_QUEUE = []
 
 def replace_abbreviations(sentence):
@@ -43,7 +44,7 @@ def title_to_print(video_title):
               break
         else:
             words_until_10_chars += word + "_"
-    return words_until_10_chars[:-1]
+    return words_until_10_chars[:-1].replace(':', '').replace('&', '')
 
 def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
@@ -90,11 +91,11 @@ def splitTextForWrap(input_str: str, line_length: int):
 def randomVideoSegment(output_video_filepath, duration):
     # background_video_path = "static/backgroundVideos/minecraft_parkour.mp4"
     # background_video_path = "static/backgroundVideos/bayashicompilation.mp4"
-    # background_video_path = "static/backgroundVideos/zachchoicompilation.mp4"
-    background_video_path = "static/backgroundVideos/gta5.mp4"
-    total_duration_seconds = 63 * 60 # bayashi
+    background_video_path = "static/backgroundVideos/zachchoicompilation.mp4"
+    # background_video_path = "static/backgroundVideos/gta5.mp4"
+    # total_duration_seconds = 63 * 60 # bayashi
     total_duration_seconds = 60 * 60 # minecraft parkour, zachchoi
-    total_duration_seconds = 28 * 60 + 15 # gta5
+    # total_duration_seconds = 28 * 60 + 15 # gta5
     dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
     if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
         background_video_path = "static/backgroundVideos/nighttime_minecraft_parkour.mp4"
@@ -108,8 +109,9 @@ def randomVideoSegment(output_video_filepath, duration):
 
 
 def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postName):
-    global TIKTOK_AND_INSTAGRAM_REELS_QUEUE
+    global INSTAGRAM_REELS_QUEUE
     global YOUTUBE_SHORTS_QUEUE
+    global TIKTOK_QUEUE
     text_colors = ['white', 'cyan', 'yellow', 'olive', 'magenta', 'lightseagreen', 
             'antiquewhite', 'orange', 'pink', 'gold', 'lavender', 'purple']
     askreddit_comment_times = []
@@ -156,6 +158,9 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
     reels_video_segments = [[], []]
     reels_video_segments[1].append(0)
+
+    tiktok_video_segments = [[], []]
+    tiktok_video_segments[1].append(0)
 
     video_clip = VideoFileClip(video_path)
 
@@ -233,20 +238,23 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
                 reels_video_segments[0].append(reels_shadow_textclip)
                 reels_video_segments[0].append(reels_new_textclip)
 
+            tiktok_new_textclip, tiktok_shadow_textclip = createTextClip(wrappedText, start_time, duration, color)
+            tiktok_video_segments[0].append(tiktok_shadow_textclip)
+            tiktok_video_segments[0].append(tiktok_new_textclip)
+
             # Update start time for the next segment
             start_time = endTime
             currentVidTime += duration
 
     video_segments[partNum][1].append(start_time)
     reels_video_segments[1].append(start_time)
+    tiktok_video_segments[1].append(start_time)
 
     audio_clip = AudioFileClip(wav_file_path)
 
     # subclip to remove audio artifact, unusure why AudioFileclip makes, maybe a bug?
     title_audio_clip = AudioFileClip(wav_title_file_path)
     print_title = title_to_print(video_title)
-    # title_audio_clip.write_audiofile("temp.wav", codec='wav')
-    # title_audio_clip = title_audio_clip.subclip(0, title_last_word_time)
     
     partNum = 1
     for part in video_segments:
@@ -273,15 +281,15 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
         final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
         
-        # add dark theme to some subreddits and if it's not long form content
-        dark_theme_subreddits = ["nosleep", "creepyencounters", "letsnotmeet", "glitch_in_the_matrix"]
-        if any(text.lower() in postName.lower() for text in dark_theme_subreddits) and not long_form:
-            # add snowfall background music for horror stories
-            print(f"adding snowfall background music to {postName}")
-            random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
-            snowfall_audio = AudioFileClip("static/audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
-            final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
-            final_video_clip.audio = final_audio
+        # # add dark theme to some subreddits and if it's not long form content
+        # dark_theme_subreddits = ["nosleep", "creepyencounters", "letsnotmeet", "glitch_in_the_matrix"]
+        # if any(text.lower() in postName.lower() for text in dark_theme_subreddits) and not long_form:
+        #     # add snowfall background music for horror stories
+        #     print(f"adding snowfall background music to {postName}")
+        #     random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
+        #     snowfall_audio = AudioFileClip("static/audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
+        #     final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
+        #     final_video_clip.audio = final_audio
 
         if not os.path.exists(f"{post_path}/{postName}"):
             os.makedirs(f"{post_path}/{postName}")
@@ -306,27 +314,36 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         video_with_text = CompositeVideoClip([snipped_video] + reels_video_segments[0])
         video_with_text = video_with_text.set_audio(snipped_audio)
         final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
-        # add dark theme to some subreddits and if it's not long form content
-        dark_theme_subreddits = ["nosleep", "creepyencounters", "letsnotmeet", "glitch_in_the_matrix"]
-        if any(text.lower() in postName.lower() for text in dark_theme_subreddits) and not long_form:
-            # add snowfall background music for horror stories
-            print(f"adding snowfall background music to {postName}")
-            random_start_time_seconds = random.uniform(0, (15 * 60 + 28) - final_video_clip.duration)
-            snowfall_audio = AudioFileClip("static/audio/snowfall_volume_boosted.mp3").subclip(random_start_time_seconds, random_start_time_seconds + final_video_clip.duration)
-            final_audio = CompositeAudioClip([final_video_clip.audio, snowfall_audio])
-            final_video_clip.audio = final_audio
         output_video_path = f"{post_path}/{postName}/{print_title}_reel.mp4"
         print(f"Writing reel: {output_video_path}")
         final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
-        TIKTOK_AND_INSTAGRAM_REELS_QUEUE.append(output_video_path)
+        INSTAGRAM_REELS_QUEUE.append(output_video_path)
         print(f"Finished writing reel: {output_video_path}")
+
+    # write seperate tiktok
+    end_time = tiktok_video_segments[1][1]
+    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title, 0, title_duration)
+    snipped_title_video = video_clip.subclip(0, title_duration)
+    snipped_title_audio_clip = title_audio_clip.subclip(0, -0.15)
+    snipped_video = video_clip.subclip(title_duration, end_time + title_duration)
+    snipped_audio = audio_clip.subclip(0, end_time)
+    title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
+    title_video_with_text = CompositeVideoClip([title_video_with_text] + [b_clip, title_clip, banner_clip, comment_clip])
+    video_with_text = CompositeVideoClip([snipped_video] + tiktok_video_segments[0])
+    video_with_text = video_with_text.set_audio(snipped_audio)
+    final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
+    output_video_path = f"{post_path}/{postName}/{print_title}_tiktok.mp4"
+    print(f"Writing tiktok: {output_video_path}")
+    final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+    TIKTOK_QUEUE.append(output_video_path)
+    print(f"Finished writing tiktok: {output_video_path}")
 
     print("Overlay complete.")
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-08"
-    today = "Test"
+    # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
@@ -342,7 +359,7 @@ if __name__ == "__main__":
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
-            if post.endswith(".mp4"):# and post.startswith("confession"):
+            if post.endswith(".mp4"):# and post.startswith("AmItheAsshole2"):
                 wav_file_path = f"{post_path}/{post.split('.')[0]}.wav"
                 wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 mp4_file_path = f"{post_path}/{post}"
@@ -353,9 +370,9 @@ if __name__ == "__main__":
         os.makedirs(upload_queue_folder_path)
 
     with open(f"{upload_queue_folder_path}/tiktok_queue.txt", 'w', encoding='utf-8') as tiktok_upload_queue:
-        tiktok_upload_queue.write('\n'.join(TIKTOK_AND_INSTAGRAM_REELS_QUEUE))
+        tiktok_upload_queue.write('\n'.join(TIKTOK_QUEUE))
     with open(f"{upload_queue_folder_path}/instagram_queue.txt", 'w', encoding='utf-8') as insta_upload_queue:
-        insta_upload_queue.write('\n'.join(TIKTOK_AND_INSTAGRAM_REELS_QUEUE))
+        insta_upload_queue.write('\n'.join(INSTAGRAM_REELS_QUEUE))
     with open(f"{upload_queue_folder_path}/youtube_queue.txt", 'w', encoding='utf-8') as youtube_upload_queue:
         youtube_upload_queue.write('\n'.join(YOUTUBE_SHORTS_QUEUE))
 

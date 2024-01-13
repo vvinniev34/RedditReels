@@ -3,6 +3,9 @@ from datetime import datetime, date, timedelta
 import re
 from helpers import YouTubeUploader
 from typing import Optional
+import time
+
+from firefox_profile import FIREFOX_PROFILE
 
 current_time = datetime.now()
 month = current_time.month
@@ -51,7 +54,7 @@ def main(video_path: str,
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    today = "Test"
+    today = "2024-01-08"
 
     YOUTUBE_UPLOADS = []
     with open(f"../RedditPosts/{today}/uploadQueue/youtube_queue.txt", "r", encoding="utf-8") as file:
@@ -76,8 +79,12 @@ if __name__ == "__main__":
 
         # youtube_json_list.append(json)
 
-        main(upload, json)
+        main(upload, json, profile_path=FIREFOX_PROFILE)
 
         max_uploads -= 1
         if max_uploads <= 0:
             break
+
+        time.sleep(5)
+
+        break
