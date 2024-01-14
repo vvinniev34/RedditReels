@@ -322,7 +322,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         INSTAGRAM_REELS_QUEUE.append(output_video_path)
 
     # write seperate tiktok
-    if not insta_reel:
+    if not insta_reel and not long_form:
         end_time = tiktok_video_segments[1][1]
         b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title, 0, title_duration)
         snipped_title_video = video_clip.subclip(0, title_duration)
@@ -346,7 +346,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     else:
         output_video_path = f"{post_path}/{postName}/{print_title}.mp4"
         print(f"Using short {output_video_path} as Tiktok")
-        INSTAGRAM_REELS_QUEUE.append(output_video_path)
+        TIKTOK_QUEUE.append(output_video_path)
 
     print("Overlay complete.")
 

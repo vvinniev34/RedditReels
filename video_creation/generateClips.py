@@ -17,14 +17,14 @@ def createTitleClip(wrappedText, start, duration):
     # font = "GILB____.TTF'"
     new_textclip = TextClip(
         wrappedText, 
-        fontsize=50, 
+        fontsize=40, 
         color='black', 
         bg_color='transparent',
         method='caption',
         font=f'C:/Windows/fonts/{font}', 
-        size=(820, None),
+        size=(830, None),
         align='West',
-    ).set_start(start).set_duration(duration).resize(width=820).set_position(('center', 'center'))
+    ).set_start(start).set_duration(duration).resize(width=830).set_position(('center', 'center'))
 
     text_width, text_height = new_textclip.size
 
@@ -39,7 +39,7 @@ def createTitleClip(wrappedText, start, duration):
         align='West',
     ).set_start(start).set_duration(duration).set_position(('center', 'center'))
 
-    banner_path = 'static/images/medalled_banner.png'
+    banner_path = 'static/images/medalled_banner_resized.png'
     banner_clip = ImageClip(banner_path, duration=duration).resize(width=900)
     banner_clip = banner_clip.set_pos((center_x, height_y / 2 - (text_height / 2) - banner_clip.size[1] - 10))
     # print(f"text size: {new_textclip.size}; Image Size: {banner_clip.size}")
@@ -85,8 +85,8 @@ def createTextClip(wrappedText, start, duration, color='white'):
 
 if __name__ == "__main__":
     background_clip, new_textclip, shadow_textclip, second_shadow_textclip = createTitleClip("UPDATE: How can I (M40) explain to my kids (F12/15/17) that my infidelity is the cause of our divorce?\n(part 1)", 0, 5)
-    background_clip, new_textclip, shadow_textclip, second_shadow_textclip = createTitleClip("UPDATE: How can I (M40) explain to my kidsthat my infedelitys (p1)", 0, 5)
-    input_video_path = 'tifu1.mp4'
+    background_clip, new_textclip, shadow_textclip, second_shadow_textclip = createTitleClip("UPDATE: How can I (M40) explain to my kids that my infedelitys (p1)", 0, 5)
+    input_video_path = 'AITAH1.mp4'
     video_clip = VideoFileClip(input_video_path)
     segment_clip = video_clip.subclip(0, 5)
 

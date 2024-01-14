@@ -95,7 +95,7 @@ if __name__ == "__main__":
         if max_uploads <= 0:
             break
 
-        time.sleep(5)
+        time.sleep(2)
 
     remaining_youtube_uploads = [upload for upload in YOUTUBE_UPLOADS if upload not in used_uploads]
     with open(f"../RedditPosts/{today}/uploadQueue/youtube_queue.txt", "w", encoding="utf-8") as file:

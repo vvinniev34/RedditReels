@@ -205,6 +205,11 @@ class YouTubeUploader:
 				self.__write_in_field(tags_field, ','.join(tags))
 				self.logger.debug('The tags were set to \"{}\"'.format(tags))
 
+			# Toggle Publish to Subscriptions Feed
+			self.browser.find(By.XPATH, Constant.SHOW_MORE_BUTTON).click()
+			self.browser.find(By.XPATH, Constant.PUBLISH_TO_SUBSCRIPTIONS_TOGGLE).click()
+
+			# Navigate to Publish Page
 			self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
 			self.logger.debug('Clicked {} one'.format(Constant.NEXT_BUTTON))
 
@@ -214,6 +219,7 @@ class YouTubeUploader:
 			self.browser.find(By.ID, Constant.NEXT_BUTTON).click()
 			self.logger.debug('Clicked {} three'.format(Constant.NEXT_BUTTON))
 
+			# Schedule
 			schedule = self.metadata_dict[Constant.VIDEO_SCHEDULE]
 			if schedule:
 				upload_time_object = datetime.strptime(schedule, "%m/%d/%Y, %H:%M")
