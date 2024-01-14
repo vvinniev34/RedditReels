@@ -145,7 +145,7 @@ def convert(filename, folder_path):
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-06"
-    # today = "Test"
+    # today = "Custom"
 
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder

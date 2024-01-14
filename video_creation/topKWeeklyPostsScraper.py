@@ -114,7 +114,7 @@ def scrape(url, download_path, subreddit):
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    # today = "Test"
+    # today = "Custom"
     current_date = datetime.datetime.now()
 
     login()

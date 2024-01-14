@@ -66,7 +66,8 @@ def createTextClip(wrappedText, start, duration, color='white'):
         # method='label',
         font='C:/Windows/fonts/GILBI___.TTF', 
         size=(textbox_size_x, None)#, textbox_size_y)
-    ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
+    # ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
+    ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.8  + 15 * t)).set_position(('center', 'center'))
     
     shadow_textclip = TextClip(
         wrappedText, 
@@ -79,17 +80,25 @@ def createTextClip(wrappedText, start, duration, color='white'):
         # method='label',
         font='C:/Windows/fonts/GILBI___.TTF', 
         size=(textbox_size_x + 20, None)#, textbox_size_y)
-    ).set_start(start).set_duration(duration).resize(width=920).set_position(('center', 'center'))
+    # ).set_start(start).set_duration(duration).resize(width=920).set_position(('center', 'center'))
+    ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.6  + 20 * t)).set_position(('center', 'center'))
 
     return new_textclip, shadow_textclip
 
 if __name__ == "__main__":
-    background_clip, new_textclip, shadow_textclip, second_shadow_textclip = createTitleClip("UPDATE: How can I (M40) explain to my kids (F12/15/17) that my infidelity is the cause of our divorce?\n(part 1)", 0, 5)
-    background_clip, new_textclip, shadow_textclip, second_shadow_textclip = createTitleClip("UPDATE: How can I (M40) explain to my kids that my infedelitys (p1)", 0, 5)
+    # title page test
+    # background_clip, new_textclip, banner_clip, comment_clip = createTitleClip("UPDATE: How can I (M40) explain to my kids (F12/15/17) that my infidelity is the cause of our divorce?\n(part 1)", 0, 5)
+    # background_clip, new_textclip, banner_clip, comment_clip = createTitleClip("UPDATE: How can I (M40) explain to my kids that my infedelitys (p1)", 0, 5)
+    # input_video_path = 'AITAH1.mp4'
+    # video_clip = VideoFileClip(input_video_path)
+    # segment_clip = video_clip.subclip(0, 5)
+    # video_with_text = CompositeVideoClip([segment_clip] + [background_clip, new_textclip, banner_clip, comment_clip])
+    # video_with_text.write_videofile("test.mp4", codec="libx264", threads=8, preset='ultrafast', logger = None)
+
+    # text scale test
+    new_textclip, shadow_textclip = createTextClip("How can I (M40) explain to my kids", 0, 5)
     input_video_path = 'AITAH1.mp4'
     video_clip = VideoFileClip(input_video_path)
     segment_clip = video_clip.subclip(0, 5)
-
-    video_with_text = CompositeVideoClip([segment_clip] + [background_clip, new_textclip, shadow_textclip, second_shadow_textclip])
-
+    video_with_text = CompositeVideoClip([segment_clip] + [shadow_textclip, new_textclip])
     video_with_text.write_videofile("test.mp4", codec="libx264", threads=8, preset='ultrafast', logger = None)

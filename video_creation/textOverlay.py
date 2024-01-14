@@ -353,6 +353,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-08"
+    # today = "Custom"
     # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
     for subreddit in os.listdir(folder_path):
