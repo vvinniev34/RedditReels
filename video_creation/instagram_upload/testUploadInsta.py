@@ -81,19 +81,6 @@ def upload(video_path):
     # )
     # post_button.click()
     # post = css-y1m958
-    all_divs = driver.find_elements(By.TAG_NAME, "div")
-    for div in all_divs:
-        try:
-            print(div.get_attribute("class"))
-        except:
-            print("not found")
-    print("-----------------------")
-    all_input = driver.find_elements(By.TAG_NAME, "input")
-    for div in all_input:
-        try:
-            print(div.get_attribute("type"))
-        except:
-            print("not found")
 
     
     # time.sleep(10)
