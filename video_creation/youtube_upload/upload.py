@@ -23,6 +23,16 @@ def remove_ending(string):
     modified_string = re.sub(pattern_long_form, '', modified_string)
     return modified_string
 
+def get_max_title(title):
+    valid_title = ""
+    title_words = title.split()
+    for word in title_words:
+        if len(valid_title) + len(word) + 1 <= 100:
+            valid_title += (word + " ")
+        else:
+            break
+    return valid_title.strip()
+
 def getNextSchedule():
     global SCHEDULE_DATE
     date = SCHEDULE_DATE.split(',')[0].strip().split("/")
@@ -49,12 +59,12 @@ def main(video_path: str,
          profile_path: Optional[str] = None):
     uploader = YouTubeUploader(video_path, metadata_path, thumbnail_path, profile_path)
     was_video_uploaded, video_id = uploader.upload()
-    assert was_video_uploaded
+    return was_video_uploaded
 
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    today = "2024-01-08"
+    today = "2024-01-12"
 
     YOUTUBE_UPLOADS = []
     with open(f"../RedditPosts/{today}/uploadQueue/youtube_queue.txt", "r", encoding="utf-8") as file:
@@ -62,7 +72,7 @@ if __name__ == "__main__":
         YOUTUBE_UPLOADS = file_contents.split('\n')
         YOUTUBE_UPLOADS = [upload for upload in YOUTUBE_UPLOADS if upload]
 
-    # youtube_json_list = []
+    used_uploads = []
     max_uploads = 20
     for upload in YOUTUBE_UPLOADS:
         subreddit = upload.split("/")[3]
@@ -71,20 +81,22 @@ if __name__ == "__main__":
         with open(f"../RedditPosts/{today}/Texts/{subreddit}/{video_num}/videoTitle.txt", "r", encoding="utf-8") as file:
             title = file.readline().strip()
         json = {
-            "title": title,
+            "title": get_max_title(title),
             "description": f"{title}\n\n#shorts #redditstories #{subreddit} #cooking",
             "tags": [],
             "schedule": f"{getNextSchedule()}"
         }
 
-        # youtube_json_list.append(json)
+        if not main(upload, json, profile_path=FIREFOX_PROFILE):
+            break
 
-        main(upload, json, profile_path=FIREFOX_PROFILE)
-
+        used_uploads.append(upload)
         max_uploads -= 1
         if max_uploads <= 0:
             break
 
         time.sleep(5)
 
-        break
+    remaining_youtube_uploads = [upload for upload in YOUTUBE_UPLOADS if upload not in used_uploads]
+    with open(f"../RedditPosts/{today}/uploadQueue/youtube_queue.txt", "w", encoding="utf-8") as file:
+        file.writelines('\n'.join(remaining_youtube_uploads))
