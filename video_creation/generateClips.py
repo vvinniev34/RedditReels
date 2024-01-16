@@ -17,7 +17,7 @@ def createTitleClip(wrappedText, start, duration):
     # font = "GILB____.TTF'"
     new_textclip = TextClip(
         wrappedText, 
-        fontsize=40, 
+        fontsize=45, 
         color='black', 
         bg_color='transparent',
         method='caption',
@@ -30,7 +30,7 @@ def createTitleClip(wrappedText, start, duration):
 
     background_clip = TextClip(
         "", 
-        fontsize=50, 
+        fontsize=45, 
         color='white', 
         bg_color='white',
         method='caption',

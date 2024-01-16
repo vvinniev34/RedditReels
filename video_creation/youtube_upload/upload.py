@@ -23,6 +23,10 @@ def remove_ending(string):
     modified_string = re.sub(pattern_long_form, '', modified_string)
     return modified_string
 
+def contains_pattern(string):
+    pattern = re.compile(r"_p\d+\.mp4")
+    return bool(pattern.search(string))
+
 def get_max_title(title):
     valid_title = ""
     title_words = title.split()
@@ -52,6 +56,19 @@ def getNextSchedule():
         SCHEDULE_DATE = f"{month}/{day}/{year}, 00:00"
     return SCHEDULE_DATE
 
+def getNextDaySchedule():
+    global SCHEDULE_DATE
+    date = SCHEDULE_DATE.split(',')[0].strip().split("/")
+    month, day, year = map(int, date)
+    time = SCHEDULE_DATE.split(',')[1].strip().split(":")
+    hour, minutes = map(int, time)
+
+    next_day = datetime(year=year, month=month, day=day) + timedelta(days=1)
+    year = next_day.year
+    month = next_day.month
+    day = next_day.day
+    SCHEDULE_DATE = f"{month}/{day}/{year}, 00:00"
+    return SCHEDULE_DATE
 
 def main(video_path: str,
          metadata_path: Optional[str] = None,
@@ -75,6 +92,10 @@ if __name__ == "__main__":
     used_uploads = []
     max_uploads = 20
     for upload in YOUTUBE_UPLOADS:
+        # skip multiple part videos, might remove might keep
+        if contains_pattern(upload):
+            continue
+
         subreddit = upload.split("/")[3]
         video_num = upload.split("/")[4]
         title = "redditstory"
@@ -84,7 +105,8 @@ if __name__ == "__main__":
             "title": get_max_title(title),
             "description": f"{title}\n\n#shorts #redditstories #{subreddit} #cooking",
             "tags": [],
-            "schedule": f"{getNextSchedule()}"
+            # "schedule": f"{getNextSchedule()}"
+            "schedule": f"{getNextDaySchedule()}"
         }
 
         if not main(upload, json, profile_path=FIREFOX_PROFILE):
