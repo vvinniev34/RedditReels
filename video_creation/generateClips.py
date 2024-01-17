@@ -17,11 +17,12 @@ def createTitleClip(wrappedText, start, duration):
     # font = "GILB____.TTF'"
     new_textclip = TextClip(
         wrappedText, 
-        fontsize=45, 
+        fontsize=50, 
         color='black', 
         bg_color='transparent',
         method='caption',
-        font=f'C:/Windows/fonts/{font}', 
+        # font=f'C:/Windows/fonts/{font}', 
+        font=f"static/fonts/{font}",
         size=(830, None),
         align='West',
     ).set_start(start).set_duration(duration).resize(width=830).set_position(('center', 'center'))
@@ -30,11 +31,12 @@ def createTitleClip(wrappedText, start, duration):
 
     background_clip = TextClip(
         "", 
-        fontsize=45, 
+        fontsize=50, 
         color='white', 
         bg_color='white',
         method='caption',
-        font='C:/Windows/fonts/GILB____.TTF', 
+        # font='C:/Windows/fonts/GILB____.TTF', 
+        font=f"static/fonts/{font}",
         size=(900, text_height + 20),
         align='West',
     ).set_start(start).set_duration(duration).set_position(('center', 'center'))
@@ -57,6 +59,7 @@ def createTextClip(wrappedText, start, duration, color='white'):
     center_x = width_x / 2 - textbox_size_x / 2
     center_y = height_y / 2 - textbox_size_y / 2
 
+    font = 'GILBI___.TTF'
     new_textclip = TextClip(
         wrappedText, 
         fontsize=105, 
@@ -64,7 +67,8 @@ def createTextClip(wrappedText, start, duration, color='white'):
         bg_color='transparent',
         method='caption',
         # method='label',
-        font='C:/Windows/fonts/GILBI___.TTF', 
+        # font=f'C:/Windows/fonts/{font}', 
+        font=f'static/fonts/{font}'
         size=(textbox_size_x, None)#, textbox_size_y)
     # ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
     ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.8  + 15 * t)).set_position(('center', 'center'))
@@ -78,7 +82,8 @@ def createTextClip(wrappedText, start, duration, color='white'):
         stroke_color="black",
         method='caption',
         # method='label',
-        font='C:/Windows/fonts/GILBI___.TTF', 
+        # font='C:/Windows/fonts/GILBI___.TTF', 
+        font=f'static/fonts/{font}'
         size=(textbox_size_x + 20, None)#, textbox_size_y)
     # ).set_start(start).set_duration(duration).resize(width=920).set_position(('center', 'center'))
     ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.6  + 20 * t)).set_position(('center', 'center'))

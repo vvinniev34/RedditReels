@@ -119,6 +119,6 @@ if __name__ == "__main__":
 
         time.sleep(2)
 
-    remaining_youtube_uploads = [upload for upload in YOUTUBE_UPLOADS if upload not in used_uploads]
-    with open(f"../RedditPosts/{today}/uploadQueue/youtube_queue.txt", "w", encoding="utf-8") as file:
-        file.writelines('\n'.join(remaining_youtube_uploads))
+    # remaining_youtube_uploads = [upload for upload in YOUTUBE_UPLOADS if upload not in used_uploads]
+    # with open(f"../RedditPosts/{today}/uploadQueue/youtube_queue.txt", "w", encoding="utf-8") as file:
+    #     file.writelines('\n'.join(remaining_youtube_uploads))
