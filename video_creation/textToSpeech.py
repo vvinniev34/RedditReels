@@ -6,7 +6,7 @@ from pydub.utils import mediainfo
 from pydub.effects import speedup
 from fileDetails import get_wav_length, get_mp3_length, add_mp3_padding
 import pyttsx3
-from tiktokvoice import tts
+from deprecated.tiktokvoice import tts
 from openai import OpenAI
 from accountCredentials.openai_key import OPENAI_API_KEY
 from speech_synthesis import synth_speech
@@ -66,7 +66,7 @@ def convert(filename, folder_path):
                 title_file.write(title)
 
             if filename.startswith("askreddit"):
-                swoosh_transition = AudioSegment.from_file("static/swoosh_transition.mp3")
+                swoosh_transition = AudioSegment.from_file("static/audio/swoosh_transition.mp3")
                 swoosh_transition_length = len(swoosh_transition) / 1000
 
                 synth_speech(title, output_title_file)

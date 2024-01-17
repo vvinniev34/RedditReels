@@ -68,7 +68,7 @@ def createTextClip(wrappedText, start, duration, color='white'):
         method='caption',
         # method='label',
         # font=f'C:/Windows/fonts/{font}', 
-        font=f'static/fonts/{font}'
+        font=f'static/fonts/{font}',
         size=(textbox_size_x, None)#, textbox_size_y)
     # ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
     ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.8  + 15 * t)).set_position(('center', 'center'))
@@ -83,7 +83,7 @@ def createTextClip(wrappedText, start, duration, color='white'):
         method='caption',
         # method='label',
         # font='C:/Windows/fonts/GILBI___.TTF', 
-        font=f'static/fonts/{font}'
+        font=f'static/fonts/{font}',
         size=(textbox_size_x + 20, None)#, textbox_size_y)
     # ).set_start(start).set_duration(duration).resize(width=920).set_position(('center', 'center'))
     ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.6  + 20 * t)).set_position(('center', 'center'))
