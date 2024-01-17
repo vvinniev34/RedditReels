@@ -23,9 +23,9 @@ def createTitleClip(wrappedText, start, duration):
         method='caption',
         # font=f'C:/Windows/fonts/{font}', 
         font=f"static/fonts/{font}",
-        size=(830, None),
+        size=(820, None),
         align='West',
-    ).set_start(start).set_duration(duration).resize(width=830).set_position(('center', 'center'))
+    ).set_start(start).set_duration(duration).resize(width=820).set_position(('center', 'center'))
 
     text_width, text_height = new_textclip.size
 
