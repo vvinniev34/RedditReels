@@ -1,6 +1,14 @@
 azure-cognitiveservices-speech
 whisper_timestamped
 pydub
+wave
 moviepy
 
 selenium_firefox==2.0.8
+selenium==4.0.0
+bs4
+
+re
+demoji
+requests
+dotenv
