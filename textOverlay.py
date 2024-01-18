@@ -1,12 +1,13 @@
 import random
 import os
 import re
-import string
 import random
 from datetime import date
 import whisper_timestamped as whisper
-from moviepy.editor import VideoFileClip, ImageClip, TextClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, concatenate_videoclips
-from fileDetails import get_mp3_length, get_wav_length, adjust_mp4_volume
+# from moviepy.editor import ImageClip, TextClip, CompositeAudioClip
+from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, concatenate_videoclips
+# from fileDetails import get_mp3_length, adjust_mp4_volume
+from fileDetails import get_wav_length
 from generateClips import createTitleClip, createTextClip
 
 # Get the current working directory of the script
@@ -26,11 +27,13 @@ YOUTUBE_SHORTS_QUEUE = []
 def replace_abbreviations(sentence):
     pattern_aita1 = r'\bada\b'
     pattern_aita2 = r'\bida\b'
+    pattern_aita3 = r'\baida\b'
     pattern_tifu1 = r'\btyphoo\b'
     pattern_tifu2 = r'\bTIF(?:\s*,*\s*)you\b'
     
     modified_sentence = re.sub(pattern_aita1, 'AITA', sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_aita2, 'AITA', sentence, flags=re.IGNORECASE)
+    modified_sentence = re.sub(pattern_aita3, 'AITA', sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu1, 'TIFU', modified_sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu2, 'TIFU', modified_sentence, flags=re.IGNORECASE)
 

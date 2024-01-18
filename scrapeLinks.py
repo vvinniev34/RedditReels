@@ -3,8 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.edge import service
-from openai import OpenAI
-from accountCredentials.openai_key import OPENAI_API_KEY
+# from openai import OpenAI
+# from accountCredentials.openai_key import OPENAI_API_KEY
 from accountCredentials.reddit_account import reddit_username, reddit_password
 from scrapeLinksHelpers import getAskRedditComments, remove_emojis
 from datetime import date

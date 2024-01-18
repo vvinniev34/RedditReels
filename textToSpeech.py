@@ -1,12 +1,12 @@
 import os
-import time
 from datetime import date
 from pydub import utils, AudioSegment, effects
 from pydub.utils import mediainfo
-from pydub.effects import speedup
-from fileDetails import get_wav_length, get_mp3_length, add_mp3_padding
-import pyttsx3
-from deprecated.tiktokvoice import tts
+# from pydub.effects import speedup
+# from fileDetails import get_mp3_length, add_mp3_padding
+from fileDetails import get_wav_length
+# import pyttsx3
+# from deprecated.tiktokvoice import tts
 from openai import OpenAI
 from accountCredentials.openai_key import OPENAI_API_KEY
 from speech_synthesis import synth_speech
