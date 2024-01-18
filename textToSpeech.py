@@ -7,11 +7,11 @@ from pydub.utils import mediainfo
 from fileDetails import get_wav_length
 # import pyttsx3
 # from deprecated.tiktokvoice import tts
-from openai import OpenAI
-from accountCredentials.openai_key import OPENAI_API_KEY
+# from openai import OpenAI
+# from accountCredentials.openai_key import OPENAI_API_KEY
 from speech_synthesis import synth_speech
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+# client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Construct the relative path to ffmpeg.exe
 script_dir = os.path.dirname(os.path.abspath(__file__))

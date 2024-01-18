@@ -1,0 +1,6 @@
+azure-cognitiveservices-speech
+whisper_timestamped
+pydub
+moviepy
+
+selenium_firefox==2.0.8
