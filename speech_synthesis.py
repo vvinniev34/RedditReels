@@ -35,3 +35,5 @@ def synth_speech(text, output_file):
         if cancellation_details.reason == speechsdk.CancellationReason.Error:
             if cancellation_details.error_details:
                 print("Error details: {}".format(cancellation_details.error_details))
+                return False
+    return True

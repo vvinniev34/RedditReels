@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import date
 from pydub import utils, AudioSegment, effects
 from pydub.utils import mediainfo
@@ -69,7 +70,12 @@ def convert(filename, folder_path):
                 swoosh_transition = AudioSegment.from_file("static/audio/swoosh_transition.mp3")
                 swoosh_transition_length = len(swoosh_transition) / 1000
 
-                synth_speech(title, output_title_file)
+                title_synthesized = synth_speech(title, output_title_file)
+                while not title_synthesized:
+                    print("Title not synthesized, trying again...")
+                    time.sleep(3)
+                    title_synthesized = synth_speech(title, output_title_file)
+                
                 segment_files = []
                 total_time = []
                 cur_time = 0
@@ -77,7 +83,12 @@ def convert(filename, folder_path):
                 for line in file:
                     if not line.isspace() and cur_time < max_video_time:
                         segment_file = f"{output_file.split('.')[0]}_seg{num_comments}.wav"
-                        synth_speech(line.strip().replace("&", "and"), segment_file)
+                        segment_synthesized = synth_speech(line.strip().replace("&", "and"), segment_file)
+                        while not segment_synthesized:
+                            print("Segment not synthesized, trying again...")
+                            time.sleep(3)
+                            segment_synthesized = synth_speech(line.strip().replace("&", "and"), segment_file)
+                        
                         new_segment_time = get_wav_length(segment_file)
                         if cur_time + new_segment_time >= max_video_time and cur_time != 0:
                             os.remove(segment_file)
@@ -118,8 +129,17 @@ def convert(filename, folder_path):
                 # tts(lines, "en_us_010", output_file, play_sound=False)
 
                 # Microsoft Azure tts
-                synth_speech(title, output_title_file)
-                synth_speech(lines, output_file)
+                title_synthesized = synth_speech(title, output_title_file)
+                while not title_synthesized:
+                    print("Title not synthesized, trying again...")
+                    time.sleep(3)
+                    title_synthesized = synth_speech(title, output_title_file)
+               
+                body_synthesized = synth_speech(lines, output_file)
+                while not body_synthesized:
+                    print("Body not synthesized, trying again...")
+                    time.sleep(3)
+                    body_synthesized = synth_speech(lines, output_file)
 
             # openai tts
             # response = client.audio.speech.create(
@@ -146,6 +166,7 @@ if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-06"
     # today = "Custom"
+    # processed = ["AmItheAsshole", "AITAH"]
 
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder
@@ -153,7 +174,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
-            if filename.split('.')[-1] == "txt":# and filename.startswith("askreddit"):
+            if filename.split('.')[-1] == "txt":# and subreddit not in processed:
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
                 
@@ -161,7 +182,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         for filename in os.listdir(subreddit_path):
             wav_file_path = f"{subreddit_path}/{filename}"
-            if filename.split('.')[-1] == "wav":
+            if filename.split('.')[-1] == "wav":# and subreddit not in processed:
                 # speedup_audio(filename, subreddit_path)
                 print(f"Increased Volume of {wav_file_path}")
 

@@ -170,3 +170,6 @@ if __name__ == "__main__":
             else:
                 subreddit = link.strip()
                 count = 1
+
+    # Close the browser
+    driver.quit()

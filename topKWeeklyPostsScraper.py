@@ -127,7 +127,7 @@ if __name__ == "__main__":
         ["TrueOffMyChest", 1, 6], ["offmychest", 3, 6],
         ["tifu", 1, 6], ["legaladvice", 1, 6], 
         ["AmItheAsshole", 3, 6], ["AITAH", 4, 6],  
-        ["askreddit", 3, 6]
+        ["askreddit", 4, 6]
     ]
 
     for subreddit in subreddits:
