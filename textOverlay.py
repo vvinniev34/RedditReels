@@ -28,12 +28,14 @@ def replace_abbreviations(sentence):
     pattern_aita1 = r'\bada\b'
     pattern_aita2 = r'\bida\b'
     pattern_aita3 = r'\baida\b'
+    pattern_aita4 = r'\bada\b'
     pattern_tifu1 = r'\btyphoo\b'
     pattern_tifu2 = r'\bTIF(?:\s*,*\s*)you\b'
     
     modified_sentence = re.sub(pattern_aita1, 'AITA', sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_aita2, 'AITA', sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_aita3, 'AITA', sentence, flags=re.IGNORECASE)
+    modified_sentence = re.sub(pattern_aita4, 'AITA', sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu1, 'TIFU', modified_sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu2, 'TIFU', modified_sentence, flags=re.IGNORECASE)
 
@@ -107,7 +109,7 @@ def randomVideoSegment(output_video_filepath, duration):
     random_start_time_seconds = random.uniform(0, total_duration_seconds - duration)
     video_clip = VideoFileClip(background_video_path)
     random_segment = video_clip.subclip(random_start_time_seconds, random_start_time_seconds + duration)
-    random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8, logger = None, preset='ultrafast')
+    random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8, preset='ultrafast')
     print(f"Snipped {duration} s length video starting at: {random_start_time_seconds} for {output_video_path.split('/')[-1]}")
 
 
@@ -141,9 +143,10 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     if (wav_duration + title_duration) < 90:
         insta_reel = True
     # only create multiple parts if proceeding clips are of valulable length
-    multipleParts = title_duration + wav_duration > MAX_SHORTS_TIME + 10
+    multipleParts = title_duration + wav_duration > MAX_SHORTS_TIME
     
-    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleParts and not long_form else ""), 0, title_duration)
+    multipleShorts = title_duration + wav_duration > MAX_SHORTS_TIME + 10
+    b_clip, title_clip, banner_clip, comment_clip = createTitleClip(video_title + (" (p1)" if multipleShorts and not long_form else ""), 0, title_duration)
 
     audio = whisper.load_audio(wav_file_path)
     result = whisper.transcribe(model, audio, 'en')
@@ -236,14 +239,15 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
             video_segments[partNum][0].append(shadow_textclip)
             video_segments[partNum][0].append(new_textclip)
 
-            if insta_reel:
+            if insta_reel and multipleParts:
                 reels_new_textclip, reels_shadow_textclip = createTextClip(wrappedText, start_time, duration, color)
                 reels_video_segments[0].append(reels_shadow_textclip)
                 reels_video_segments[0].append(reels_new_textclip)
 
-            tiktok_new_textclip, tiktok_shadow_textclip = createTextClip(wrappedText, start_time, duration, color)
-            tiktok_video_segments[0].append(tiktok_shadow_textclip)
-            tiktok_video_segments[0].append(tiktok_new_textclip)
+            if not insta_reel and not long_form:
+                tiktok_new_textclip, tiktok_shadow_textclip = createTextClip(wrappedText, start_time, duration, color)
+                tiktok_video_segments[0].append(tiktok_shadow_textclip)
+                tiktok_video_segments[0].append(tiktok_new_textclip)
 
             # Update start time for the next segment
             start_time = endTime
@@ -293,12 +297,11 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
         if not os.path.exists(f"{post_path}/{postName}"):
             os.makedirs(f"{post_path}/{postName}")
-        video_num = f"_p{partNum}" if multipleParts and not long_form else ""
+        video_num = f"_p{partNum}" if multipleShorts and not long_form else ""
         output_video_path = f"{post_path}/{postName}/{print_title}{video_num}.mp4"
         print(f"Writing output video: {output_video_path}")
-        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast')
         YOUTUBE_SHORTS_QUEUE.append(output_video_path)
-        print(f"Finished writing part {partNum}")
         partNum += 1
 
     # write seperate if fits within instagram reels
@@ -315,8 +318,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         video_with_text = video_with_text.set_audio(snipped_audio)
         final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
         output_video_path = f"{post_path}/{postName}/{print_title}_reel.mp4"
-        print(f"Writing reel: {output_video_path}")
-        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast')
         INSTAGRAM_REELS_QUEUE.append(output_video_path)
         print(f"Finished writing reel: {output_video_path}")
     elif insta_reel:
@@ -338,8 +340,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         video_with_text = video_with_text.set_audio(snipped_audio)
         final_video_clip = concatenate_videoclips([title_video_with_text, video_with_text])
         output_video_path = f"{post_path}/{postName}/{print_title}_tiktok.mp4"
-        print(f"Writing tiktok: {output_video_path}")
-        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast', logger = None)
+        final_video_clip.write_videofile(output_video_path, codec="libx264", threads=8, preset='ultrafast')
         TIKTOK_QUEUE.append(output_video_path)
         print(f"Finished writing tiktok: {output_video_path}")
     elif insta_reel and multipleParts:
@@ -355,7 +356,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2024-01-08"
+    # today = "2024-01-18"
     # today = "Custom"
     # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"

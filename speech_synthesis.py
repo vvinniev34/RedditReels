@@ -16,7 +16,7 @@ speech_config.speech_synthesis_voice_name='en-US-RyanMultilingualNeural'
 def synth_speech(text, output_file):
     ssml_text = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
                     <voice name="en-US-RyanMultilingualNeural">
-                        <prosody pitch="-3%" rate="+25.0%" volume="+100.0%">
+                        <prosody pitch="-3.5%" rate="+25.0%" volume="+100.0%">
                             {text}
                         </prosody>
                     </voice>

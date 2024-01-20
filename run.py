@@ -11,6 +11,7 @@ if __name__ == "__main__":
     subprocess.run(["python", "./textToSpeech.py"])
     # create videos
     subprocess.run(["python", "./textOverlay.py"])
-    # upload videos to YouTube
-    subprocess.run(["python", "./youtube_upload/upload.py"])
-    subprocess.run(["python", "./tiktok_uploader/upload_vid.py"])
+
+    # upload videos to YouTube, Tiktok, and Instagram
+    # subprocess.run(["python", "./youtube_upload/upload.py"])
+    # subprocess.run(["python", "./tiktok_uploader/upload_vid.py"])

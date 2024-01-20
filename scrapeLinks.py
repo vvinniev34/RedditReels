@@ -13,7 +13,7 @@ import os
 import re
 
 # s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
-s=service.Service(r"edgedriver_win64/msedgedriver.exe")
+s=service.Service(executable_path=r"edgedriver_win64/msedgedriver.exe")
 driver = webdriver.Edge(service=s)
 entire_post = ""
 
@@ -78,7 +78,6 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
     if not custom and subreddits[subreddit] <= 0:
         # print(f"Reached quota for {subreddit}")
         return False
-    subreddits[subreddit] -= 1
 
     if not os.path.exists(download_path):
         os.makedirs(download_path)
@@ -98,6 +97,17 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
         title = title_element.get_attribute("text").rsplit(':', 1)[0].strip()
         if not title.endswith(('.', '!', '?', ';', ':')):
             title += '.'
+
+        if title == 'Reddit - Dive into anything.':
+            title_element = driver.find_element(By.XPATH, '//*[@id="t3_198rdnr"]/div/div[3]/div[1]/div/h1')
+            title = title_element.get_attribute("text").rsplit(':', 1)[0].strip()
+            if not title.endswith(('.', '!', '?', ';', ':')):
+                title += '.'
+            print(f"Default title found, replacing with {title}")
+
+        if "update" in title.lower():
+            print(f"Skipping post at url {url}: Update instead of new content")
+            return False
 
         entire_post = title + "\n"
 
@@ -121,17 +131,23 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
         match = pattern.search(entire_post)
         if match and (match.start() > (len(entire_post) / 4)):
             entire_post = entire_post[:match.start()]
+        pattern = re.compile(r'edited to:', re.IGNORECASE)
+        match = pattern.search(entire_post)
+        if match and (match.start() > (len(entire_post) / 4)):
+            entire_post = entire_post[:match.start()]
 
         entire_post = entire_post
         # entire_post = title + '.\n' + completion.choices[0].message.content
         entire_post = remove_emojis(entire_post)
 
         if len(entire_post) < 1000 or len(entire_post) > 4000:
-            print("Post is too short or long, skipping...")
+            print(f"Post at {url} is too short or long with {len(entire_post)} characters, skipping...")
             return False
 
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write(entire_post)
+        
+        subreddits[subreddit] -= 1
         return True
     
     except Exception as e:
@@ -148,7 +164,7 @@ if __name__ == "__main__":
 
     # Define the URL of the Reddit page you want to scrape
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2023-09-02"
+    # today = "2024-01-18"
     # today = "Custom"
 
     login()
