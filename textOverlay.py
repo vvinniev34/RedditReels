@@ -13,7 +13,8 @@ from generateClips import createTitleClip, createTextClip
 # Get the current working directory of the script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the relative path to ffmpeg.exe
-ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+# ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 
 model = whisper.load_model("base")
 

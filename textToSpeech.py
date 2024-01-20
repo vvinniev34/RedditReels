@@ -16,7 +16,9 @@ from speech_synthesis import synth_speech
 
 # Construct the relative path to ffmpeg.exe
 script_dir = os.path.dirname(os.path.abspath(__file__))
-ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+# ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
+
 AudioSegment.converter = ffmpeg_exe_path
 def get_prob_path():
     return os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffprobe.exe")

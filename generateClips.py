@@ -4,7 +4,8 @@ from moviepy.editor import VideoFileClip, ImageClip, TextClip, CompositeVideoCli
 # Get the current working directory of the script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the relative path to ffmpeg.exe
-ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+# ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 
 def createTitleClip(wrappedText, start, duration):
     width_x = 1080
