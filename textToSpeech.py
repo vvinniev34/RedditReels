@@ -21,7 +21,8 @@ ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 
 AudioSegment.converter = ffmpeg_exe_path
 def get_prob_path():
-    return os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffprobe.exe")
+    return ffmpeg_exe_path
+    # return os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffprobe.exe")
 utils.get_prober_name = get_prob_path
 
 MAX_PART_TIME = 59
