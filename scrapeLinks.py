@@ -4,12 +4,16 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.edge import service
 # from openai import OpenAI
 # from accountCredentials.openai_key import OPENAI_API_KEY
-from accountCredentials.reddit_account import reddit_username, reddit_password
 from scrapeLinksHelpers import getAskRedditComments, remove_emojis
 from datetime import date
 import time
 import os
 import re
+
+from dotenv import load_dotenv
+load_dotenv()
+reddit_username = os.environ.get('REDDIT_USERNAME')
+reddit_password = os.environ.get('REDDIT_PASSWORD')
 
 # s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
 s=service.Service(executable_path=r"edgedriver_win64/msedgedriver.exe")

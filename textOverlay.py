@@ -1,19 +1,15 @@
 import random
 import os
-import re
 import random
 from datetime import date
 import whisper_timestamped as whisper
-# from moviepy.editor import ImageClip, TextClip, CompositeAudioClip
 from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, concatenate_videoclips
-# from fileDetails import get_mp3_length, adjust_mp4_volume
 from fileDetails import get_wav_length
 from generateClips import createTitleClip, createTextClip
+from stringHelpers import replace_abbreviations, title_to_print#, splitTextForWrap
 
-# Get the current working directory of the script
-script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the relative path to ffmpeg.exe
-# ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
+script_dir = os.path.dirname(os.path.abspath(__file__))
 ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 
 model = whisper.load_model("base")
@@ -25,87 +21,22 @@ INSTAGRAM_REELS_QUEUE = []
 TIKTOK_QUEUE = []
 YOUTUBE_SHORTS_QUEUE = []
 
-def replace_abbreviations(sentence):
-    pattern_aita1 = r'\bada\b'
-    pattern_aita2 = r'\bida\b'
-    pattern_aita3 = r'\baida\b'
-    pattern_aita4 = r'\bada\b'
-    pattern_tifu1 = r'\btyphoo\b'
-    pattern_tifu2 = r'\bTIF(?:\s*,*\s*)you\b'
-    
-    modified_sentence = re.sub(pattern_aita1, 'AITA', sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_aita2, 'AITA', sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_aita3, 'AITA', sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_aita4, 'AITA', sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_tifu1, 'TIFU', modified_sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_tifu2, 'TIFU', modified_sentence, flags=re.IGNORECASE)
-
-    return modified_sentence
-
-def title_to_print(video_title):
-    first_5_words = video_title[:-1].split()[:5]
-    words_until_10_chars = ""
-    for word in first_5_words:
-        if len(words_until_10_chars) > 15:
-              break
-        else:
-            words_until_10_chars += word + "_"
-    return words_until_10_chars[:-1].replace(':', '').replace('&', '')
-
-def splitTextForWrap(input_str: str, line_length: int):
-    words = input_str.split(" ")
-    line_count = 0
-    split_input = ""
-    line = ""
-    i = 0
-    for word in words:
-        # long word case
-        if (line_count == 0 and len(word) >= line_length):
-            split_input += (word + ("\n" if i < (len(words) - 1) else ""))
-        elif (line_count + len(word) + 1) > line_length:
-            paddingNeeded = line_length - line_count
-            alternatePadding = True
-            while (paddingNeeded > 0):
-                if alternatePadding:
-                    line = "\u00A0" + line
-                else:
-                    line = line + "\u00A0"
-                alternatePadding = not alternatePadding
-                paddingNeeded -= 1
-            line += "\n"
-
-            split_input += line
-            line = word
-            line_count = len(word)
-        else:
-            line += ("\u00A0" + word) 
-            line_count += len(word) + 1
-        i += 1
-    
-    paddingNeeded = line_length - line_count
-    alternatePadding = True
-    while (line_count != 0 and paddingNeeded > 0):
-        if alternatePadding:
-            line = "\u00A0" + line
-        else:
-            line = line + "\u00A0"
-        alternatePadding = not alternatePadding
-        paddingNeeded -= 1
-    split_input += line
-    return split_input
-
-def randomVideoSegment(output_video_filepath, duration):
-    # background_video_path = "static/backgroundVideos/minecraft_parkour.mp4"
-    # background_video_path = "static/backgroundVideos/bayashicompilation.mp4"
+def randomVideoSegment(output_video_filepath, duration, background="zachchoi"):
     background_video_path = "static/backgroundVideos/zachchoicompilation.mp4"
-    # background_video_path = "static/backgroundVideos/gta5.mp4"
-    # total_duration_seconds = 63 * 60 # bayashi
-    total_duration_seconds = 60 * 60 # minecraft parkour, zachchoi
-    # total_duration_seconds = 28 * 60 + 15 # gta5
-    dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
-    if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
-        background_video_path = "static/backgroundVideos/nighttime_minecraft_parkour.mp4"
-        total_duration_seconds = 33 * 60 + 33 # nightime minecraft parkour
+    total_duration_seconds = 60 * 60 # zachchoi
+    if background == "minecraft":
+        minecraft_times = [4*60+17, 4*60+58, 9*60+50, 7*60+4, 5*60+59, 6*60+53, 53*60+32]
+        rand_background = random.randint(1, 7)
+        total_duration_seconds = minecraft_times[rand_background - 1]
+        background_video_path = f"static/backgroundVideos/minecraft{rand_background}.mp4"
+    elif background == "bayashi":
+        background_video_path = "static/backgroundVideos/bayashicompilation.mp4"
+        total_duration_seconds = 63 * 60
+
+    # dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
+    # if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
+    #     background_video_path = "static/backgroundVideos/nighttime_minecraft_parkour.mp4"
+    #     total_duration_seconds = 33 * 60 + 33 # nightime minecraft parkour
 
     random_start_time_seconds = random.uniform(0, total_duration_seconds - duration)
     video_clip = VideoFileClip(background_video_path)
@@ -124,8 +55,6 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     if (postName.startswith("askreddit")):
         with open(f"{video_path.split('.')[0]}/comment_times.txt", 'r', encoding='utf-8') as comment_times:
             askreddit_comment_times = [float(value) for value in comment_times.read().split(',')]
-        # for i in range(1, len(askreddit_comment_times)):
-        #     askreddit_comment_times[i] += askreddit_comment_times[i - 1]
     partNum = 0 
     wav_duration = get_wav_length(wav_file_path)
 
@@ -133,7 +62,6 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     video_title = "Errors Reading From Title"
     with open(video_title_path, 'r', encoding='utf-8') as file:
         video_title = file.read().strip()
-        # print(video_title)
     title_duration = get_wav_length(wav_title_file_path)
 
      # if more than a 6 parter, create long form content intead
@@ -370,7 +298,7 @@ if __name__ == "__main__":
                 output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
                 duration = get_wav_length(wav_file_path)
                 title_duration = get_wav_length(wav_title_file_path)
-                randomVideoSegment(output_video_path, duration + title_duration)
+                randomVideoSegment(output_video_path, duration + title_duration, background="minecraft")
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"

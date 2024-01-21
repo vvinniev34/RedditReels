@@ -5,45 +5,25 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.edge import service
 
-# from msedge.selenium_tools import Edge, EdgeOptions
 from selenium import webdriver
-from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.edge.options import Options as EdgeOptions
 from datetime import date
 
-from accountCredentials.reddit_account import reddit_username, reddit_password
-
-# Set the desired user agent string
-user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/95.0.1020.30 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/95.0",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Version/14.1.2 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edge/95.0.1020.30 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/95.0",
-    ]
-
-headers = {
-    "User-Agent": user_agents[7],
-    "Accept-Language": "en-US,en;q=0.9",
-}
+from dotenv import load_dotenv
+load_dotenv()
+reddit_username = os.environ.get('REDDIT_USERNAME')
+reddit_password = os.environ.get('REDDIT_PASSWORD')
 
 # Configure Edge WebDriver options
 edge_options = EdgeOptions()
 edge_options.use_chromium = True  # Use Chromium-based Edge
-edge_options.add_argument(f"user-agent={user_agents[1]}")  # Change the index as needed
+edge_options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/95.0.1020.30 Safari/537.36")
 
 # Specify the path to the Microsoft Edge WebDriver executable
 script_dir = os.path.dirname(os.path.abspath(__file__))
 edge_driver_path = os.path.join(script_dir, "edgedriver_win64/msedgedriver.exe")
-
-# Create an Edge WebDriver instance
-# driver = webdriver.Edge(options=edge_options)
 
 s=service.Service(r"edgedriver_win64/msedgedriver.exe")
 driver = webdriver.Edge(service=s)

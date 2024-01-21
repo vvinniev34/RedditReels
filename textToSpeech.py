@@ -3,8 +3,6 @@ import time
 from datetime import date
 from pydub import utils, AudioSegment, effects
 from pydub.utils import mediainfo
-# from pydub.effects import speedup
-# from fileDetails import get_mp3_length, add_mp3_padding
 from fileDetails import get_wav_length
 # import pyttsx3
 # from deprecated.tiktokvoice import tts
@@ -16,13 +14,11 @@ from speech_synthesis import synth_speech
 
 # Construct the relative path to ffmpeg.exe
 script_dir = os.path.dirname(os.path.abspath(__file__))
-# ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
 ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 
 AudioSegment.converter = ffmpeg_exe_path
 def get_prob_path():
     return ffmpeg_exe_path
-    # return os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffprobe.exe")
 utils.get_prober_name = get_prob_path
 
 MAX_PART_TIME = 59
