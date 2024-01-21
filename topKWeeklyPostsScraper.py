@@ -15,17 +15,14 @@ from dotenv import load_dotenv
 load_dotenv()
 reddit_username = os.environ.get('REDDIT_USERNAME')
 reddit_password = os.environ.get('REDDIT_PASSWORD')
+edge_driver_path = os.environ.get('EDGE_DRIVER_PATH')
 
 # Configure Edge WebDriver options
 edge_options = EdgeOptions()
 edge_options.use_chromium = True  # Use Chromium-based Edge
 edge_options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/95.0.1020.30 Safari/537.36")
 
-# Specify the path to the Microsoft Edge WebDriver executable
-script_dir = os.path.dirname(os.path.abspath(__file__))
-edge_driver_path = os.path.join(script_dir, "edgedriver_win64/msedgedriver.exe")
-
-s=service.Service(r"edgedriver_win64/msedgedriver.exe")
+s = service.Service(executable_path=edge_driver_path)
 driver = webdriver.Edge(service=s)
 
 # Function to scroll the page by a specified amount (in pixels)

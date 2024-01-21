@@ -25,7 +25,7 @@ def randomVideoSegment(output_video_filepath, duration, background="zachchoi"):
     background_video_path = "static/backgroundVideos/zachchoicompilation.mp4"
     total_duration_seconds = 60 * 60 # zachchoi
     if background == "minecraft":
-        minecraft_times = [4*60+17, 4*60+58, 9*60+50, 7*60+4, 5*60+59, 6*60+53, 53*60+32]
+        minecraft_times = [4*60+17, 4*60+58, 9*60+50, 7*60+4, 5*60+59, 6*60+53, 51*60+54]
         rand_background = random.randint(1, 7)
         total_duration_seconds = minecraft_times[rand_background - 1]
         background_video_path = f"static/backgroundVideos/minecraft{rand_background}.mp4"

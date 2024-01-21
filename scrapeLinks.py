@@ -14,9 +14,10 @@ from dotenv import load_dotenv
 load_dotenv()
 reddit_username = os.environ.get('REDDIT_USERNAME')
 reddit_password = os.environ.get('REDDIT_PASSWORD')
+edge_driver_path = os.environ.get('EDGE_DRIVER_PATH')
 
 # s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
-s=service.Service(executable_path=r"edgedriver_win64/msedgedriver.exe")
+s = service.Service(executable_path=edge_driver_path)
 driver = webdriver.Edge(service=s)
 entire_post = ""
 
@@ -79,7 +80,6 @@ def login():
 def getContentLoggedIn(url, download_path, subreddit, number, custom):
     global subreddits
     if not custom and subreddits[subreddit] <= 0:
-        # print(f"Reached quota for {subreddit}")
         return False
 
     if not os.path.exists(download_path):
@@ -159,13 +159,6 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
 
 if __name__ == "__main__":
     # Define the URL of the Reddit page you want to scrape
-    # today = date.today().strftime("%Y-%m-%d")
-    # today = "2023-09-02"
-
-    # url = "https://www.reddit.com/r/AmItheAsshole/comments/167chip/aita_for_not_disclosing_to_my_daughter_she_wasnt/"
-    # getContent(url, "", "", "")
-
-    # Define the URL of the Reddit page you want to scrape
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-18"
     # today = "Custom"
@@ -183,7 +176,6 @@ if __name__ == "__main__":
             tryLink = "https://" + link
             path = download_path + '/' + subreddit
             if "reddit.com" in tryLink:
-                # print(link)
                 if getContentLoggedIn(tryLink, path, subreddit, count, custom):
                     count += 1
             else:

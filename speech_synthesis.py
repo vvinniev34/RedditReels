@@ -6,7 +6,6 @@ load_dotenv()
 speech_key = os.environ.get('SPEECH_KEY')
 speech_region = os.environ.get('SPEECH_REGION')
 
-# This example requires environment variables named "SPEECH_KEY" and "SPEECH_REGION"
 speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
 
 # The language of the voice that speaks.

@@ -3,8 +3,6 @@ from moviepy.editor import VideoFileClip, ImageClip, TextClip, CompositeVideoCli
 
 # Get the current working directory of the script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-# Construct the relative path to ffmpeg.exe
-# ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg-2023-08-30-git-7aa71ab5c0-full_build", "bin", "ffmpeg.exe")
 ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
 
 def createTitleClip(wrappedText, start, duration):
@@ -15,14 +13,12 @@ def createTitleClip(wrappedText, start, duration):
     center_x = width_x / 2 - textbox_size_x / 2
     center_y = height_y / 2 - textbox_size_y / 2
     font = "ARLRDBD.TTF"
-    # font = "GILB____.TTF'"
     new_textclip = TextClip(
         wrappedText, 
         fontsize=50, 
         color='black', 
         bg_color='transparent',
         method='caption',
-        # font=f'C:/Windows/fonts/{font}', 
         font=f"static/fonts/{font}",
         size=(820, None),
         align='West',
@@ -36,7 +32,6 @@ def createTitleClip(wrappedText, start, duration):
         color='white', 
         bg_color='white',
         method='caption',
-        # font='C:/Windows/fonts/GILB____.TTF', 
         font=f"static/fonts/{font}",
         size=(900, text_height + 20),
         align='West',
@@ -45,7 +40,7 @@ def createTitleClip(wrappedText, start, duration):
     banner_path = 'static/images/medalled_banner_resized.png'
     banner_clip = ImageClip(banner_path, duration=duration).resize(width=900)
     banner_clip = banner_clip.set_pos((center_x, height_y / 2 - (text_height / 2) - banner_clip.size[1] - 10))
-    # print(f"text size: {new_textclip.size}; Image Size: {banner_clip.size}")
+
     comment_path = 'static/images/comments.png'
     comment_clip = ImageClip(comment_path, duration=duration).resize(width=900)
     comment_clip = comment_clip.set_pos((center_x, height_y / 2 + (text_height / 2) + 10))
@@ -68,10 +63,8 @@ def createTextClip(wrappedText, start, duration, color='white'):
         bg_color='transparent',
         method='caption',
         # method='label',
-        # font=f'C:/Windows/fonts/{font}', 
         font=f'static/fonts/{font}',
         size=(textbox_size_x, None)#, textbox_size_y)
-    # ).set_start(start).set_duration(duration).resize(width=900).set_position(('center', 'center'))
     ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.8  + 15 * t)).set_position(('center', 'center'))
     
     shadow_textclip = TextClip(
@@ -83,10 +76,8 @@ def createTextClip(wrappedText, start, duration, color='white'):
         stroke_color="black",
         method='caption',
         # method='label',
-        # font='C:/Windows/fonts/GILBI___.TTF', 
         font=f'static/fonts/{font}',
         size=(textbox_size_x + 20, None)#, textbox_size_y)
-    # ).set_start(start).set_duration(duration).resize(width=920).set_position(('center', 'center'))
     ).set_start(start).set_duration(duration).resize(lambda t : min(1, 0.6  + 20 * t)).set_position(('center', 'center'))
 
     return new_textclip, shadow_textclip
