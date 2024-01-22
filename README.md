@@ -1,7 +1,4 @@
-# RedditReels
-Automates creation of short-form video content for TikTok, YouTube Shorts, etc, using top weekly Reddit posts with upcoming support for automatic script execution scheduling
-
-# Overview (readme and requirements is outdated, will update sometime soon)
+# RedditReels (readme and requirements is outdated, will update sometime soon)
 
 RedditReels is an automated video creator/uploader for YouTube Shorts, Instagram Reels, and Tiktok, specializing in short-form video content, particularly Reddit-style narration videos layered over video gameplay. This script autonomously fetches the top weekly posts from chosen subreddits, converting them into short-form video content for seamless uploading. 
 
