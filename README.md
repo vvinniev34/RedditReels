@@ -9,34 +9,22 @@ This script is designed to run independently every week.
 
 # Setup/Installation
 
-1. Within project directory, either run $ pip install -r requirements.txt or pip install the following dependencies:
-   - azure-cognitiveservices-speech
-   - whisper_timestamped
-   - pydub
-   - wave
-   - moviepy
-   - selenium_firefox==2.0.8
-   - selenium==4.0.0
-   - bs4
-   - demoji
-   - requests
-   - python-dotenv
-
-2. Download Microsoft EdgeDriver using the following link: https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/. Place path to .exe within a .env within working direcotry with key value EDGE_DRIVER_PATH. 
-3. Download ffmpeg command line tool using https://ffmpeg.org/. Ensure downloaded .exe file is in either in System PATH or within working directory
+1. Within project directory, run the following command: ```$ pip install -r requirements.txt```
+2. Download Microsoft EdgeDriver, placing executable path within a .env file within working direcotry with key value EDGE_DRIVER_PATH
+3. Download ffmpeg command line tool, ensuring downloaded executable file is in either in System PATH or within working directory
 4. Setup Microsoft Azure account and Speech Services. Place the corresponding SPEECH_KEY and SPEECH_REGION within the .env file
    - https://azure.microsoft.com/en-us/products/ai-services/text-to-speech
    - If tiktok voices or pytt3x are sufficient, uncomment corresponding imports and portions in the ./TextToSpeech.py file.
    - OpenAI voices are also available if an account already exists
-6. Place Reddit account username and password into the .env file with corresponding keys values, REDDIT_USERNAME and REDDIT_PASSWORD
+5. Place Reddit account username and password into the .env file with corresponding keys values, REDDIT_USERNAME and REDDIT_PASSWORD
 
 Summary:
-Install dependencies and ensure .env file is properly setup. An example is provided within code. 
+Install dependencies and ensure .env file is properly setup. An example .env is provided within code. 
 
 # Usage/Instructions
 
 1. Enter directory containing redditReels
-3. Run $ python run.py
+3. Run the following command: ```$ python run.py```
 4. Wait until script finishes, created videos are contained within RedditPosts/{current_day} folder
    
 # How It Works
