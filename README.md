@@ -10,11 +10,10 @@ This script is designed to run independently every week.
 # Setup/Installation
 
 1. Within project directory, run the following command: ```$ pip install -r requirements.txt```
-2. Download Microsoft EdgeDriver, placing executable path within a .env file within working direcotry with key value EDGE_DRIVER_PATH
-3. Download ffmpeg command line tool, ensuring downloaded executable file is in either in System PATH or within working directory
-4. Setup Microsoft Azure account and Speech Services. Place the corresponding SPEECH_KEY and SPEECH_REGION within the .env file
-   - https://azure.microsoft.com/en-us/products/ai-services/text-to-speech
-   - If tiktok voices or pytt3x are sufficient, uncomment corresponding imports and portions in the ./TextToSpeech.py file.
+2. Download [Microsoft EdgeDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/?form=MA13LH), placing executable path within a .env file with key value EDGE_DRIVER_PATH
+3. Download [FFmpeg](https://ffmpeg.org/download.html) command line tool, ensuring downloaded executable file is in either in System PATH or within working directory
+4. Setup [Microsoft Azure](https://azure.microsoft.com/en-us/products/ai-services/text-to-speech) account and Speech Services. Place the corresponding SPEECH_KEY and SPEECH_REGION within the .env file
+   - If tiktok voices or pytt3x are sufficient, uncomment corresponding imports and code blocks in the ./TextToSpeech.py file.
    - OpenAI voices are also available if an account already exists
 5. Place Reddit account username and password into the .env file with corresponding keys values, REDDIT_USERNAME and REDDIT_PASSWORD
 
