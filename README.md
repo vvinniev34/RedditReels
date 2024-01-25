@@ -8,7 +8,7 @@ This script is designed to run independently every week.
 
 1. Within project directory, run the following command: ```$ pip install -r requirements.txt```
    
-2. Download the following dependencies if not on machine: [Microsoft EdgeDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/?form=MA13LH) | [FFmpeg](https://ffmpeg.org/download.html)
+2. Download the following dependencies if not on machine: [Microsoft EdgeDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/?form=MA13LH) | [FFmpeg](https://ffmpeg.org/download.html) | [ImageMagick](https://imagemagick.org/script/download.php)
    
 3. Setup [Microsoft Azure](https://azure.microsoft.com/en-us/products/ai-services/text-to-speech) account and Speech Services. 
    - If tiktok voices or pytt3x are sufficient, uncomment corresponding imports and code blocks in the ./TextToSpeech.py file.
