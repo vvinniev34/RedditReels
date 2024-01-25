@@ -18,7 +18,7 @@ This script is designed to run independently every week.
 
 # Usage/Instructions
 
-1. Enter directory containing redditReels
+1. Enter directory containing RedditReels
    
 2. Run the following command: ```$ python run.py```
    
@@ -28,7 +28,7 @@ This script is designed to run independently every week.
 
 1. **Subreddit Selection and Weekly Scraping:**
    - The script selects specific subreddits for content sourcing.
-   - It automatically scrapes the top 15 most popular posts from these subreddits on a weekly basis using Selenium and Beautiful Soup, posting the results into a .txt file within a folder managed by the script. 
+   - The top 15 popular posts from these subreddits are scraped on a weekly basis using Selenium and Beautiful Soup, posting the results into a .txt file within folders managed by the script. 
 
 2. **Video Content Creation:**
    - Transforms the extracted text content into short-form video clips suitable for Tiktok, Reels, and Shorts.
