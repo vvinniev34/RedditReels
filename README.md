@@ -7,20 +7,22 @@ This script is designed to run independently every week.
 # Setup/Installation
 
 1. Within project directory, run the following command: ```$ pip install -r requirements.txt```
-2. Download [Microsoft EdgeDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/?form=MA13LH), placing executable path within a .env file with key value EDGE_DRIVER_PATH
-3. Download [FFmpeg](https://ffmpeg.org/download.html) command line tool, ensuring downloaded executable file is in either in System PATH or within working directory
-4. Setup [Microsoft Azure](https://azure.microsoft.com/en-us/products/ai-services/text-to-speech) account and Speech Services. Place the corresponding SPEECH_KEY and SPEECH_REGION within the .env file
+   
+2. Download the following dependencies if not on machine: [Microsoft EdgeDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/?form=MA13LH) | [FFmpeg](https://ffmpeg.org/download.html)
+   
+3. Setup [Microsoft Azure](https://azure.microsoft.com/en-us/products/ai-services/text-to-speech) account and Speech Services. 
    - If tiktok voices or pytt3x are sufficient, uncomment corresponding imports and code blocks in the ./TextToSpeech.py file.
    - OpenAI voices are also available if an account already exists
-5. Place Reddit account username and password into the .env file with corresponding keys values, REDDIT_USERNAME and REDDIT_PASSWORD
-
-An example .env is provided within code. 
+   
+4. Follow instructions within provided example .env to fill in necesary environment variables
 
 # Usage/Instructions
 
 1. Enter directory containing redditReels
-3. Run the following command: ```$ python run.py```
-4. Wait until script finishes, created videos are contained within RedditPosts/{current_day} folder
+   
+2. Run the following command: ```$ python run.py```
+   
+3. Wait until script finishes. Created videos are contained within RedditPosts/{current_day} folder
    
 # How It Works
 
@@ -37,4 +39,3 @@ An example .env is provided within code.
    - more requirements needed, will update later
    - Uploads the generated videos to YouTube channels managed by the user.
    - Handles video metadata, descriptions, and scheduling.
-
