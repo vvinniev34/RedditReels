@@ -172,7 +172,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
-            if filename.split('.')[-1] == "txt" and subreddit in processed:
+            if filename.split('.')[-1] == "txt":# and subreddit in processed:
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
                 
@@ -180,7 +180,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         for filename in os.listdir(subreddit_path):
             wav_file_path = f"{subreddit_path}/{filename}"
-            if filename.split('.')[-1] == "wav" and subreddit in processed:
+            if filename.split('.')[-1] == "wav":# and subreddit in processed:
                 # speedup_audio(filename, subreddit_path)
                 print(f"Increased Volume of {wav_file_path}")
 
