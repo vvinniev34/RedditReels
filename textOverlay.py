@@ -8,10 +8,6 @@ from fileDetails import get_wav_length
 from generateClips import createTitleClip, createTextClip
 from stringHelpers import replace_abbreviations, title_to_print#, splitTextForWrap
 
-# Construct the relative path to ffmpeg.exe
-script_dir = os.path.dirname(os.path.abspath(__file__))
-ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
-
 model = whisper.load_model("base")
 
 MAX_SHORTS_TIME = 60
@@ -41,7 +37,7 @@ def randomVideoSegment(output_video_filepath, duration, background="zachchoi"):
     random_start_time_seconds = random.uniform(0, total_duration_seconds - duration)
     video_clip = VideoFileClip(background_video_path)
     random_segment = video_clip.subclip(random_start_time_seconds, random_start_time_seconds + duration)
-    random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8, preset='ultrafast')
+    random_segment.write_videofile(output_video_filepath, codec="libx264", threads=8, preset='ultrafast', logger=None)
     print(f"Snipped {duration} s length video starting at: {random_start_time_seconds} for {output_video_path.split('/')[-1]}")
 
 

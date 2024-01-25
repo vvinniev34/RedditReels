@@ -12,14 +12,13 @@ from speech_synthesis import synth_speech
 
 # client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Construct the relative path to ffmpeg.exe
-script_dir = os.path.dirname(os.path.abspath(__file__))
-ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
-
-AudioSegment.converter = ffmpeg_exe_path
-def get_prob_path():
-    return ffmpeg_exe_path
-utils.get_prober_name = get_prob_path
+# Construct the relative path to ffmpeg.exe if ffmpeg not in System PATH. Uncomment if needed
+# script_dir = os.path.dirname(os.path.abspath(__file__))
+# ffmpeg_exe_path = os.path.join(script_dir, "ffmpeg.exe")
+# AudioSegment.converter = ffmpeg_exe_path
+# def get_prob_path():
+#     return ffmpeg_exe_path
+# utils.get_prober_name = get_prob_path
 
 MAX_PART_TIME = 59
 
@@ -165,7 +164,7 @@ if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-06"
     # today = "Custom"
-    # processed = ["AmItheAsshole", "AITAH"]
+    processed = ["askreddit"]
 
     folder_path = f"RedditPosts/{today}/Texts"
     # Iterate through all files in the folder
@@ -173,7 +172,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         print(f"Currently processing {subreddit}")
         for filename in os.listdir(subreddit_path):
-            if filename.split('.')[-1] == "txt":# and subreddit not in processed:
+            if filename.split('.')[-1] == "txt" and subreddit in processed:
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
                 
@@ -181,7 +180,7 @@ if __name__ == "__main__":
         subreddit_path = f"{folder_path}/{subreddit}"
         for filename in os.listdir(subreddit_path):
             wav_file_path = f"{subreddit_path}/{filename}"
-            if filename.split('.')[-1] == "wav":# and subreddit not in processed:
+            if filename.split('.')[-1] == "wav" and subreddit in processed:
                 # speedup_audio(filename, subreddit_path)
                 print(f"Increased Volume of {wav_file_path}")
 
