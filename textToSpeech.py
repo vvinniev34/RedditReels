@@ -76,7 +76,7 @@ def convert(filename, folder_path):
                 
                 segment_files = []
                 total_time = []
-                cur_time = 0
+                cur_time = get_wav_length(output_title_file)
                 num_comments = 0
                 for line in file:
                     if not line.isspace() and cur_time < max_video_time:

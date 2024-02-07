@@ -95,7 +95,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
     video_clip = VideoFileClip(video_path)
 
-    print(f"Overlaying Text on {postName}...")
+    print(f"\nOverlaying Text on {postName}...")
     first_segment = True
     for segment in result['segments']:
         abbreviationFixedText = replace_abbreviations(segment['text'])

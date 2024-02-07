@@ -5,6 +5,7 @@ from selenium.webdriver.edge import service
 # from openai import OpenAI
 # from accountCredentials.openai_key import OPENAI_API_KEY
 from scrapeLinksHelpers import getAskRedditComments, remove_emojis
+from static.profanity_replacement import replaceProfanity
 from datetime import date
 import time
 import os
@@ -79,7 +80,7 @@ def login():
 
 def getContentLoggedIn(url, download_path, subreddit, number, custom):
     global subreddits
-    if not custom and subreddits[subreddit] <= 0:
+    if not custom and subreddits[subreddit] <= 0 or "removed_by_reddit" in url:
         return False
 
     if not os.path.exists(download_path):
@@ -117,6 +118,7 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
         if subreddit == "askreddit":
              # create a file and write the title to it
             with open(output_file, 'w', encoding='utf-8') as file:
+                replaceProfanity(entire_post)
                 file.write(entire_post)
             return getAskRedditComments(output_file, url)
 
@@ -148,6 +150,7 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
             return False
 
         with open(output_file, 'w', encoding='utf-8') as file:
+            replaceProfanity(entire_post)
             file.write(entire_post)
         
         subreddits[subreddit] -= 1

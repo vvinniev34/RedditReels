@@ -96,5 +96,3 @@ if __name__ == "__main__":
     # convert_video_to_audio(input_video_path, output_audio_path)
 
     # make_mp3_audio_louder("audio/snowfall.mp3", "audio/snowfall2x.mp3", 2.0)
-
-    

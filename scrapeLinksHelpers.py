@@ -5,6 +5,7 @@ import re
 import html
 import demoji
 from bs4 import BeautifulSoup
+from static.profanity_replacement import replaceProfanity
 
 MAX_COMMENTS = 8
 
@@ -44,7 +45,7 @@ def getAskRedditComments(output_file, url):
                 if (top_thread_body == '[removed]' or top_thread_body == '[deleted]'):
                     continue
                 with open(output_file, 'a', encoding='utf-8') as file:
-                    file.write(str(remove_emojis(top_thread_body).replace("\n", " ")) + "\n\n")
+                    file.write(replaceProfanity(str(remove_emojis(top_thread_body).replace("\n", " ")) + "\n\n"))
 
             i += 1
             if (i >= MAX_COMMENTS):
