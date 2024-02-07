@@ -32,7 +32,7 @@ subreddits = {
     "legaladvice": 1, 
     "AmItheAsshole": 3, 
     "AITAH": 4,  
-    "askreddit": 4
+    "askreddit": 7
 }   
 
 def check_id(id_name):
@@ -120,7 +120,10 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
             with open(output_file, 'w', encoding='utf-8') as file:
                 replaceProfanity(entire_post)
                 file.write(entire_post)
-            return getAskRedditComments(output_file, url)
+            if getAskRedditComments(output_file, url):
+                subreddits[subreddit] -= 1
+                return True
+            return False
 
         # get all text into a variable
         p_elements = div_post.find_elements(By.TAG_NAME, "p")
