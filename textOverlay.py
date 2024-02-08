@@ -18,8 +18,8 @@ TIKTOK_QUEUE = []
 YOUTUBE_SHORTS_QUEUE = []
 
 def randomVideoSegment(output_video_filepath, duration, background="zachchoi"):
-    background_video_path = "static/backgroundVideos/zachchoicompilation.mp4"
-    total_duration_seconds = 60 * 60 # zachchoi
+    total_duration_seconds = 30 * 60
+    background_video_path = "static/backgroundVideos/minecraft/minecraft_parkour.mp4"
     if background == "minecraft":
         minecraft_times = [4*60+17, 4*60+58, 9*60+50, 7*60+4, 5*60+59, 6*60+53, 51*60+54]
         rand_background = random.randint(1, 7)
@@ -28,6 +28,11 @@ def randomVideoSegment(output_video_filepath, duration, background="zachchoi"):
     elif background == "bayashi":
         background_video_path = "static/backgroundVideos/bayashicompilation.mp4"
         total_duration_seconds = 63 * 60
+    elif background == "zachchoi":
+        zachchoi_times = [60*60, 57*60+10]
+        rand_background = random.randint(1, 3)
+        total_duration_seconds = zachchoi_times[rand_background - 1]
+        background_video_path = f"static/backgroundVideos/zachchoi/zachchoi{rand_background}.mp4"
 
     # dark_theme_subreddits = ["nosleep", "letsnotmeet", "glitch_in_the_matrix", "creepyencounters"]
     # if any(text.lower() in output_video_filepath.lower() for text in dark_theme_subreddits):
@@ -294,7 +299,8 @@ if __name__ == "__main__":
                 output_video_path = f"{post_path}/{post.split('.')[0]}.mp4"
                 duration = get_wav_length(wav_file_path)
                 title_duration = get_wav_length(wav_title_file_path)
-                randomVideoSegment(output_video_path, duration + title_duration, background="minecraft")
+                background = "minecraft" if subreddit == "askreddit" else "zachchoi"
+                randomVideoSegment(output_video_path, duration + title_duration, background)
     
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
