@@ -1,5 +1,4 @@
 import requests
-# import json
 import time
 import re
 import html
@@ -26,27 +25,29 @@ def getAskRedditComments(output_file, url):
         i = 0
         # top_comments = []
         for thread in data[1]["data"]["children"]:
-            thread_data = thread["data"]
-            if "body" in thread_data:
-                top_thread_body = html.unescape(thread_data["body"])
-                soup = BeautifulSoup(top_thread_body, 'html.parser')
-                top_thread_body = soup.get_text()
+            try:
+                thread_data = thread["data"]
+                if "body" in thread_data:
+                    top_thread_body = html.unescape(thread_data["body"])
+                    soup = BeautifulSoup(top_thread_body, 'html.parser')
+                    top_thread_body = soup.get_text()
 
-                pattern = re.compile(r'edit:', re.IGNORECASE)
-                match = pattern.search(top_thread_body)
-                if match:
-                    top_thread_body = top_thread_body[:match.start()]
-                pattern = re.compile(r'update:', re.IGNORECASE)
-                match = pattern.search(top_thread_body)
-                if match and (match.start() > (len(top_thread_body) / 4)):
-                    top_thread_body = top_thread_body[:match.start()]
+                    pattern = re.compile(r'edit:', re.IGNORECASE)
+                    match = pattern.search(top_thread_body)
+                    if match:
+                        top_thread_body = top_thread_body[:match.start()]
+                    pattern = re.compile(r'update:', re.IGNORECASE)
+                    match = pattern.search(top_thread_body)
+                    if match and (match.start() > (len(top_thread_body) / 4)):
+                        top_thread_body = top_thread_body[:match.start()]
 
-                # top_comments.append(remove_emojis(top_thread_body))
-                if (top_thread_body == '[removed]' or top_thread_body == '[deleted]'):
-                    continue
-                with open(output_file, 'a', encoding='utf-8') as file:
-                    file.write(replaceProfanity(str(remove_emojis(top_thread_body).replace("\n", " ")) + "\n\n"))
-
+                    # top_comments.append(remove_emojis(top_thread_body))
+                    if (top_thread_body == '[removed]' or top_thread_body == '[deleted]' or 'https' in top_thread_body):
+                        continue
+                    with open(output_file, 'a', encoding='utf-8') as file:
+                        file.write(replaceProfanity(str(remove_emojis(top_thread_body).replace("\n", " ")) + "\n\n"))
+            except:
+                print("Out of comments, moving on...")
             i += 1
             if (i >= MAX_COMMENTS):
                 break

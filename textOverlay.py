@@ -30,7 +30,7 @@ def randomVideoSegment(output_video_filepath, duration, background="zachchoi"):
         total_duration_seconds = 63 * 60
     elif background == "zachchoi":
         zachchoi_times = [60*60, 57*60+10]
-        rand_background = random.randint(1, 3)
+        rand_background = random.randint(1, 2)
         total_duration_seconds = zachchoi_times[rand_background - 1]
         background_video_path = f"static/backgroundVideos/zachchoi/zachchoi{rand_background}.mp4"
 
@@ -50,8 +50,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
     global INSTAGRAM_REELS_QUEUE
     global YOUTUBE_SHORTS_QUEUE
     global TIKTOK_QUEUE
-    text_colors = ['white', 'cyan', 'yellow', 'olive', 'magenta', 'lightseagreen', 
-            'antiquewhite', 'orange', 'pink', 'gold', 'lavender', 'purple']
+    text_colors = ['white', 'cyan', 'yellow', 'magenta']
     askreddit_comment_times = []
     if (postName.startswith("askreddit")):
         with open(f"{video_path.split('.')[0]}/comment_times.txt", 'r', encoding='utf-8') as comment_times:
@@ -163,7 +162,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
                         colorI += 1
                     else:
                         break
-                color = text_colors[colorI]
+                color = text_colors[colorI % 4]
             
             new_textclip, shadow_textclip = createTextClip(wrappedText, currentVidTime, duration, color)
             video_segments[partNum][0].append(shadow_textclip)
@@ -286,7 +285,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
 if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
-    # today = "2024-01-18"
+    # today = "2024-02-08"
     # today = "Custom"
     # today = "Test"
     folder_path = f"RedditPosts/{today}/Texts"
@@ -305,7 +304,7 @@ if __name__ == "__main__":
     for subreddit in os.listdir(folder_path):
         post_path = f"{folder_path}/{subreddit}"
         for post in os.listdir(post_path):
-            if post.endswith(".mp4"):# and post.startswith("AmItheAsshole2"):
+            if post.endswith(".mp4"):# and post.startswith("askreddit"):
                 wav_file_path = f"{post_path}/{post.split('.')[0]}.wav"
                 wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 mp4_file_path = f"{post_path}/{post}"

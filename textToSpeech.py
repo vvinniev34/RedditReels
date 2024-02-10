@@ -76,10 +76,11 @@ def convert(filename, folder_path):
                 
                 segment_files = []
                 total_time = []
-                cur_time = get_wav_length(output_title_file)
+                title_time = get_wav_length(output_title_file)
+                cur_time = 0
                 num_comments = 0
                 for line in file:
-                    if not line.isspace() and cur_time < max_video_time:
+                    if not line.isspace() and cur_time + title_time < max_video_time:
                         segment_file = f"{output_file.split('.')[0]}_seg{num_comments}.wav"
                         segment_synthesized = synth_speech(line.strip().replace("&", "and"), segment_file)
                         while not segment_synthesized:
@@ -88,10 +89,10 @@ def convert(filename, folder_path):
                             segment_synthesized = synth_speech(line.strip().replace("&", "and"), segment_file)
                         
                         new_segment_time = get_wav_length(segment_file)
-                        if cur_time + new_segment_time >= max_video_time and cur_time != 0:
+                        if cur_time + new_segment_time + title_time >= max_video_time and cur_time != 0:
                             os.remove(segment_file)
                             break
-                        elif cur_time + new_segment_time >= max_video_time and cur_time == 0:
+                        elif cur_time + new_segment_time + title_time >= max_video_time and cur_time == 0:
                             total_time.append((cur_time + (swoosh_transition_length + new_segment_time)))
                             segment_files.append(segment_file)
                             break
