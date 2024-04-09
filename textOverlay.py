@@ -108,6 +108,8 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
 
         # split segment into multiple if phrase is longer than 30 characters
         splitSegments = []
+        if segment['end'] > start_time + 30:
+            continue
         if len(abbreviationFixedText) <= 30:
             splitSegments.append([abbreviationFixedText, segment['end']])
         else:
@@ -130,7 +132,6 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         for split in splitSegments:
             text = split[0].strip()
             endTime = split[1]
-
             # wrappedText = splitTextForWrap(text.strip(), 15)
             wrappedText = text
             if len(wrappedText) == 0:
@@ -205,7 +206,7 @@ def overlayText(wav_file_path, wav_title_file_path, video_path, post_path, postN
         
         snipped_video = video_clip.subclip(start_time + title_duration, end_time + title_duration)
         snipped_audio = audio_clip.subclip(start_time, end_time)
-
+        
         title_video_with_text = snipped_title_video.set_audio(snipped_title_audio_clip)
         title_video_with_text = CompositeVideoClip([title_video_with_text] + part[0][:4])
 
@@ -308,6 +309,8 @@ if __name__ == "__main__":
                 wav_file_path = f"{post_path}/{post.split('.')[0]}.wav"
                 wav_title_file_path = f"{post_path}/{post.split('.')[0]}_title.wav"
                 mp4_file_path = f"{post_path}/{post}"
+                # if post != "AITAH2.mp4":
+                #     continue
                 overlayText(wav_file_path, wav_title_file_path, mp4_file_path, post_path, f"{post.split('.')[0]}")
     
     upload_queue_folder_path = f"RedditPosts/{today}/uploadQueue"

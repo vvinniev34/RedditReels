@@ -9,9 +9,9 @@ def replace_abbreviations(sentence):
     pattern_tifu2 = r'\bTIF(?:\s*,*\s*)you\b'
     
     modified_sentence = re.sub(pattern_aita1, 'AITA', sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_aita2, 'AITA', sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_aita3, 'AITA', sentence, flags=re.IGNORECASE)
-    modified_sentence = re.sub(pattern_aita4, 'AITA', sentence, flags=re.IGNORECASE)
+    modified_sentence = re.sub(pattern_aita2, 'AITA', modified_sentence, flags=re.IGNORECASE)
+    modified_sentence = re.sub(pattern_aita3, 'AITA', modified_sentence, flags=re.IGNORECASE)
+    modified_sentence = re.sub(pattern_aita4, 'AITA', modified_sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu1, 'TIFU', modified_sentence, flags=re.IGNORECASE)
     modified_sentence = re.sub(pattern_tifu2, 'TIFU', modified_sentence, flags=re.IGNORECASE)
 
@@ -25,7 +25,7 @@ def title_to_print(video_title):
               break
         else:
             words_until_10_chars += word + "_"
-    return words_until_10_chars[:-1].replace(':', '').replace('&', '')
+    return words_until_10_chars[:-1].replace(':', '').replace('&', '').replace('"', '')
 
 def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")

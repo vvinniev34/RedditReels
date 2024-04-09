@@ -4,17 +4,22 @@ import azure.cognitiveservices.speech as speechsdk
 
 load_dotenv()
 speech_key = os.environ.get('SPEECH_KEY')
+secondary_speech_key = os.environ.get('SPEECH_KEY_SECONDARY')
 speech_region = os.environ.get('SPEECH_REGION')
 
 speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
+# speech_config = speechsdk.SpeechConfig(subscription=secondary_speech_key, region=speech_region)
 
 # The language of the voice that speaks.
-speech_config.speech_synthesis_language = "en-US" 
-speech_config.speech_synthesis_voice_name='en-US-RyanMultilingualNeural'
+# speech_config.speech_synthesis_language = "en-US" 
+# speech_config.speech_synthesis_voice_name='en-US-RyanMultilingualNeural'
+# <voice name="en-US-SaraNeural">
+# <voice name="en-US-RyanMultilingualNeural">
 
 def synth_speech(text, output_file):
-    ssml_text = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+    ssml_text = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="en-US">
                     <voice name="en-US-RyanMultilingualNeural">
+                    <mstts:silence  type="Sentenceboundary" value="50ms"/>
                         <prosody pitch="-3.5%" rate="+25.0%" volume="+100.0%">
                             {text}
                         </prosody>

@@ -6,9 +6,9 @@ profanity = {
 	"whore": "tramp",
     "bastard": "scoundrel",
     "cock": "rod",
-	"ass": "butt",
+	# "ass": "butt",
     
-	"sex":"shenanigans"
+	# "sex":"shenanigans"
 }
 
 def replaceProfanity(text):

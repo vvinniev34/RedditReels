@@ -165,6 +165,7 @@ if __name__ == "__main__":
     today = date.today().strftime("%Y-%m-%d")
     # today = "2024-01-06"
     # today = "Custom"
+    # today = "Test"
     processed = ["askreddit"]
 
     folder_path = f"RedditPosts/{today}/Texts"
@@ -177,12 +178,12 @@ if __name__ == "__main__":
                 convert(filename, subreddit_path)
                 print(f"Processed {filename}")
                 
-    for subreddit in os.listdir(folder_path):
-        subreddit_path = f"{folder_path}/{subreddit}"
-        for filename in os.listdir(subreddit_path):
-            wav_file_path = f"{subreddit_path}/{filename}"
-            if filename.split('.')[-1] == "wav":# and subreddit in processed:
-                # speedup_audio(filename, subreddit_path)
-                print(f"Increased Volume of {wav_file_path}")
+    # for subreddit in os.listdir(folder_path):
+    #     subreddit_path = f"{folder_path}/{subreddit}"
+    #     for filename in os.listdir(subreddit_path):
+    #         wav_file_path = f"{subreddit_path}/{filename}"
+    #         if filename.split('.')[-1] == "wav":# and subreddit in processed:
+    #             # speedup_audio(filename, subreddit_path)
+    #             print(f"Increased Volume of {wav_file_path}")
 
                 

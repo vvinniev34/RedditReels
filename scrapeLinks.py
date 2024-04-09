@@ -26,13 +26,13 @@ subreddits = {
     "relationships": 1, 
     "relationship_advice": 2, 
     "confessions": 2, 
-    "TrueOffMyChest": 2, 
+    "TrueOffMyChest": 3, 
     "offmychest": 3,
     "tifu": 1, 
     "legaladvice": 1, 
-    "AmItheAsshole": 3, 
-    "AITAH": 4,  
-    "askreddit": 8
+    "AmItheAsshole": 8, 
+    "AITAH": 8,  
+    "askreddit": 4
 }   
 
 def check_id(id_name):
@@ -64,19 +64,19 @@ from selenium.webdriver.support import expected_conditions as EC
 def login():
     driver.get("https://www.reddit.com/login/")
     username_field = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, "loginUsername"))
+        EC.presence_of_element_located((By.ID, "login-username"))
     )
     password_field = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, "loginPassword"))
+        EC.presence_of_element_located((By.ID, "login-password"))
     )
     username_field.send_keys(reddit_username)
     password_field.send_keys(reddit_password)
-    login_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "AnimatedForm__submitButton"))
-    )
-    login_button.click()
+    # login_button = WebDriverWait(driver, 10).until(
+    #     EC.element_to_be_clickable((By.CLASS_NAME, "AnimatedForm__submitButton"))
+    # )
+    # login_button.click()
 
-    time.sleep(5)
+    time.sleep(10)
 
 def getContentLoggedIn(url, download_path, subreddit, number, custom):
     global subreddits
@@ -92,13 +92,18 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
     try:
         driver.get(url)
         driver.execute_script("return document.readyState")
+        time.sleep(1)
+
         div_post = ""
         contentClass = "_3xX726aBn29LDbsDtzr_6E"
-        div_post = driver.find_element(By.CLASS_NAME, contentClass)
-        title_element = driver.find_element(By.TAG_NAME, "title")
+        # div_post = driver.find_element(By.CLASS_NAME, contentClass)
+        div_post = driver.find_element(By.XPATH, "//div[starts-with(@id, 't3')]")
+
+        # title_element = driver.find_element(By.TAG_NAME, "title")
+        title_element = driver.find_element(By.XPATH, "//h1[starts-with(@id, 'post-title-t3')]")
 
         # title = title_element.get_attribute("text").split(':')[0].strip()
-        title = title_element.get_attribute("text").rsplit(':', 1)[0].strip()
+        title = title_element.text.rsplit(':', 1)[0].strip()
         if not title.endswith(('.', '!', '?', ';', ':')):
             title += '.'
 
@@ -148,7 +153,7 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
         # entire_post = title + '.\n' + completion.choices[0].message.content
         entire_post = remove_emojis(entire_post)
 
-        if len(entire_post) < 1000 or len(entire_post) > 4000:
+        if len(entire_post) < 900 or len(entire_post) > 2100:
             print(f"Post at {url} is too short or long with {len(entire_post)} characters, skipping...")
             return False
 
