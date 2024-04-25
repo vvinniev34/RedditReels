@@ -11,19 +11,14 @@ from selenium import webdriver
 from selenium.webdriver.edge.options import Options as EdgeOptions
 from datetime import date
 
+from webdriver_manager.chrome import ChromeDriverManager
+
 from dotenv import load_dotenv
 load_dotenv()
 reddit_username = os.environ.get('REDDIT_USERNAME')
 reddit_password = os.environ.get('REDDIT_PASSWORD')
-edge_driver_path = os.environ.get('EDGE_DRIVER_PATH')
 
-# Configure Edge WebDriver options
-edge_options = EdgeOptions()
-edge_options.use_chromium = True  # Use Chromium-based Edge
-edge_options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/95.0.1020.30 Safari/537.36")
-
-s = service.Service(executable_path=edge_driver_path)
-driver = webdriver.Edge(service=s)
+driver = webdriver.Chrome(ChromeDriverManager().install())
 
 # Function to scroll the page by a specified amount (in pixels)
 def scroll_page(by_pixels):

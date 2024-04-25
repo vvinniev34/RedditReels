@@ -11,15 +11,14 @@ import time
 import os
 import re
 
+from webdriver_manager.chrome import ChromeDriverManager
+
 from dotenv import load_dotenv
 load_dotenv()
 reddit_username = os.environ.get('REDDIT_USERNAME')
 reddit_password = os.environ.get('REDDIT_PASSWORD')
-edge_driver_path = os.environ.get('EDGE_DRIVER_PATH')
 
-# s=service.Service(r"/Users/joshuakim/Downloads/MicrosoftWebDriver.exe")
-s = service.Service(executable_path=edge_driver_path)
-driver = webdriver.Edge(service=s)
+driver = webdriver.Chrome(ChromeDriverManager().install())
 entire_post = ""
 
 subreddits = {
