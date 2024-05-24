@@ -7,6 +7,7 @@ pillow==9.5.0
 
 selenium_firefox==2.0.8
 selenium==4.0.0
+webdriver-manager
 bs4
 
 demoji

@@ -22,16 +22,16 @@ driver = webdriver.Chrome(ChromeDriverManager().install())
 entire_post = ""
 
 subreddits = {
-    "relationships": 1, 
-    "relationship_advice": 2, 
-    "confessions": 2, 
-    "TrueOffMyChest": 3, 
-    "offmychest": 3,
-    "tifu": 1, 
+    "relationships": 3, 
+    "relationship_advice": 3, 
+    "confessions": 3, 
+    "TrueOffMyChest": 5, 
+    "offmychest": 5,
+    "tifu": 4, 
     "legaladvice": 1, 
     "AmItheAsshole": 8, 
     "AITAH": 8,  
-    "askreddit": 4
+    "askreddit": 3
 }   
 
 def check_id(id_name):
@@ -140,6 +140,10 @@ def getContentLoggedIn(url, download_path, subreddit, number, custom):
         if match:
             entire_post = entire_post[:match.start()]
         pattern = re.compile(r'update:', re.IGNORECASE)
+        match = pattern.search(entire_post)
+        if match and (match.start() > (len(entire_post) / 4)):
+            entire_post = entire_post[:match.start()]
+        pattern = re.compile(r'update post:', re.IGNORECASE)
         match = pattern.search(entire_post)
         if match and (match.start() > (len(entire_post) / 4)):
             entire_post = entire_post[:match.start()]

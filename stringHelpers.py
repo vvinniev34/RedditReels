@@ -25,7 +25,7 @@ def title_to_print(video_title):
               break
         else:
             words_until_10_chars += word + "_"
-    return words_until_10_chars[:-1].replace(':', '').replace('&', '').replace('"', '')
+    return words_until_10_chars[:-1].replace(':', '').replace('&', '').replace('"', '').replace('/', '')
 
 def splitTextForWrap(input_str: str, line_length: int):
     words = input_str.split(" ")
